@@ -159,10 +159,22 @@ public class AppMenu{
                     do {
                         afficherMenu("Accès Admin", admin);
                         System.out.print("Votre choix : ");
+                        System.out.println("choix 1");
 
-                        while (!scanner.hasNextInt()) {
+                        /*while (!scanner.hasNextInt()) {
                             System.out.println("❌ Veuillez entrer un nombre valide.");
                             scanner.next();
+                            System.out.print("Votre choix : ");
+                        }*/
+
+                        while (!scanner.hasNextInt()) {
+                            if (!scanner.hasNext()) {
+                                //System.out.println("❌ Pas d'entrée disponible, fin du programme.");
+                                break;
+                            }
+                            System.out.println("❌ Veuillez entrer un nombre valide.");
+                            scanner.next();
+                            System.out.println("on est ligne 176");
                             System.out.print("Votre choix : ");
                         }
 
@@ -577,7 +589,7 @@ public class AppMenu{
     }
 
     public static void modifierQte(){
-        // Cette fonction sert à modifier la qte d'un livre dans la BD
+        // Cette fonction sert à modifier la qte d'un livre dans un magasin
         List<String> lstRep = new ArrayList<>();
         Magasin mag = demanderMagasin("Dans quel magasin voulez vous modifier la quantité ?");
         Livre livre = demanderLivreExistant("Quel livre voulez vous modifier ?", mag);
@@ -586,6 +598,7 @@ public class AppMenu{
         Scanner scanner = new Scanner(System.in);
         int nouvelleQte = scanner.nextInt();
         Connection connexion = ConnectionBD.getConnection();
+        
         
     }
 
@@ -632,7 +645,7 @@ public class AppMenu{
     }
 
     public static void estDisponible(){
-        // Cette fonction sert à savoir si un livre est disponible
+        // Cette fonction sert à savoir si un livre est disponible dans un magasin
         String aff = "Veuillez entrer un livre";
         List<String> lstRep = new ArrayList<>();
         lstRep.add(aff);

@@ -61,7 +61,7 @@ public class MagasinBD {
 		try {
 			String req = "Select MAX(idmag) max FROM Magasin";
 			PreparedStatement st = laConnexion.prepareStatement(req);
-			ResultSet rs = st.executeQuery(req);
+			ResultSet rs = st.executeQuery();
 			while(rs.next()){
                 int max = Integer.parseInt(rs.getString("max"))+1;
 				return String.valueOf(max);
@@ -90,7 +90,24 @@ public class MagasinBD {
         }
         return res;
     }
+    
+    
+    public void modifQteLivre(Magasin mag, Livre livre, int qte){
+        String req = "UPDATE POSSEDER SET qte = ? WHERE idmag = ? AND isbn = ?";
+        try {
+            PreparedStatement st = laConnexion.prepareStatement(req);
+            st.setInt(1, qte);
+            st.setString(2, mag.getIdmag());
+            st.setString(3, livre.getIsbn());
+            st.executeUpdate();
+            System.out.println("Quantité du livre mise à jour avec succès.");
+        } catch (SQLException e) {
+            System.err.println("Erreur lors de la mise à jour de la quantité du livre : " + e.getMessage());
+        }            
+    }
 }
+
+
 /*
     // liste livre du mag 
     // "select titre from livre where mag =" + magasin.nonmmag 
