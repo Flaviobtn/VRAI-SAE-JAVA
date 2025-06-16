@@ -119,25 +119,16 @@ public class LivreExpresss extends Application {
         ImageView imgLogo = new ImageView(this.lesImages.get(0));
         imgLogo.setFitWidth(400);
         imgLogo.setPreserveRatio(true);
-        
-        
-        Button admin = new Button("Administrateur");
-        Button vendeur = new Button("Vendeur");
-        Button client = new Button("Client");
 
-        TitledPane menu = new TitledPane();
-        menu.setText(null);
+
+        ComboBox<String> comboBox = new ComboBox<>();
+        comboBox.getItems().addAll("Administrateur", "Vendeur", "Client");
+        comboBox.setValue("Choisissez un rôle");
+
         HBox listBoutons = new HBox();
-        listBoutons.getChildren().add(admin);
-        listBoutons.getChildren().add(vendeur);
-        listBoutons.getChildren().add(client);
-        menu.setContent(listBoutons);
-
-        menu.setCollapsible(false);
-        menu.setContent(admin);
-        panelCentral.getChildren().addAll(imgLogo,menu);
+        listBoutons.getChildren().add(comboBox);
+        panelCentral.getChildren().addAll(imgLogo);
     }
-
     /**
      * charge les images à afficher en fonction des erreurs
      * @param repertoire répertoire où se trouvent les images
