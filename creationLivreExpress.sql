@@ -48,6 +48,7 @@ CREATE TABLE CLIENT (
   idcli      int NOT NULL,
   nomcli     varchar(50),
   prenomcli  varchar(30),
+  identifiant varchar(50),
   adressecli varchar(100),
   codepostal varchar(5),
   motDePasse varchar(50),

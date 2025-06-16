@@ -1,0 +1,66 @@
+
+        if (lequel == 1){
+            System.out.println("Vous êtes un administrateur");
+            AdministrateurBD admin = new AdministrateurBD(connexion);
+            System.out.println("on passe dans le seconnecter");
+            try{
+                System.out.println("on passe dans le try");
+                if (admin.seconnecterAdmin(ident, mdp)){
+                    System.out.println("on passe dans le if");
+                    System.out.println("Connexion réussie en tant qu'administrateur.");
+                    lstRep = new ArrayList<>();
+                    lstRep.add("Content de vous revoir "+ ident);
+                    afficherMenu("Connection ", lstRep);
+                    return true;
+                }
+                else {
+                    System.out.println("on passe dans le else");
+                    System.out.println("Identifiant ou mot de passe incorrect.");
+                    return false;
+                }
+            }
+            catch (SQLException e){
+                System.out.println("on passe dans le catch");
+                System.err.println("Erreur de connexion : " + e.getMessage());
+            }
+        } else if (lequel == 2){
+            System.out.println("Vous êtes un vendeur");
+            VendeurBD vendeur = new VendeurBD(connexion);
+            try{
+                vendeur.seconnecterVendeur(ident, mdp);
+                System.out.println("Connexion réussie en tant que vendeur.");
+                lstRep = new ArrayList<>();
+                lstRep.add("Content de vous revoir "+ ident);
+                afficherMenu("Connection ", lstRep);
+                return true;
+            }
+            catch (SQLException e){
+                System.err.println("Erreur de connexion : " + e.getMessage());
+            }
+
+        } else if (lequel == 3){
+            System.out.println("Vous êtes un client");
+            ClientBD client = new ClientBD(connexion);
+            try{
+                client.seconnecterClient(ident, mdp);
+                System.out.println("Connexion réussie en tant que client.");
+                lstRep = new ArrayList<>();
+                lstRep.add("Content de vous revoir "+ ident);
+                afficherMenu("Connection ", lstRep);
+                return true;
+            }
+            catch (SQLException e){
+                System.err.println("Erreur de connexion : " + e.getMessage());
+            }
+
+        } else {
+            System.out.println("Erreur de connexion, veuillez réessayer");
+            return false;
+        }
+        /* 
+        il faudrat penser a creer une liste contenant tous les vendeurs/admin/clients existant 
+        pour voir s'il contient bien les informations rentrees
+        */
+        // si on arrive ici, c'est que la connexion a réussi
+        return false;
+        
