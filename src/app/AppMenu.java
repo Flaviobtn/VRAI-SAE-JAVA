@@ -394,8 +394,7 @@ public class AppMenu{
         // deja pour l'id on recupere la liste des magasins existantes et on ajoute 1
         Connection connexion = ConnectionBD.getConnection();
         MagasinBD magasinBD = new MagasinBD(connexion);
-        List<Magasin> lstMag = magasinBD.getToutLesMagasins();
-        String idmag = String.valueOf(lstMag.size() + 1); // on genere un id de magasin
+        String idmag = magasinBD.genererId(); // on genere un id de magasin
         // le nom de la librairie
         String aff1 = "Quel est le nom de la librairie ?";
         lstRep.add(aff1);
@@ -408,9 +407,9 @@ public class AppMenu{
         lstRep.add(aff2);
         afficherMenu("Vous voulez ajouter une librairie ", lstRep);
         String villeMag = scanner.nextLine();
-
         Magasin mag = new Magasin(idmag, nomMag, villeMag);
         magasinBD.insertMagasin(mag);
+        scanner.close();
 
         
     }
