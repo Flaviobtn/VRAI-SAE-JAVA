@@ -1,0 +1,5 @@
+host=servinfo-maria
+port=3306
+database=DBbouton
+user=bouton
+password=bouton
