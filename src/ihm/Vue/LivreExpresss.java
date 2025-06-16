@@ -120,7 +120,21 @@ public class LivreExpresss extends Application {
         imgLogo.setFitWidth(400);
         imgLogo.setPreserveRatio(true);
         
+        
+        Button admin = new Button("Administrateur");
+        Button vendeur = new Button("Vendeur");
+        Button client = new Button("Client");
+
         TitledPane menu = new TitledPane();
+        menu.setText(null);
+        HBox listBoutons = new HBox();
+        listBoutons.getChildren().add(admin);
+        listBoutons.getChildren().add(vendeur);
+        listBoutons.getChildren().add(client);
+        menu.setContent(listBoutons);
+
+        menu.setCollapsible(false);
+        menu.setContent(admin);
         panelCentral.getChildren().addAll(imgLogo,menu);
     }
 

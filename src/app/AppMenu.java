@@ -578,10 +578,57 @@ public class AppMenu{
 
     public static void modifierQte(){
         // Cette fonction sert à modifier la qte d'un livre dans la BD
-        String aff = "De quel livre voulez vous modifier la quantité ?";
         List<String> lstRep = new ArrayList<>();
-        lstRep.add(aff);
-        afficherMenu("Quantité d'un livre ", lstRep);
+        Magasin mag = demanderMagasin("Dans quel magasin voulez vous modifier la quantité ?");
+        Livre livre = demanderLivreExistant("Quel livre voulez vous modifier ?", mag);
+        lstRep.add("Quelle est la nouvelle quantité pour le livre " + livre.getTitre() + " ?");
+        afficherMenu("De quel livre voulez vous modifier la quantité ? ", lstRep);
+        Scanner scanner = new Scanner(System.in);
+        int nouvelleQte = scanner.nextInt();
+        Connection connexion = ConnectionBD.getConnection();
+        
+    }
+
+    public static Livre demanderLivreExistant(String question, Magasin mag){
+        // on récupère la liste des livres existants
+        Connection connexion = ConnectionBD.getConnection();
+        LivreBD livreBD = new LivreBD(connexion);
+        List<Livre> lstLivres = new ArrayList<>();
+        lstLivres = livreBD.getTousLesLivres(mag);
+        Scanner scanner = new Scanner(System.in);
+        Livre livre = null;
+        boolean correct = false;
+        while (! correct){ 
+            List<String> lstRep = new ArrayList<>();
+            for (Livre liv : lstLivres){
+                lstRep.add(liv.getTitre());
+            }
+            lstRep.add("QUITTER");
+            afficherMenu(question, lstRep);
+
+            int choix = scanner.nextInt();
+            if (choix == lstRep.size()){
+                lstRep = new ArrayList<>();
+                lstRep.add("Vous quittez " );
+                afficherMenu(question,lstRep);
+                correct = true;
+            }
+            else{
+                if (choix-1 < lstRep.size()){
+                    livre = lstLivres.get(choix-1);
+                    lstRep = new ArrayList<>();
+                    lstRep.add("Vous avez choisi le livre : "+ livre.getTitre());
+                    afficherMenu(question,lstRep);
+                    correct = true;
+                }
+                else {
+                    lstRep = new ArrayList<>();
+                    lstRep.add("Veuillez choisir un livre correct ");
+                    afficherMenu(question,lstRep);
+                }
+            }
+        }
+        return livre;
     }
 
     public static void estDisponible(){
