@@ -389,10 +389,30 @@ public class AppMenu{
 
     public static void ajouterLibrairie(){
         // Cette fonction sert à ajouter une nouvelle librairie au réseau
-        String aff = "vous avez créé une librairie";
+        Scanner scanner = new Scanner(System.in);
         List<String> lstRep = new ArrayList<>();
-        lstRep.add(aff);
+        // deja pour l'id on recupere la liste des magasins existantes et on ajoute 1
+        Connection connexion = ConnectionBD.getConnection();
+        MagasinBD magasinBD = new MagasinBD(connexion);
+        List<Magasin> lstMag = magasinBD.getToutLesMagasins();
+        String idmag = String.valueOf(lstMag.size() + 1); // on genere un id de magasin
+        // le nom de la librairie
+        String aff1 = "Quel est le nom de la librairie ?";
+        lstRep.add(aff1);
         afficherMenu("Vous voulez ajouter une librairie ", lstRep);
+        String nomMag = scanner.nextLine();
+
+        // la ville de la librairie
+        lstRep = new ArrayList<>();
+        String aff2 = "Quelle est la ville de la librairie ?";
+        lstRep.add(aff2);
+        afficherMenu("Vous voulez ajouter une librairie ", lstRep);
+        String villeMag = scanner.nextLine();
+
+        Magasin mag = new Magasin(idmag, nomMag, villeMag);
+        magasinBD.insertMagasin(mag);
+
+        
     }
 
     public static void gererLesStocks(){
