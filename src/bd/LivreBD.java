@@ -1,14 +1,67 @@
 package bd;
 
 import Modele.*;
-import java.util.*;
 import java.sql.*;
+import java.util.*;
 
 public class LivreBD {
     private Connection laConnexion;
 
     public LivreBD(Connection laConnection) {
         this.laConnexion = laConnection;
+    }
+
+    public List<Livre> getTousLesLivres(){
+        List<Livre> livres = new ArrayList<>();
+        try {
+            String req = "SELECT * FROM livre";
+            PreparedStatement st = laConnexion.prepareStatement(req);
+            ResultSet rs = st.executeQuery();
+            while (rs.next()) {
+                //on recuper l'isbn
+                String isbn = rs.getString("isbn");
+                //on recupere le titre
+                String titre = rs.getString("titre");
+                //on recupere l'id de l'auteur puis toutes ses info
+                int idauteur = rs.getInt("idauteur");
+                //on recupere les info de l'auteur 
+                String reqAuteur = "SELECT * FROM auteur WHERE idauteur = ?";
+                PreparedStatement stAuteur = laConnexion.prepareStatement(reqAuteur);
+                ResultSet rsAuteur = stAuteur.executeQuery();
+                Auteur auteur = null;
+                while (rsAuteur.next()) {
+                    String nom = rsAuteur.getString("nomauteur");
+                    int anneeNais = rsAuteur.getInt("anneenais");
+                    int anneeDeces = rsAuteur.getInt("anneedeces");
+                    auteur = new Auteur(String.valueOf(idauteur), nom, anneeNais, anneeDeces);
+                }
+
+                // on recupere le nombre de pages
+                int nbpages = rs.getInt("nbpages");
+
+                //on recupere le prix
+                double prix = rs.getDouble("prix");
+
+                //on recupere la date de publication
+                int datepub = rs.getInt("datepubli");
+
+                // on recupere l'editeur
+                String reqEditeur = "SELECT * FROM editeur WHERE idediteur = ?";
+                PreparedStatement stEditeur = laConnexion.prepareStatement(reqEditeur);
+                ResultSet rsEditeur = stEditeur.executeQuery();
+                Editeur editeur = null;
+                while (rsEditeur.next()) {
+                    String nomEditeur = rsEditeur.getString("nom");
+                    editeur = new Editeur(nomEditeur);
+                }
+
+                
+                livres.add(new Livre(isbn, titre, auteur, datepub, nbpages, prix, editeur));
+            }
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+        }
+        return livres;       
     }
 /*
     public Livre getLivre(String id) throws SQLException{

@@ -1,9 +1,8 @@
 package app;
-import bd.*;
 import Modele.*;
-import java.util.*;
+import bd.*;
 import java.sql.*;
-import java.io.*;
+import java.util.*;
 
 public class AppMenu{
     public static void afficherMenu(String titre, List<String> options) {
@@ -298,6 +297,8 @@ public class AppMenu{
         scanner.close();
     }
 
+
+    // les fonctions d'administrateur
     public static void  creerVendeur(){
         Connection connexion = ConnectionBD.getConnection();
         Scanner scanner = new Scanner(System.in);
@@ -335,7 +336,6 @@ public class AppMenu{
         lstRep.add("Son mot de passe sera : " + mdp);
         afficherMenu("Le magasin du vendeur ", lstRep);
         
-        //Vendeur unVendeur = new Vendeur();
                 
     }
 
@@ -448,6 +448,8 @@ public class AppMenu{
         afficherMenu("Consultation statistique ", lstRep);
     }
 
+
+    // Les fonctions de vendeur
     public static void ajouterLivre(){
         // Cette fonction sert à ajouter un livre à la BD
         String aff = "Quel livre voulez vous ajouter ?";
@@ -494,11 +496,19 @@ public class AppMenu{
         afficherMenu("Commande de stock", lstRep);
     }
 
+
+    // les fonctions du client
     public static void accesBibli(){
         // Cette fonction sert à afficher tous les livres disponible d'un magasin
-        String aff = "Voici les livres disponible dans ce magasin :";
+        Magasin mag = demanderMagasin("Dans quel magasin voulez vous accéder à la bibliothèque ?");
+        List<Livre> lstLivres = new ArrayList<>();
+        Connection connexion = ConnectionBD.getConnection();
+        LivreBD livreBD = new LivreBD(connexion);
         List<String> lstRep = new ArrayList<>();
-        lstRep.add(aff);
+        lstLivres = livreBD.getTousLesLivres();
+        for (Livre livre : lstLivres) {
+            lstRep.add(livre.getTitre());
+        }
         afficherMenu("Accès bibliothèque ", lstRep);
     }
 
@@ -525,6 +535,9 @@ public class AppMenu{
         lstRep.add(aff);
         afficherMenu("Vos commande", lstRep);
     }
+
+    // autres fonctions ------------------------------------------
+
 
     public static boolean seconnecter(int lequel){
         Connection connexion = ConnectionBD.getConnection();
