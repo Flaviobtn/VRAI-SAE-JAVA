@@ -11,11 +11,12 @@ public class LivreBD {
         this.laConnexion = laConnection;
     }
 
-    public List<Livre> getTousLesLivres(){
+    public List<Livre> getTousLesLivres(Magasin mag){
         List<Livre> livres = new ArrayList<>();
         try {
-            String req = "SELECT * FROM livre";
+            String req = "SELECT * FROM livre WHERE idmagasin = ?";
             PreparedStatement st = laConnexion.prepareStatement(req);
+            st.setString(1, mag.getIdmag());
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
                 //on recuper l'isbn
@@ -62,6 +63,42 @@ public class LivreBD {
             System.err.println(e.getMessage());
         }
         return livres;       
+    }
+
+    public boolean ajouterLivre(Livre livre) {
+        try {
+            if (! livreExiste(livre.getIsbn())) {
+            String req = "INSERT INTO livre (isbn, titre, idauteur, nbpages, prix, datepubli, idmagasin) VALUES (?, ?, ?, ?, ?, ?)";
+            PreparedStatement st = laConnexion.prepareStatement(req);
+            st.setString(1, livre.getIsbn());
+            st.setString(2, livre.getTitre());
+            st.setInt(3, Integer.parseInt(livre.getAuteur().getIdAuteur()));
+            st.setInt(4, livre.getNbDePages());
+            st.setDouble(5, livre.getPrix());
+            st.setInt(6, livre.getDateparution());
+            st.executeUpdate();
+            System.out.println("Livre ajouté avec succès.");
+            return true;
+            } else {
+                System.out.println("Le livre existe déjà.");
+        }
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+        }
+        return false;
+    }
+
+    public boolean livreExiste(String isbn) {
+        try {
+            String req = "SELECT * FROM livre WHERE isbn = ?";
+            PreparedStatement st = laConnexion.prepareStatement(req);
+            st.setString(1, isbn);
+            ResultSet rs = st.executeQuery();
+            return rs.next(); // Si un résultat est trouvé, le livre existe
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+        }
+        return false;
     }
 /*
     public Livre getLivre(String id) throws SQLException{

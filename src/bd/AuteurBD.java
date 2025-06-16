@@ -5,7 +5,7 @@ import java.util.*;
 
 public class AuteurBD{
     Connection laConnexion;
-	AuteurBD(Connection laConnexion){
+	public AuteurBD(Connection laConnexion){
 		this.laConnexion = laConnexion;
 	}
 
@@ -33,6 +33,26 @@ public class AuteurBD{
 			System.err.println(e.getMessage());
 		}
         return null;
+    }
+
+    public List<Auteur> getListeAuteurs() throws SQLException{
+        List<Auteur> auteurs = new ArrayList<>();
+        String req = "SELECT * FROM AUTEUR";
+        try {
+            PreparedStatement st = laConnexion.prepareStatement(req);
+            ResultSet rs = st.executeQuery(req);
+            while(rs.next()){
+                String idauteur = rs.getString("idauteur");
+                String nomprenomauteur = rs.getString("nomauteur");
+                int anneenais = rs.getInt("annenais");
+                int anneedeces = rs.getInt("anneedeces");
+                Auteur auteur = new Auteur(idauteur, nomprenomauteur, anneenais, anneedeces);
+                auteurs.add(auteur);
+            }
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+        }
+        return auteurs;
     }
 
     public List<Livre> getListeLivres(Auteur auteur){

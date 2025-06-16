@@ -298,7 +298,7 @@ public class AppMenu{
     }
 
 
-    // les fonctions d'administrateur
+    // les fonctions d'administrateur  ----------------------------------------------------------------------------------------------------------
     public static void  creerVendeur(){
         Connection connexion = ConnectionBD.getConnection();
         Scanner scanner = new Scanner(System.in);
@@ -449,13 +449,112 @@ public class AppMenu{
     }
 
 
-    // Les fonctions de vendeur
+    // Les fonctions de vendeur ----------------------------------------------------------------------------------------------------------
     public static void ajouterLivre(){
         // Cette fonction sert à ajouter un livre à la BD
-        String aff = "Quel livre voulez vous ajouter ?";
+        Livre livre = demanderLivre();
+        Connection connexion = ConnectionBD.getConnection();
+        LivreBD livreBD = new LivreBD(connexion);
+        livreBD.ajouterLivre(livre);
         List<String> lstRep = new ArrayList<>();
-        lstRep.add(aff);
+        lstRep.add("Le livre " + livre.getTitre() + " a été ajouté à la base de données.");
         afficherMenu("Ajout d'un livre ", lstRep);
+    }
+
+
+    public static Livre demanderLivre(){
+        // Cette fonction sert à demander les informations d'un livre
+        Scanner scanner = new Scanner(System.in);
+        String aff1 = "Veuillez entrer l'ISBN du livre";
+        String aff2 = "Veuillez entrer le titre du livre";
+        String aff6 = "Veuillez entrer le nombre de pages du livre";
+        String aff7 = "Veuillez entrer le prix du livre";
+        String aff8 = "Veuillez entrer la date de publication du livre";
+        String aff9 = "Veuillez entrer le nom de l'éditeur du livre";
+
+        List<String> lstRep = new ArrayList<>();
+        lstRep.add(aff1);
+        afficherMenu("Ajout d'un livre ", lstRep);
+        String isbn = scanner.nextLine();
+
+        lstRep = new ArrayList<>();
+        lstRep.add(aff2);
+        afficherMenu("Ajout d'un livre ", lstRep);
+        String titre = scanner.nextLine();
+
+        Auteur auteur = demanderAuteur("De quel auteur est ce livre ?");
+
+        lstRep = new ArrayList<>();
+        lstRep.add(aff6);
+        afficherMenu("Ajout d'un livre ", lstRep);
+        int nbPages = scanner.nextInt();
+
+        lstRep = new ArrayList<>();
+        lstRep.add(aff7);
+        afficherMenu("Ajout d'un livre ", lstRep);
+        double prix = scanner.nextDouble();
+
+        
+        lstRep = new ArrayList<>();
+        lstRep.add(aff8);
+        afficherMenu("Ajout d'un livre ", lstRep);
+        int dateParution = scanner.nextInt();
+
+        lstRep = new ArrayList<>();
+        lstRep.add(aff9);
+        afficherMenu("Ajout d'un livre ", lstRep);
+        String editeurNom = scanner.nextLine();
+        Editeur editeur = new Editeur(editeurNom);
+        Livre livre = new Livre(isbn, titre, auteur, dateParution, nbPages, prix, editeur);
+        return livre;
+    }
+
+    public static Auteur demanderAuteur(String question){
+        // Cette fonction sert à demander les informations d'un auteur
+        List<Auteur> lstAuteurs = new ArrayList<>();
+        Connection connexion = ConnectionBD.getConnection();
+        AuteurBD auteurBD = new AuteurBD(connexion);
+        try { 
+            lstAuteurs = auteurBD.getListeAuteurs();
+        }
+        catch (SQLException e) {
+            System.err.println("Erreur lors de la récupération des auteurs : " + e.getMessage());
+        }
+        Scanner scanner = new Scanner(System.in);
+        Auteur auteur = null;
+        boolean correct = false;
+        
+        while (! correct){ 
+            List<String> lstRep = new ArrayList<>();
+            for (Auteur aut : lstAuteurs){
+                lstRep.add(aut.getNom() + " " + aut.getPrenom());
+            }
+            lstRep.add("QUITTER");
+            afficherMenu(question, lstRep);
+
+            int choix = scanner.nextInt();
+            if (choix == lstRep.size()){
+                lstRep = new ArrayList<>();
+                lstRep.add("Vous quittez " );
+                afficherMenu(question,lstRep);
+                correct = true;
+            }
+            else{
+                if (choix-1 < lstRep.size()){
+                    auteur = lstAuteurs.get(choix-1);
+                    lstRep = new ArrayList<>();
+                    lstRep.add("Vous avez choisi l'auteur(trice) : "+ auteur.getNom() + " " + auteur.getPrenom() );
+                    afficherMenu(question,lstRep);
+                    correct = true;
+                }
+                else {
+                    lstRep = new ArrayList<>();
+                    lstRep.add("Veuillez choisir un(e) auteur(trice) correct ");
+                    afficherMenu(question,lstRep);
+                }
+            }
+        }
+        return auteur;
     }
 
     public static void modifierQte(){
@@ -497,7 +596,7 @@ public class AppMenu{
     }
 
 
-    // les fonctions du client
+    // les fonctions du client  ----------------------------------------------------------------------------------------------------------
     public static void accesBibli(){
         // Cette fonction sert à afficher tous les livres disponible d'un magasin
         Magasin mag = demanderMagasin("Dans quel magasin voulez vous accéder à la bibliothèque ?");
@@ -505,7 +604,7 @@ public class AppMenu{
         Connection connexion = ConnectionBD.getConnection();
         LivreBD livreBD = new LivreBD(connexion);
         List<String> lstRep = new ArrayList<>();
-        lstLivres = livreBD.getTousLesLivres();
+        lstLivres = livreBD.getTousLesLivres(mag);
         for (Livre livre : lstLivres) {
             lstRep.add(livre.getTitre());
         }
