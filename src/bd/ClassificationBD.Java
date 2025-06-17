@@ -1,2 +1,0 @@
-package bd;
-import Modele.*;

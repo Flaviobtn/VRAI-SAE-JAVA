@@ -1,5 +1,19 @@
 @echo off
-:: attention à l'emplacement de javafx
-javac --module-path "C:\Program Files\javafx-sdk-22\lib" --add-modules javafx.controls -d bin src\ihm\Vue\*.java
+:: Répertoire JavaFX
+set JAVAFX_PATH="C:\Program Files\javafx-sdk-22\lib"
 
-java --module-path "C:\Program Files\javafx-sdk-22\lib" --add-modules javafx.controls -cp bin ihm.Vue.LivreExpresss
+:: Nettoyer puis recréer le dossier bin
+if exist bin rd /s /q bin
+mkdir bin
+
+:: Compiler tous les fichiers .java dans src
+for /R src %%f in (*.java) do (
+    echo Compilation de %%f
+    javac --module-path %JAVAFX_PATH% --add-modules javafx.controls -d bin -cp src %%f
+)
+
+:: Exécuter la classe principale
+echo.
+echo Lancement de l'application...
+java --module-path %JAVAFX_PATH% --add-modules javafx.controls -cp bin ihm.Vue.LivreExpresss
+pause

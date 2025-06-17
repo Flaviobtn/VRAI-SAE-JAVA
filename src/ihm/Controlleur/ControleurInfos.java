@@ -1,3 +1,5 @@
+package ihm.Controlleur;
+import ihm.Vue.*;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 
@@ -6,12 +8,12 @@ import javafx.event.EventHandler;
  */
 public class ControleurInfos implements EventHandler<ActionEvent> {
 
-    private Pendu appliPendu;
+    private LivreExpresss appliPendu;
 
     /**
      * @param p vue du jeu
      */
-    public ControleurInfos(Pendu appliPendu) {
+    public ControleurInfos(/*LivreExpresss appliPendu*/) {
         this.appliPendu = appliPendu;
     }
 

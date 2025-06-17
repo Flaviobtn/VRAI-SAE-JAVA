@@ -8,7 +8,7 @@ import java.util.Optional;
 /**
  * Contrôleur à activer lorsque l'on clique sur le bouton Accueil
  */
-public class RetourAccueil implements EventHandler<ActionEvent> {
+public class AllerPanier implements EventHandler<ActionEvent> {
     /**
      * modèle du jeu
      */
@@ -23,7 +23,7 @@ public class RetourAccueil implements EventHandler<ActionEvent> {
      * @param modelePendu modèle du jeu
      * @param vuePendu vue du jeu
      */
-    public RetourAccueil(LivreExpresss vue) {
+    public AllerPanier(LivreExpresss vue) {
         // A implémenter
         this.vue=vue;
     }
@@ -36,7 +36,7 @@ public class RetourAccueil implements EventHandler<ActionEvent> {
     @Override
     public void handle(ActionEvent actionEvent) {
         // A implémenter
-        vue.modeAccueilC();
+        vue.modePanier();
         
     }
 }

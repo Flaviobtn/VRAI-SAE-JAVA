@@ -1,3 +1,5 @@
+package ihm.Controlleur;
+import ihm.Vue.*;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.RadioButton;
@@ -10,13 +12,13 @@ public class ControleurNiveau implements EventHandler<ActionEvent> {
     /**
      * modèle du jeu
      */
-    private MotMystere modelePendu;
+    
 
 
     /**
      * @param modelePendu modèle du jeu
      */
-    public ControleurNiveau(MotMystere modelePendu) {
+    public ControleurNiveau() {
         // A implémenter
     }
 
