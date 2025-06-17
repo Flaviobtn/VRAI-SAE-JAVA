@@ -5,6 +5,7 @@ import java.io.*;
 
 public class ConnectionBD {
     private static Connection connexion = null;
+
     public static Connection getConnection() {
         if (connexion != null) return connexion;
 
@@ -26,6 +27,7 @@ public class ConnectionBD {
 
         try {
             connexion = DriverManager.getConnection(url, user, password);
+            System.out.println("Connecté à la base de données");
             return connexion;
         } catch (SQLException e) {
             System.out.println("Erreur lors de la connexion à la base de données : " + e.getMessage());
