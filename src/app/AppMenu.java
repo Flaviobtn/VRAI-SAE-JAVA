@@ -538,9 +538,7 @@ public class AppMenu{
 
     switch(rep){
         case 1 -> {
-            System.out.println("Chiffre d'affaire total par année : ");
-            MagasinBD magasinBD = new MagasinBD(ConnectionBD.getConnection());
-            //magasinBD.chiffreAffaireParAnnee(mag);
+            chiffreAffaire(mag);
         }
         case 2 -> {
             System.out.println("Le livre le plus vendu : ");
@@ -566,6 +564,15 @@ public class AppMenu{
     }
 }
 
+    public static void chiffreAffaire(Magasin mag){
+        // Cette fonction sert à afficher le chiffre d'affaire d'un magasin
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Veuillez entrer l'année pour laquelle vous voulez le chiffre d'affaire : ");
+        int annee = scanner.nextInt();
+        MagasinBD magasinBD = new MagasinBD(ConnectionBD.getConnection());
+        double chiffreAffaire = magasinBD.chiffreAffaire(mag, annee);
+        System.out.println("Le chiffre d'affaire du magasin " + mag.getNomMag() + " pour l'année " + annee + " est de : " + chiffreAffaire + " €");
+    }
 
     // Les fonctions de vendeur ----------------------------------------------------------------------------------------------------------
     

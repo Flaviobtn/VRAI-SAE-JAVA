@@ -58,6 +58,26 @@ public class MagasinBD {
 		}
     }
 
+    public double chiffreAffaire(Magasin mag, int annee){
+        double chiffreAffaire = 0.0;
+        String req = "SELECT SUM(dc.prixvente * dc.qte) AS chiffre FROM COMMANDE c " +
+                     "JOIN DETAILCOMMANDE dc ON c.numcom = dc.numcom " +
+                     "WHERE c.idmag = ? AND YEAR(c.datecom) = ?";
+        try {
+            PreparedStatement st = laConnexion.prepareStatement(req);
+            st.setString(1, mag.getIdmag());
+            st.setInt(2, annee);
+            ResultSet rs = st.executeQuery();
+            if (rs.next()) {
+                chiffreAffaire = rs.getDouble("chiffre");
+            }
+            rs.close();
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+        }
+        return chiffreAffaire;
+    }
+
     public String genererId(){
 		try {
 			String req = "Select MAX(idmag) max FROM MAGASIN";

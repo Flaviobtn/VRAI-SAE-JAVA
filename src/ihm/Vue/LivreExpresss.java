@@ -1,5 +1,6 @@
 package ihm.Vue;
 import ihm.Controlleur.*;
+import bd.*;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.text.Font;
@@ -14,7 +15,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.control.ButtonBar.ButtonData ;
-
+import java.sql.*;
 import java.util.*;
 import javax.swing.border.TitledBorder;
 import java.io.File;
@@ -25,9 +26,9 @@ import java.io.File;
  */
 public class LivreExpresss extends Application {
     /**
-     * modèle du jeu
-     **/
-   
+     * connection à la base de données
+     */
+    private Connection connection;
     /**
      * Liste qui contient les images du jeu
      */
@@ -35,14 +36,17 @@ public class LivreExpresss extends Application {
     /**
      * Liste qui contient les noms des niveaux
      */    
-    public List<String> roles;
+    private List<String> roles;
 
     // les différents contrôles qui seront mis à jour ou consultés pour l'affichage
     
     /**
      * le text qui indique l'utilisateur
      */
-    public Text lUtilisateur;
+    private Text lUtilisateur;
+    
+    private String identifiant;
+    private String motdepasse;
     
     /**
      * le panel Central qui pourra être modifié selon le mode (accueil ou jeu)
@@ -82,6 +86,7 @@ public class LivreExpresss extends Application {
         this.bDeconnexion= new Button();
         this.bPanier= new Button();
         this.boutonProfil= new Button();
+        this.connection = ConnectionBD.getConnection();
 
         // A terminer d'implementer
     }
@@ -95,7 +100,7 @@ public class LivreExpresss extends Application {
         fenetre.setTop(this.banniere);
         fenetre.setLeft(this.gauche);
         fenetre.setCenter(this.panelCentral);
-        return new Scene(fenetre, 1920, 1080, Color.WHITE);
+        return new Scene(fenetre, 1920, 1000, Color.WHITE);
     }
 
 
@@ -158,7 +163,7 @@ public class LivreExpresss extends Application {
 
         // Bouton de connexion
         Button choix = new Button("CONNEXION");
-        choix.setOnAction(new ControleurConnexion(this));
+        choix.setOnAction(new ControleurConnexion(this,this.lUtilisateur, new ClientBD(connection), new VendeurBD(connection), new AdministrateurBD(connection)));
         choix.setMinWidth(200);
         choix.setMinHeight(100);
         choix.setFont(Font.font("Arial", 15));
@@ -180,11 +185,18 @@ public class LivreExpresss extends Application {
         // Conteneur pour le combobox et la Connexion
         VBox choixContainer = new VBox();
         choixContainer.setAlignment(Pos.CENTER);
-        this.lUtilisateur = new Text(comboBox.getValue());
         // L'écart important vient de cette ligne :
         choixContainer.setSpacing(100); // <-- Cette valeur crée un grand espace vertical entre les éléments du VBox
         choixContainer.getChildren().addAll(comboBox, choix);
         choixContainer.setPadding(new Insets(100, 0, 0, 250));
+
+        // Crée l'objet Text et ajoute un listener pour suivre la sélection
+        this.lUtilisateur = new Text(""); // ou comboBox.getValue() si tu veux la valeur initiale
+        comboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null && !newValue.equals("Choix de l'utilisateur")) {
+                this.lUtilisateur.setText(newValue);
+            }
+        });
 
         // Ajout des éléments au panel central
         centerPanel.getChildren().addAll(titleContainer, choixContainer);
@@ -256,7 +268,7 @@ public class LivreExpresss extends Application {
         // Bouton de connexion et d'inscription
         HBox loginContainer = new HBox();
         Button inscription = new Button("INSCRIPTION");
-        inscription.setOnAction(new ControleurConnexion(this));
+        inscription.setOnAction(new ControleurConnexion(this, this.lUtilisateur, new ClientBD(connection), new VendeurBD(connection), new AdministrateurBD(connection)));
         inscription.setMinWidth(200);
         inscription.setMinHeight(100);
         inscription.setFont(Font.font("Arial", 15));
@@ -264,7 +276,7 @@ public class LivreExpresss extends Application {
                              "-fx-border-color: #2c2c2c; -fx-border-width: 2; " +
                              "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;");
         Button connexion = new Button("SE CONNECTER");
-        connexion.setOnAction(new ControleurConnexion(this));
+        connexion.setOnAction(new ControleurConnexion(this, this.lUtilisateur, new ClientBD(connection), new VendeurBD(connection), new AdministrateurBD(connection)));
         connexion.setMinWidth(200);
         connexion.setMinHeight(100);
         connexion.setFont(Font.font("Arial", 15));
@@ -312,6 +324,8 @@ public class LivreExpresss extends Application {
         this.panelCentral = new BorderPane();
         this.panelCentral.getChildren().add(centerPanel);
         this.gauche.getChildren().add(imgG);
+        this.identifiant = Fidentifiant.getText();
+        this.motdepasse = Fmotdepasse.getText();
     }
 
     private void fenetreInscription(){
@@ -537,18 +551,23 @@ public class LivreExpresss extends Application {
     this.lesImages.add(new Image(file8.toURI().toString()));
 }
 
-    public void modeChoix(){
+    public String modeChoix(){
         fenetreChoix();
         fenetre.setTop(this.banniere);
         fenetre.setLeft(this.gauche);
         fenetre.setCenter(this.panelCentral);
+        return this.lUtilisateur.getText();
     }
     
-    public void modeConnexion(){
+    public List<String> modeConnexion(){
         fenetreConnexion();
         fenetre.setTop(this.banniere);
         fenetre.setLeft(this.gauche);
         fenetre.setCenter(this.panelCentral);
+        List<String> login = new ArrayList<>();
+        login.add(this.identifiant);
+        login.add(this.motdepasse);
+        return login;
     }
     
     public void modeInscription(){
