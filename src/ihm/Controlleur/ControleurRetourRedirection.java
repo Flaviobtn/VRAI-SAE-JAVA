@@ -2,13 +2,14 @@ package ihm.Controlleur;
 import ihm.Vue.*;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import java.util.Optional;
 
 /**
  * Contrôleur à activer lorsque l'on clique sur le bouton Accueil
  */
-public class RetourAccueil implements EventHandler<ActionEvent> {
+public class ControleurRetourRedirection implements EventHandler<ActionEvent> {
     /**
      * modèle du jeu
      */
@@ -23,7 +24,7 @@ public class RetourAccueil implements EventHandler<ActionEvent> {
      * @param modelePendu modèle du jeu
      * @param vuePendu vue du jeu
      */
-    public RetourAccueil(LivreExpresss vue) {
+    public ControleurRetourRedirection(LivreExpresss vue) {
         // A implémenter
         this.vue=vue;
     }
@@ -35,8 +36,21 @@ public class RetourAccueil implements EventHandler<ActionEvent> {
      */
     @Override
     public void handle(ActionEvent actionEvent) {
-        // A implémenter
-        vue.modeAccueilC();
-        
+        Button button = (Button) actionEvent.getTarget();
+        Object data = button.getUserData();
+        if(data.equals("MAISON")) {
+            vue.modeAccueilC();
+        } if(data.equals("PROFIL")) {
+            vue.modeProfil();
+        } if(data.equals("PANIER")) {
+            vue.modePanier();
+        } if(data.equals("DECONNEXION")) {
+            vue.modeChoix();
+        } if(data.equals("INSCRIPTION")){
+            vue.modeInscription();
+        }
+        if(data.equals("CONNEXION")){
+            vue.modeConnexion();
+        }
     }
 }
