@@ -22,4 +22,8 @@ public abstract class Personne{
         return prenom;
     }
 
+    @Override
+    public String toString() {
+        return "Vous êtes : " + this.prenom + " " + this.nom;
+    }
 }

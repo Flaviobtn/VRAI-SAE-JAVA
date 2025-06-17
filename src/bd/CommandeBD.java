@@ -37,6 +37,7 @@ public class CommandeBD {
 				ClientBD cliBD = new ClientBD(laConnexion);
                 Commande commande = new Commande(numcom, datecom, enligne, mode,  magBD.getMagasin(idmag), cliBD.getClient(idcli));
 				// faire detailCommande pour finir
+				
 			}
 		}
 		catch(SQLException e){

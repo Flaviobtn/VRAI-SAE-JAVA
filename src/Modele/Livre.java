@@ -6,17 +6,17 @@ import java.util.List;
 public class Livre{
     private String isbn;
     private String titre;
-    private Auteur auteurs;
-    private int nbDePages;
-    private double prix;
-    private int dateParution;
-    private Editeur editeur;
+    private List<Auteur> auteurs;
+    private Integer nbDePages;
+    private Double prix;
+    private Integer dateParution;
+    private List<Editeur> editeurs;
     private List<Classification> themes;
 
     public String getTitre() {
         return titre;
     }
-    public Auteur getAuteur() {
+    public List<Auteur> getAuteur() {
         return auteurs;
     }
 
@@ -29,22 +29,31 @@ public class Livre{
     public List<Classification> getThemes() {
         return themes;
     }
-    public Editeur getEditeur() {
-        return editeur;
+    public List<Editeur> getEditeur() {
+        return editeurs;
     }
 
     public String getIsbn() {
         return isbn;
     }   
-
-    public Livre(String isbn,String titre, Auteur auteurs,int dateParution, int nbDePages, double prix, Editeur editeur) {
+    public Livre(){
+        this.isbn = null;
+        this.titre = null;
+        this.auteurs = null;
+        this.dateParution = null;
+        this.nbDePages = null;
+        this.prix = null;
+        this.editeurs = null;
+        this.themes = null;
+    }
+    public Livre(String isbn,String titre, List<Auteur> auteurs,int dateParution, int nbDePages, double prix, List<Editeur> editeurs) {
         this.isbn = isbn;
         this.titre = titre;
         this.auteurs = auteurs;
         this.dateParution = dateParution;
         this.nbDePages = nbDePages;
         this.prix = prix;
-        this.editeur = editeur;
+        this.editeurs = editeurs;
         this.themes = new ArrayList<>();
     }
 
@@ -55,7 +64,40 @@ public class Livre{
     public int getDateparution(){
         return this.dateParution;
     }
-    public void setAuteurs(Auteur auteurs) {
+    public void setAuteurs(List<Auteur> auteurs) {
         this.auteurs = auteurs;
     }
+
+    public void ajouterAuteur(Auteur auteur){
+        this.auteurs.add(auteur);
+    }
+
+    public void ajouterEditeur(Editeur editeur){
+        this.editeurs.add(editeur);
+    }
+    public void setEditeurs(List<Editeur> editeurs) {
+        this.editeurs = editeurs;
+    }
+    public void setThemes(List<Classification> themes) {
+        this.themes = themes;
+    }
+    public void setIsbn(String isbn) {
+        this.isbn = isbn;
+    }
+    public void setTitre(String titre) {
+        this.titre = titre;
+    }
+    public void setNbDePages(Integer nbDePages) {
+        this.nbDePages = nbDePages;
+    }
+    public void setPrix(Double prix) {
+        this.prix = prix;
+    }
+    public void setDateParution(Integer dateParution) {
+        this.dateParution = dateParution;
+    }
+
+    
+
+    
 }

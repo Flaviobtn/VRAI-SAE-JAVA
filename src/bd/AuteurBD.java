@@ -13,7 +13,7 @@ public class AuteurBD{
         String req = "SELECT * FROM AUTEUR WHERE idauteur = ?";
         PreparedStatement st=laConnexion.prepareStatement(req);
         st.setString(1, id);
-        ResultSet rs = st.executeQuery(req);
+        ResultSet rs = st.executeQuery();
         try{
             while(rs.next()){
                 // idauteur -> String
@@ -21,7 +21,7 @@ public class AuteurBD{
                 // nomauteur  -> String
                 String nomprenomauteur = rs.getString("nomauteur");
                 // anneenais -> int
-                int anneenais = rs.getInt("annenais");
+                int anneenais = rs.getInt("anneenais");
                 // anneedeces -> int 
                 int anneedeces = rs.getInt("anneedeces");
                 // Creation de l'auteur
@@ -40,7 +40,7 @@ public class AuteurBD{
         String req = "SELECT * FROM AUTEUR";
         try {
             PreparedStatement st = laConnexion.prepareStatement(req);
-            ResultSet rs = st.executeQuery(req);
+            ResultSet rs = st.executeQuery();
             while(rs.next()){
                 String idauteur = rs.getString("idauteur");
                 String nomprenomauteur = rs.getString("nomauteur");
@@ -55,16 +55,16 @@ public class AuteurBD{
         return auteurs;
     }
 
-    public List<Livre> getListeLivres(Auteur auteur){
+   public List<Livre> getListeLivres(Auteur auteur){
         List<Livre> livres = new ArrayList<>();
         try{
             String req = "SELECT * FROM ECRIR WHERE idauteur = ?";
             PreparedStatement st=laConnexion.prepareStatement(req);
             st.setString(1, auteur.getIdAuteur());
-            ResultSet rs = st.executeQuery(req);
+            ResultSet rs = st.executeQuery();
             while(rs.next()){
-                getAuteur(rs.getString("idauteur"));
-                Auteur aut = getAuteur(rs.getString("idauteur"));
+                //getAuteur(rs.getString("idauteur"));
+                //Auteur aut = getAuteur(rs.getString("idauteur"));
                 
                 return livres;
             }
@@ -82,6 +82,7 @@ public class AuteurBD{
             st.setString(2,aut.getNom());
             st.setInt(3,aut.getAnneeNais());
             st.setInt(4,aut.getAnneeDeces());
+            st.executeUpdate();
         } catch (Exception e) {
             System.err.println("Le programme retourn l'erreur suivante: "+ e.getMessage());
         }
@@ -92,7 +93,7 @@ public class AuteurBD{
         try {
 			String req = "SELECT MAX(CAST(SUBSTRING(idauteur, 3, LENGTH(code) - 3) AS UNSIGNED)) AS max FROM AUTEUR WHERE code LIKE 'OL%A'";
 			PreparedStatement st = laConnexion.prepareStatement(req);
-			ResultSet rs = st.executeQuery(req);
+			ResultSet rs = st.executeQuery();
 			while(rs.next()){
 				int max =  rs.getInt("max")+1;
                 return "OL"+max+"A";
@@ -104,6 +105,22 @@ public class AuteurBD{
 		return null;
     }
 
+    public void livreDunAuteur(Auteur auteur){
+        try {
+			String req = "SELECT * from ECRIRE WHERE idauteur = ?";
+			PreparedStatement st = laConnexion.prepareStatement(req);
+			ResultSet rs = st.executeQuery();
+			while(rs.next()){
+                LivreBD livreBD = new LivreBD(laConnexion);
+				Livre livre = livreBD.getLivre(rs.getString("isbn"));
+                livre.ajouterAuteur(auteur);
+                auteur.ajouterLivreEcrit(livre);
+			}
+			rs.close();
+		} catch (SQLException e) {
+			System.err.println(e.getMessage());
+		}
+    }
 
 	/*
     public String getIdAuteur(String nomprenom) throws SQLException {

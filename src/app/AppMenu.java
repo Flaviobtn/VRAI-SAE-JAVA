@@ -5,7 +5,9 @@ import java.sql.*;
 import java.util.*;
 
 public class AppMenu{
+    private static Personne personneConnectee = null; // pour savoir qui est connecté
     public static void afficherMenu(String titre, List<String> options) {
+        
         //clear();
         // Déterminer la largeur maximale
         int largeur = titre.length();
@@ -41,7 +43,7 @@ public class AppMenu{
 }
     
     public static void main(String[] args) {
-        Connection connexion = ConnectionBD.getConnection();
+        Connection connection = ConnectionBD.getConnection();
         Scanner scanner = new Scanner(System.in);
         List<String> mainapp = List.of(
             "Administrateur",
@@ -52,7 +54,8 @@ public class AppMenu{
 
         List<String> connect = List.of(
             "Se connecter",
-            "S'inscrire"
+            "S'inscrire",
+            "Annuler"
         );
 
         List<String> client = List.of(
@@ -60,15 +63,18 @@ public class AppMenu{
             "Recommandation",
             "Passer Commande",
             "Voir mes Commandes",
+            "Profil",
             "Retour"
         );
 
         List<String> vendeur = List.of(
             "Ajouter livre ",
+            "Supprimer livre",
             "Modifier Quantité Livre",
             "Vérifier Disponibilité",
             "Commander du stock",
             "Transférer un livre",
+            "Profil",
             "Quitter"
         );
 
@@ -77,6 +83,7 @@ public class AppMenu{
             "Ajouter une nouvelle librairie",
             "Gérer les stocks globaux", //doit ouvrir un autre menu
             "Consulter les statistiques de vente",
+            "Profil",
             "Quitter"
         );
 
@@ -96,28 +103,49 @@ public class AppMenu{
             // si c'est un client, il peut soit s'inscrire soit se connecter
             boolean estConnecte = false;
             while (! estConnecte){
+                do {
                 afficherMenu("Qui êtes vous ?", mainapp);
-                int identif = scanner.nextInt();
-                choix = identif; // on garde le choix pour la suite
+                System.out.print("Votre choix : ");
+                String input = scanner.nextLine();
+                try {
+                    choix = Integer.parseInt(input);
+                } catch (NumberFormatException e) {
+                    System.out.println("❌ Veuillez entrer un nombre valide.");
+                    choix = 0; // force à redemander
+                }
+                } while (choix < 1 || choix > mainapp.size());
+
+                int identif = choix; // on garde le choix pour la suite
                 if (identif == 3){
                     afficherMenu("choisissez votre mode de connexion", connect);
-                    int modeCo = scanner.nextInt();
+                    int modeCo;
+                    do {
+                        System.out.print("Votre choix : ");
+                        String inputMode = scanner.nextLine();
+                        try {
+                            modeCo = Integer.parseInt(inputMode);
+                        } catch (NumberFormatException e) {
+                            System.out.println("❌ Veuillez entrer un nombre valide.");
+                            modeCo = 0;
+                        }
+                    } while (modeCo < 1 || modeCo > connect.size());
                     switch (modeCo) {
                         case 1 -> {
                             if (! seconnecter(identif)){
                                 System.out.println("Singe");
-
                             }
                             else{
                                 System.out.println("bogoss");
                                 estConnecte = true; // on sort de la boucle de connexion
                             }
                         }
-
                         case 2 -> {
                             inscription();
                         }
-
+                        case 3 ->{
+                            // on retourne au menu principal
+                            System.out.println("Retour au menu principal");
+                        }
                         default -> {
                             //on retourne juste au menu
                             System.out.println("Retour au menu");
@@ -155,60 +183,34 @@ public class AppMenu{
                 //Boucle Admin
 
 
-                case 1 ->{
+                case 1 -> {
                     do {
                         afficherMenu("Accès Admin", admin);
                         System.out.print("Votre choix : ");
-                        System.out.println("choix 1");
 
-                        /*while (!scanner.hasNextInt()) {
+                        String input = scanner.nextLine();
+                        try {
+                            choix = Integer.parseInt(input);
+                        } catch (NumberFormatException e) {
                             System.out.println("❌ Veuillez entrer un nombre valide.");
-                            scanner.next();
-                            System.out.print("Votre choix : ");
-                        }*/
-
-                        while (!scanner.hasNextInt()) {
-                            if (!scanner.hasNext()) {
-                                //System.out.println("❌ Pas d'entrée disponible, fin du programme.");
-                                break;
-                            }
-                            System.out.println("❌ Veuillez entrer un nombre valide.");
-                            scanner.next();
-                            System.out.println("on est ligne 176");
-                            System.out.print("Votre choix : ");
+                            choix = -1;
                         }
+                        if (choix < 1 || choix > admin.size()) continue;
 
-                        choix = scanner.nextInt();
                         switch(choix){
-                            //créer un compte vendeur
-                            case 1->{
-                                    //Vendeur unVendeur = creerVendeur();
-                                    creerVendeur();
+                            case 1 -> creerVendeur();
+                            case 2 -> ajouterLibrairie();
+                            case 3 -> gererLesStocks();
+                            case 4 -> consulterStat();
+                            case 5 -> System.out.println(personneConnectee.toString());
+                            case 6 -> {
+                                System.out.println("👋 Au revoir " + personneConnectee.getPrenom()+ " !");
+                                personneConnectee = null;
+                                System.out.println("Deconnexion réussie.");
                             }
-                            //Ajouter une nouvelle librairie
-                            case 2-> {
-                                    ajouterLibrairie();
-                            }
-
-                            //Gérer les stocks globaux //doit ouvrir un autre menu
-                            case 3-> {
-                                gererLesStocks();
-                                // afficher les stock d'un magasin précis
-                                //ajoute un livre dans la bd
-                                //ajoute un livre à un magasin
-
-                            }
-
-                            //Consulter les statistiques de vente
-                            case 4-> {
-                                consulterStat();
-                            }
-
-                            case 5-> System.out.println("Retour au main");
-                            default-> System.out.println("❌ Option invalide.");
+                            default -> System.out.println("❌ Option invalide.");
                         }
-
-                    } while(choix !=client.size());
+                    } while(choix != admin.size());
                 }
         
 
@@ -228,30 +230,44 @@ public class AppMenu{
                         switch(choix){
                             //Ajouter livre
                             case 1-> {
-                                ajouterLivre();
+                                ajouterLivreMagasin();
                             }
+
+                            //Supprimer livre
+                            case 2 -> {
+                                supprimerLivreMagasin();
+                            }
+
                             //Modifier Quantité Livre
-                            case 2-> {
+                            case 3-> {
                                 modifierQte();
                             }
                             // Vérifier Disponibilité
-                            case 3-> {
+                            case 4-> {
                                 estDisponible();
                             }
 
                             // Commander du stock
-                            case 4-> {
+                            case 5-> {
                                 commanderStock();
                             }
 
 
                             //Transférer un livre
-                            case 5-> {
+                            case 6-> {
                                 transfererLivre();
                             }
 
+                            //Profil
+                            case 7 -> {
+                                System.out.println(personneConnectee.toString());
+                            }
                             //quitter 
-                            case 6-> System.out.println("Retour au main");
+                            case 8->{
+                                System.out.println("👋 Au revoir " + personneConnectee.getPrenom()+ " !");
+                                personneConnectee = null; // on déconnecte la personne
+                                System.out.println("Deconnexion réussie.");
+                                }
                             default-> System.out.println("❌ Option invalide.");
                         }
 
@@ -291,14 +307,22 @@ public class AppMenu{
                                 voirCommandes();
                             }
 
+                            //"Profil"
+                            case 5 -> {
+                                System.out.println(personneConnectee.toString());
+                            }
                             //"Retour"
-                            case 5-> System.out.println("Retour au main");
+                            case 6-> {
+                                System.out.println("👋 Au revoir " + personneConnectee.getPrenom()+ " !");
+                                personneConnectee = null; // on déconnecte la personne
+                                System.out.println("Deconnexion réussie.");
+                            }
                             default-> System.out.println("❌ Option invalide.");
                         }
 
                     } while(choix !=client.size());
                 }
-                case 4 -> System.out.println("👋 Au revoir !");
+                case 4 -> System.out.println("Vous quittez l'application. 👋");
                 default -> System.out.println("❌ Option invalide.");
             }
 
@@ -336,6 +360,12 @@ public class AppMenu{
         lstRep = new ArrayList<>();
         String question = "Choisissez le magasin ou assigner le vendeur ";
         Magasin mag = demanderMagasin(question);
+        if (mag == null) {
+            // si le magasin est null, on quitte la fonction
+            lstRep.add("Vous avez quitté la création du vendeur");
+            afficherMenu("Création d'un vendeur ", lstRep);
+            return;
+        }
         
         VendeurBD vendeurBD = new VendeurBD(connexion);
         String idVendeur = vendeurBD.genererId();
@@ -377,6 +407,7 @@ public class AppMenu{
                 lstRep.add("Vous quittez " );
                 afficherMenu(question,lstRep);
                 correct = true;
+                leMag = null; // on quitte la fonction
             }
             else{
                 if (choix-1 < lstRep.size()){
@@ -421,9 +452,6 @@ public class AppMenu{
         String villeMag = scanner.nextLine();
         Magasin mag = new Magasin(idmag, nomMag, villeMag);
         magasinBD.insertMagasin(mag);
-        scanner.close();
-
-        
     }
 
     public static void gererLesStocks(){
@@ -435,10 +463,12 @@ public class AppMenu{
         String aff1 = "afficher les stock d'un magasin";
         String aff2 = "ajoute un livre dans la bd";
         String aff3 = "ajoute un livre à un magasin";
+        String affRet = "Retour au menu principal";
         List<String> lstRep = new ArrayList<>();
         lstRep.add(aff1);
         lstRep.add(aff2);
         lstRep.add(aff3);
+        lstRep.add(affRet);
         afficherMenu("Vous voulez ajouter une librairie ", lstRep);
         int choix = scanner.nextInt();
         List<String> nvlstRep = new ArrayList<>();
@@ -461,6 +491,11 @@ public class AppMenu{
                 afficherMenu("Vous voulez ajouter un livre à la base", lstRep);
             }
 
+            case 4 -> {
+                lstRep = new ArrayList<>();
+                lstRep.add(affRet);
+                afficherMenu("Retour au menu principal", lstRep);
+            }
                 
             default -> {
                 lstRep = new ArrayList<>();
@@ -481,22 +516,54 @@ public class AppMenu{
 
 
     // Les fonctions de vendeur ----------------------------------------------------------------------------------------------------------
-    public static void ajouterLivre(){
+    
+    public static void ajouterLivreMagasin(){
         // Cette fonction sert à ajouter un livre à la BD
-        Livre livre = demanderLivre();
+        List<String> lstRep = new ArrayList<>();
+        Livre livre = demanderLivreAll();
+        if (livre == null) {
+            // si le livre est null, on quitte la fonction
+            lstRep.add("Vous avez quitté l'ajout d'un livre");
+            afficherMenu("Ajout d'un livre ", lstRep);
+            return;
+        }
         Connection connexion = ConnectionBD.getConnection();
         LivreBD livreBD = new LivreBD(connexion);
-        livreBD.ajouterLivre(livre);
-        List<String> lstRep = new ArrayList<>();
-        lstRep.add("Le livre " + livre.getTitre() + " a été ajouté à la base de données.");
+        Vendeur vendeur = (Vendeur) personneConnectee; // on cast la personne connectée en vendeur
+        livreBD.ajouterLivreMagasin(vendeur, livre);
+        lstRep.add("Le livre " + livre.getTitre() + " a été ajouté à le magasin "+ vendeur.getMagasin().getNomMag() + " .");
         afficherMenu("Ajout d'un livre ", lstRep);
     }
 
-
+    public static void supprimerLivreMagasin(){
+        // Cette fonction sert à supprimer un livre du magasin
+        Scanner scanner = new Scanner(System.in);
+        Connection connexion = ConnectionBD.getConnection();
+        LivreBD livreBD = new LivreBD(connexion);
+        Vendeur vendeur = (Vendeur) personneConnectee; // on cast la personne connectée en vendeur
+        Livre livre = demanderLivreExistant("Quel livre voulez vous supprimer ?", vendeur.getMagasin());
+        if (livre == null) {
+            // si le livre est null, on quitte la fonction
+            List<String> lstRep = new ArrayList<>();
+            lstRep.add("Vous avez quitté la suppression du livre");
+            afficherMenu("Suppression d'un livre ", lstRep);
+            return;
+        }
+        // on le supprime du magasin
+        livreBD.supprimerLivreMagasin(vendeur, livre);
+    }
+    
+    /**
+     * Cette fonction demande les informations d'un livre à l'utilisateur.
+     * Elle retourne un objet Livre contenant les informations saisies.
+     * 
+     * @return Livre - un objet Livre avec les informations saisies par l'utilisateur.
+     */
     public static Livre demanderLivre(){
         // Cette fonction sert à demander les informations d'un livre
         Scanner scanner = new Scanner(System.in);
-        String aff1 = "Veuillez entrer l'ISBN du livre";
+        Connection connexion = ConnectionBD.getConnection();
+        //String aff1 = "Veuillez entrer l'ISBN du livre"; //complètement con tu connais l'isbn du livre toi ?
         String aff2 = "Veuillez entrer le titre du livre";
         String aff6 = "Veuillez entrer le nombre de pages du livre";
         String aff7 = "Veuillez entrer le prix du livre";
@@ -504,7 +571,7 @@ public class AppMenu{
         String aff9 = "Veuillez entrer le nom de l'éditeur du livre";
 
         List<String> lstRep = new ArrayList<>();
-        lstRep.add(aff1);
+        //lstRep.add(aff1);
         afficherMenu("Ajout d'un livre ", lstRep);
         String isbn = scanner.nextLine();
 
@@ -512,8 +579,18 @@ public class AppMenu{
         lstRep.add(aff2);
         afficherMenu("Ajout d'un livre ", lstRep);
         String titre = scanner.nextLine();
-
-        Auteur auteur = demanderAuteur("De quel auteur est ce livre ?");
+        // on demande le nombre d'auteurs du livre
+        String aff3 = "Combien d'auteurs pour ce livre ?";
+        lstRep = new ArrayList<>();
+        lstRep.add(aff3);
+        afficherMenu("Ajout d'un livre ", lstRep);
+        int nbAuteurs = scanner.nextInt();
+        List<Auteur> auteurs = new ArrayList<>();
+        Auteur auteur = null;
+        for (int i = 0; i < nbAuteurs; i++) {
+            auteur = demanderAuteur("De quel auteur est ce livre ?");
+            auteurs.add(auteur);
+        }
 
         lstRep = new ArrayList<>();
         lstRep.add(aff6);
@@ -535,9 +612,115 @@ public class AppMenu{
         lstRep.add(aff9);
         afficherMenu("Ajout d'un livre ", lstRep);
         String editeurNom = scanner.nextLine();
-        Editeur editeur = new Editeur(editeurNom);
-        Livre livre = new Livre(isbn, titre, auteur, dateParution, nbPages, prix, editeur);
+        
+        EditeurBD editeurBD = new EditeurBD(connexion);
+        // on vérifie si l'éditeur existe déjà
+        List<Editeur> editeurs = new ArrayList<>();
+        Editeur editeur = null;
+        // on demande le nombre d'éditeurs du livre
+        String aff4 = "Combien d'éditeurs pour ce livre ?";
+        lstRep = new ArrayList<>();
+        lstRep.add(aff4);
+        afficherMenu("Ajout d'un livre ", lstRep);
+        int nbEditeurs = scanner.nextInt();
+        for (int i = 0; i < nbEditeurs; i++) {
+            editeur = demanderEditeur("De quel éditeur est ce livre ?");
+            editeurs.add(editeur);
+        }
+
+        Livre livre = new Livre(isbn, titre, auteurs, dateParution, nbPages, prix, editeurs);
         return livre;
+    }
+
+    public static Livre demanderLivreAll(){
+        Connection connexion = ConnectionBD.getConnection();
+        Scanner scanner = new Scanner(System.in);
+        //on va prendre la liste des livres existants dans la base de données
+        LivreBD livreBD = new LivreBD(connexion);
+        List<Livre> lstLivres = new ArrayList<>();
+        lstLivres = livreBD.getTousLesLivresBase();
+        
+        List<String> lstRep = new ArrayList<>();
+        Livre livre = null;
+        boolean correct = false;
+        while (! correct){ 
+            lstRep = new ArrayList<>();
+            for (Livre liv : lstLivres){
+                lstRep.add(liv.getTitre());
+            }
+            lstRep.add("QUITTER");
+            afficherMenu("Quel livre voulez vous modifier ?", lstRep);
+
+            int choix = scanner.nextInt();
+            if (choix == lstRep.size()){
+                // on retourne au menu principal
+                // on quitte la fonction
+                lstRep = new ArrayList<>();
+                lstRep.add("Vous quittez " );
+                afficherMenu("Quel livre voulez vous modifier ?",lstRep);
+                livre = null; // on quitte la fonction
+                correct = true;
+            }
+            else{
+                if (choix-1 < lstRep.size()){
+                    livre = lstLivres.get(choix-1);
+                    lstRep = new ArrayList<>();
+                    lstRep.add("Vous avez choisi le livre : "+ livre.getTitre());
+                    afficherMenu("Quel livre voulez vous modifier ?",lstRep);
+                    correct = true;
+                }
+                else {
+                    lstRep = new ArrayList<>();
+                    lstRep.add("Veuillez choisir un livre correct ");
+                    afficherMenu("Quel livre voulez vous modifier ?",lstRep);
+                }
+            }
+        }
+        return livre;
+    }
+
+    public static Editeur demanderEditeur(String question){
+        // Cette fonction sert à demander les informations d'un éditeur
+        List<Editeur> lstEditeurs = new ArrayList<>();
+        Connection connexion = ConnectionBD.getConnection();
+        EditeurBD editeurBD = new EditeurBD(connexion);
+        lstEditeurs = editeurBD.getListeEditeurs();
+        Scanner scanner = new Scanner(System.in);
+        Editeur editeur = null;
+        boolean correct = false;
+        
+        while (! correct){ 
+            List<String> lstRep = new ArrayList<>();
+            for (Editeur ed : lstEditeurs){
+                lstRep.add(ed.getNom());
+            }
+            lstRep.add("QUITTER");
+            afficherMenu(question, lstRep);
+
+            int choix = scanner.nextInt();
+            if (choix == lstRep.size()){
+                lstRep = new ArrayList<>();
+                lstRep.add("Vous quittez " );
+                afficherMenu(question,lstRep);
+                correct = true;
+                editeur = null; // on quitte la fonction
+            }
+            else{
+                if (choix-1 < lstRep.size()){
+                    editeur = lstEditeurs.get(choix-1);
+                    lstRep = new ArrayList<>();
+                    lstRep.add("Vous avez choisi l'éditeur : "+ editeur.getNom() );
+                    afficherMenu(question,lstRep);
+                    correct = true;
+                }
+                else {
+                    lstRep = new ArrayList<>();
+                    lstRep.add("Veuillez choisir un(e) éditeur(trice) correct ");
+                    afficherMenu(question,lstRep);
+                }
+            }
+        }
+        return editeur;
     }
 
     public static Auteur demanderAuteur(String question){
@@ -569,6 +752,7 @@ public class AppMenu{
                 lstRep.add("Vous quittez " );
                 afficherMenu(question,lstRep);
                 correct = true;
+                auteur = null; // on quitte la fonction
             }
             else{
                 if (choix-1 < lstRep.size()){
@@ -591,15 +775,28 @@ public class AppMenu{
     public static void modifierQte(){
         // Cette fonction sert à modifier la qte d'un livre dans un magasin
         List<String> lstRep = new ArrayList<>();
-        Magasin mag = demanderMagasin("Dans quel magasin voulez vous modifier la quantité ?");
+        //Magasin mag = demanderMagasin("Dans quel magasin voulez vous modifier la quantité ?");
+        Vendeur vendeur = (Vendeur) personneConnectee; // on cast la personne connectée en vendeur
+        Magasin mag = vendeur.getMagasin(); // on récupère le magasin du vendeur
+        if (mag == null) {
+            // si le magasin est null, on quitte la fonction
+            lstRep.add("Vous avez quitté la modification de la quantité");
+            afficherMenu("Modification de la quantité ", lstRep);
+            return;
+        }
         Livre livre = demanderLivreExistant("Quel livre voulez vous modifier ?", mag);
+        if (livre == null) {
+            // si le livre est null, on quitte la fonction
+            lstRep.add("Vous avez quitté la modification de la quantité");
+            afficherMenu("Modification de la quantité ", lstRep);
+            return;
+        }
         lstRep.add("Quelle est la nouvelle quantité pour le livre " + livre.getTitre() + " ?");
         afficherMenu("De quel livre voulez vous modifier la quantité ? ", lstRep);
         Scanner scanner = new Scanner(System.in);
         int nouvelleQte = scanner.nextInt();
         Connection connexion = ConnectionBD.getConnection();
-        
-        
+
     }
 
     public static Livre demanderLivreExistant(String question, Magasin mag){
@@ -621,9 +818,12 @@ public class AppMenu{
 
             int choix = scanner.nextInt();
             if (choix == lstRep.size()){
+                // on retourne au menu principal
+                // on quitte la fonction
                 lstRep = new ArrayList<>();
                 lstRep.add("Vous quittez " );
                 afficherMenu(question,lstRep);
+                livre = null; // on quitte la fonction
                 correct = true;
             }
             else{
@@ -645,11 +845,31 @@ public class AppMenu{
     }
 
     public static void estDisponible(){
+        Scanner scanner = new Scanner(System.in);
+        Connection connexion = ConnectionBD.getConnection();
         // Cette fonction sert à savoir si un livre est disponible dans un magasin
+        Magasin mag = demanderMagasin("Dans quel magasin voulez vous vérifier la disponibilité ?");
+        if (mag == null) {
+            // si le magasin est null, on quitte la fonction
+            List<String> lstRep = new ArrayList<>();
+            lstRep.add("Vous avez quitté la vérification de la disponibilité");
+            afficherMenu("Vérification de la disponibilité ", lstRep);
+            return;
+        }
         String aff = "Veuillez entrer un livre";
         List<String> lstRep = new ArrayList<>();
         lstRep.add(aff);
         afficherMenu("Disponibilité d'un livre ", lstRep);
+        String titreLivre = scanner.nextLine();
+        LivreBD livreBD = new LivreBD(connexion);
+        Livre livre = livreBD.getLivreParTitre(titreLivre);
+        if (livre != null){
+            System.out.println("Le livre " + livre.getTitre() + " est disponible dans le magasin " + mag.getNomMag() + ".");
+        }
+        else {
+            System.out.println("Le livre " + titreLivre + " n'est pas disponible dans le magasin " + mag.getNomMag() + ".");
+        }
+
     }
 
     public static void commanderStock(){
@@ -679,6 +899,13 @@ public class AppMenu{
     public static void accesBibli(){
         // Cette fonction sert à afficher tous les livres disponible d'un magasin
         Magasin mag = demanderMagasin("Dans quel magasin voulez vous accéder à la bibliothèque ?");
+        if (mag == null) {
+            // si le magasin est null, on quitte la fonction
+            List<String> lstRep = new ArrayList<>();
+            lstRep.add("Vous avez quitté l'accès à la bibliothèque");
+            afficherMenu("Accès à la bibliothèque ", lstRep);
+            return;
+        }
         List<Livre> lstLivres = new ArrayList<>();
         Connection connexion = ConnectionBD.getConnection();
         LivreBD livreBD = new LivreBD(connexion);
@@ -686,6 +913,9 @@ public class AppMenu{
         lstLivres = livreBD.getTousLesLivres(mag);
         for (Livre livre : lstLivres) {
             lstRep.add(livre.getTitre());
+        }
+        if (lstRep.isEmpty()) {
+            lstRep.add("Aucun livre disponible dans ce magasin.");
         }
         afficherMenu("Accès bibliothèque ", lstRep);
     }
@@ -746,6 +976,10 @@ public class AppMenu{
             AdministrateurBD adminBD = new AdministrateurBD(connexion);
             try {
                 if (adminBD.seconnecterAdmin(ident, mdp)) {
+                    // demande a la bd getAdmin ident et mdp
+                    Administrateur admin = adminBD.getAdministrateur(ident, mdp);
+                    personneConnectee = admin; // on récupère l'admin connecté
+                    System.out.println("✅ Bienvenue " + admin.getPrenom() + " " + admin.getNom() + " !");
                     return true;
                 } else {
                     System.out.println("❌ Identifiant ou mot de passe incorrect.");
@@ -759,6 +993,10 @@ public class AppMenu{
             VendeurBD vendeurBD = new VendeurBD(connexion);
             try {
                 if (vendeurBD.seconnecterVendeur(ident, mdp)) {
+                    // demande a la bd getVendeur ident et mdp
+                    Vendeur vendeur = vendeurBD.getVendeur(ident, mdp);
+                    personneConnectee = vendeur; // on récupère le vendeur connecté
+                    System.out.println("Bienvenue " + vendeur.getPrenom() + " " + vendeur.getNom());
                     return true;
                 } else {
                     System.out.println("❌ Identifiant ou mot de passe incorrect.");
@@ -772,6 +1010,10 @@ public class AppMenu{
             ClientBD clientBD = new ClientBD(connexion);
             try {
                 if (clientBD.seconnecterClient(ident, mdp)) {
+                    // demande a la bd getClient ident et mdp
+                    Client client = clientBD.getClient(ident, mdp);
+                    personneConnectee = client; // on récupère le client connecté
+                    System.out.println("✅ Bienvenue " + client.getPrenom() + " " + client.getNom() + " !");
                     return true;
                 } else {
                     System.out.println("❌ Identifiant ou mot de passe incorrect.");

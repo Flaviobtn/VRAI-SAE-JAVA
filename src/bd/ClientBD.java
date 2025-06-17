@@ -25,7 +25,7 @@ public class ClientBD{
 				int codePostalCli = rs.getInt("codepostal");
 				String motdepasse = rs.getString("identifiant");
 				String villeCli = rs.getString("villecli");
-				return new Client(idClient, nomCli,prenomCli, identifiant,addresseCli, codePostalCli,motdepasse, villeCli);
+				return new Client(idClient, nomCli,prenomCli, identifiant,addresseCli, codePostalCli, motdepasse, villeCli);
 			}
 			rs.close();
 		}
@@ -56,6 +56,27 @@ public class ClientBD{
 			rs.close();
 		}
 		return false;
+	}
+
+	public Client getClient(String id, String mdp) throws SQLException {
+		String req = "Select * FROM CLIENT WHERE identifiant = ? AND motdepasse = ?";
+		this.st = laConnexion.prepareStatement(req);
+		this.st.setString(1, id);
+		this.st.setString(2, mdp);
+		ResultSet rs = st.executeQuery();
+		if(rs.next()) {
+			int idClient = rs.getInt("idcli");
+			String nomCli = rs.getString("nomcli");
+			String prenomCli = rs.getString("prenomcli");
+			String identifiant = rs.getString("identifiant");
+			String addresseCli = rs.getString("adressecli");
+			int codePostalCli = rs.getInt("codepostal");
+			String motdepasse = rs.getString("motDePasse");
+			String villeCli = rs.getString("villecli");
+			return new Client(idClient, nomCli, prenomCli, identifiant, addresseCli, codePostalCli, motdepasse, villeCli);
+		}
+			rs.close();
+		return null;
 	}
 
 	public void inscrireClient(Integer idCli, String prenom, String nom, String mdp, String adresse, String ville, int codePostal) throws SQLException {
