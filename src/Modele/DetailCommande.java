@@ -25,7 +25,7 @@ public class DetailCommande{
         this.numCo = numCo;
     }
 
-    public double prixLivres(){
+    public double getPrixLivres(){
         return this.livre.getPrix()*qte;
     }
     
@@ -33,5 +33,10 @@ public class DetailCommande{
         return numCo;
     }
 
-    
+    @Override
+    public String toString(){
+        return "Titre du livre: "+ this.getLivre().getTitre()+"\n" +
+        "Quantité: "+this.getQte()+"\n"+
+        "Prix Unitaire: "+this.livre.getPrix()+" euros";
+    }
 }

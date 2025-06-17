@@ -3,6 +3,7 @@ import Modele.*;
 import bd.*;
 import java.sql.*;
 import java.util.*;
+import java.time.*;
 
 public class AppMenu{
     private static Personne personneConnectee = null; // pour savoir qui est connecté
@@ -28,7 +29,8 @@ public class AppMenu{
         // Afficher les options
         for (int i = 0; i < options.size(); i++) {
             String ligne = (i + 1) + ". " + options.get(i);
-            System.out.println("║ "+ligne+" ".repeat(largeur-options.get(i).length()-4)+"║");
+            int espacesARajouter = largeur - ligne.length() - 2; // -2 pour les 2 espaces de marge
+            System.out.println("║ " + ligne + " ".repeat(Math.max(0, espacesARajouter)) + " ║");
         }
 
         // Afficher le cadre inférieur
@@ -36,12 +38,11 @@ public class AppMenu{
     }
 
     public static String centrerTexte(String texte, int largeur) {
-    int padding = (largeur - texte.length()) / 2;
-    if(padding % 2 == 0){
-        padding += 1;
+        int totalPadding = largeur - texte.length();
+        int paddingGauche = totalPadding / 2;
+        int paddingDroite = totalPadding - paddingGauche;
+        return " ".repeat(Math.max(0, paddingGauche)) + texte + " ".repeat(Math.max(0, paddingDroite));
     }
-    return " ".repeat(Math.max(0, padding)) + texte + " ".repeat(Math.max(0, padding));
-}
     
     public static void main(String[] args) {
         Connection connection = ConnectionBD.getConnection();
@@ -510,59 +511,95 @@ public class AppMenu{
     public static void consulterStat(){
     // Cette fonction sert à consulter les statistiques d'un magasin
     Magasin mag = demanderMagasin("De quel magasin voulez vous les statistiques ?");
-    Scanner scanner = new Scanner(System.in);
-    String q1 = "Chiffre d'affaire total par année";
-    String q2 = "Le livre le plus vendu";
-    String q3 = "Le nombre de livre(s) vendu(s)";
-    String q4 = "Le nombre de livre de la librairie";
-    String quit = "Quitter";
-    List<String> lstRep = new ArrayList<>();
-    lstRep.add(q1);
-    lstRep.add(q2);
-    lstRep.add(q3);
-    lstRep.add(q4);
-    lstRep.add(quit);
-    afficherMenu("Consultation des statistiques du magasin "+mag.getNomMag(), lstRep);
-
-    int rep = -1;
-    while (true) {
-        System.out.print("Veuillez entrer un nombre correspondant à votre choix : ");
-        if (scanner.hasNextInt()) {
-            rep = scanner.nextInt();
-            break;
-        } else {
-            System.out.println("❌ Veuillez entrer un nombre valide.");
-            scanner.next(); // Consomme l'entrée invalide
-        }
+    if (mag == null) {
+        // si le magasin est null, on quitte la fonction
+        System.out.println("Vous avez quitté la consultation des statistiques");
+        return;
     }
+    else{
+        Scanner scanner = new Scanner(System.in);
+        String q1 = "Chiffre d'affaire total par année";
+        String q2 = "Le livre le plus vendu";
+        String q3 = "Le nombre de livre(s) vendu(s)";
+        String q4 = "Le nombre de livre de la librairie";
+        String quit = "Quitter";
+        List<String> lstRep = new ArrayList<>();
+        lstRep.add(q1);
+        lstRep.add(q2);
+        lstRep.add(q3);
+        lstRep.add(q4);
+        lstRep.add(quit);
+        afficherMenu("Consultation des statistiques du magasin "+mag.getNomMag(), lstRep);
 
-    switch(rep){
-        case 1 -> {
-            chiffreAffaire(mag);
+        int rep = -1;
+        while (true) {
+            System.out.print("Veuillez entrer un nombre correspondant à votre choix : ");
+            if (scanner.hasNextInt()) {
+                rep = scanner.nextInt();
+                break;
+            } else {
+                System.out.println("❌ Veuillez entrer un nombre valide.");
+                scanner.next(); // Consomme l'entrée invalide
+            }
         }
-        case 2 -> {
-            System.out.println("Le livre le plus vendu : ");
-            MagasinBD magasinBD = new MagasinBD(ConnectionBD.getConnection());
-            //magasinBD.livrePlusVendu(mag);
-        }
-        case 3 -> {
-            System.out.println("Le nombre de livre(s) vendu(s) : ");
-            MagasinBD magasinBD = new MagasinBD(ConnectionBD.getConnection());
-            //magasinBD.nombreLivresVendus(mag);
-        }
-        case 4 -> {
-            System.out.println("Le nombre de livre de la librairie : ");
-            MagasinBD magasinBD = new MagasinBD(ConnectionBD.getConnection());
-            //magasinBD.nombreLivresLibrairie(mag);
-        }
-        case 5 -> {
-            System.out.println("Vous quittez la consultation des statistiques");
-        }
-        default -> {
-            System.out.println("❌ Option invalide. Veuillez réessayer.");
+
+        switch(rep){
+            case 1 -> {
+                chiffreAffaire(mag);
+            }
+            case 2 -> {
+                livreLePlusVendu(mag);
+            }
+            case 3 -> {
+                nombreDeLivreVendu(mag);
+            }
+            case 4 -> {
+                nbLivresMag(mag);
+            }
+            case 5 -> {
+                System.out.println("Vous quittez la consultation des statistiques");
+            }
+            default -> {
+                System.out.println("❌ Option invalide. Veuillez réessayer.");
+            }
         }
     }
 }
+
+    public static void nbLivresMag(Magasin mag){
+        // Cette fonction sert à afficher le nombre de livre d'un magasin
+        MagasinBD magasinBD = new MagasinBD(ConnectionBD.getConnection());
+        int nombreLivres = magasinBD.nombreDeLivre(mag);
+        System.out.println("Le nombre de livre dans le magasin " + mag.getNomMag() + " est de : " + nombreLivres);
+    }
+
+    public static void nombreDeLivreVendu(Magasin mag){
+        // Cette fonction sert à afficher le nombre de livre vendu d'un magasin
+        MagasinBD magasinBD = new MagasinBD(ConnectionBD.getConnection());
+        // on récupère l'année voulu 
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Veuillez entrer l'année pour laquelle vous voulez le nombre de livre vendu : ");  
+        int annee = scanner.nextInt();
+        
+        int nombreLivres = magasinBD.nombreDeLivreVendu(mag, annee);
+        System.out.println("Le nombre de livre vendu dans le magasin " + mag.getNomMag() + " pour l'année " + annee + " est de : " + nombreLivres);
+    }
+
+    public static void livreLePlusVendu(Magasin mag){
+        // Cette fonction sert à afficher le livre le plus vendu d'un magasin
+        MagasinBD magasinBD = new MagasinBD(ConnectionBD.getConnection());
+        // on récupère l'année voulu 
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Veuillez entrer l'année pour laquelle vous voulez le livre le plus vendu : ");  
+        int annee = scanner.nextInt();
+        
+        Livre livre = magasinBD.livreLePlusVendu(mag, annee);
+        if (livre != null) {
+            System.out.println("Le livre le plus vendu du magasin " + mag.getNomMag() + " est : " + livre.getTitre());
+        } else {
+            System.out.println("Aucun livre n'a été vendu dans le magasin " + mag.getNomMag());
+        }
+    }
 
     public static void chiffreAffaire(Magasin mag){
         // Cette fonction sert à afficher le chiffre d'affaire d'un magasin
@@ -571,7 +608,7 @@ public class AppMenu{
         int annee = scanner.nextInt();
         MagasinBD magasinBD = new MagasinBD(ConnectionBD.getConnection());
         double chiffreAffaire = magasinBD.chiffreAffaire(mag, annee);
-        System.out.println("Le chiffre d'affaire du magasin " + mag.getNomMag() + " pour l'année " + annee + " est de : " + chiffreAffaire + " €");
+        System.out.println("Le chiffre d'affaire du magasin " + mag.getNomMag() + " pour l'année " + annee + " est de : " + chiffreAffaire + " euros");
     }
 
     // Les fonctions de vendeur ----------------------------------------------------------------------------------------------------------
@@ -958,6 +995,7 @@ public class AppMenu{
     public static void accesBibli(){
         // Cette fonction sert à afficher tous les livres disponible d'un magasin
         Magasin mag = demanderMagasin("Dans quel magasin voulez vous accéder à la bibliothèque ?");
+        
         if (mag == null) {
             // si le magasin est null, on quitte la fonction
             List<String> lstRep = new ArrayList<>();
@@ -988,11 +1026,108 @@ public class AppMenu{
     }
 
     public static void passerComm(){
+        Connection connexion = ConnectionBD.getConnection();
+        Scanner scanner = new Scanner(System.in);
         // Cette fonction sert à passer une commande
-        String aff = "Dans quel magasin voulez vous commander ?";
-        List<String> lstRep = new ArrayList<>();
-        lstRep.add(aff);
-        afficherMenu("Commande", lstRep);
+        // on demande le magasin où passer la commande
+        Magasin mag = demanderMagasin("Dans quel magasin voulez vous passer la commande ?");
+        if (mag == null) {
+            // si le magasin est null, on quitte la fonction
+            List<String> lstRep = new ArrayList<>();
+            lstRep.add("Vous avez quitté la commande");
+            afficherMenu("Passer une commande ", lstRep);
+            return;
+        }else{
+            System.out.println(mag.getIdmag());
+            CommandeBD commandeBD = new CommandeBD(connexion);
+            List<String> lstRep = new ArrayList<>();
+            //  Magasin magasin, Client client
+            //numero de commande 
+            int numCommande = commandeBD.genererId(); // on génère un numéro de commande
+
+            // la date 
+            LocalDate date = LocalDate.now(); // on récupère la date du jour
+
+            // en ligne ?
+            boolean enLigne = true; // on suppose que la commande est en ligne
+
+            // livraison ?
+            // on demande si la commande est livrée ou pas
+            Livraison livraison = Livraison.MAGASIN;
+            lstRep = new ArrayList<>();
+            lstRep.add("La commande est-elle livrée ? (oui/non)");
+            afficherMenu("Passer une commande ", lstRep);
+            String reponse = scanner.next();
+            if (reponse.equalsIgnoreCase("oui") || reponse.equalsIgnoreCase("o")) {
+                livraison = Livraison.DOMICILE; // on appelle la fonction domicile pour créer une livraison
+            } else if (reponse.equalsIgnoreCase("non") || reponse.equalsIgnoreCase("n")) {
+                livraison = Livraison.MAGASIN; // pas de livraison
+            }
+
+            // on a deja le magasin
+
+            // on a le client
+            Client client = (Client) personneConnectee; // on cast la personne connectée en client
+
+            // on crée la commande
+            Commande commande = new Commande(numCommande, date, enLigne, livraison, mag, client);
+
+        // ------------------------------------------------------------------
+        boolean commandeFini = false; // on initialise la commande à false
+        List<DetailCommande> lstDetails = new ArrayList<>(); // on initialise la liste des détails de commande
+        DetailCommandeBD detailCommandeBD = new DetailCommandeBD(connexion);
+        while (!commandeFini) {
+            // on demande le livre à commander
+            lstRep = new ArrayList<>();
+            lstRep.add("Quel livre voulez vous commander ?");
+            afficherMenu("Passer une commande ", lstRep);
+            
+            // on demande le livre à commander
+            Livre livre = demanderLivreExistant("Quel livre voulez vous commander ?", mag);
+            if (livre == null) {
+                // si le livre est null, on quitte la fonction
+                lstRep = new ArrayList<>();
+                lstRep.add("Vous avez quitté la commande");
+                afficherMenu("Passer une commande ", lstRep);
+                return;
+            }
+            
+            // on demande la quantité à commander
+            lstRep = new ArrayList<>();
+            lstRep.add("Quelle est la quantité à commander pour le livre " + livre.getTitre() + " ?");
+            afficherMenu("Passer une commande ", lstRep);
+            int quantite = scanner.nextInt();
+            
+            // on ajoute le détail de commande
+            //int numDetailCommande, Livre livre, int qte, int numCo
+            int numIdDetCo = detailCommandeBD.genererId(); // on génère un numéro de détail de commande
+            DetailCommande detailCommande = new DetailCommande(numIdDetCo,livre, quantite, numCommande);
+            lstDetails.add(detailCommande); // on ajoute le détail de commande à la liste
+            
+            
+            // on demande si l'utilisateur veut continuer ou pas
+            lstRep = new ArrayList<>();
+            lstRep.add("Voulez-vous ajouter un autre livre ? (oui/non)");
+            afficherMenu("Passer une commande ", lstRep);
+            String reponse2 = scanner.next();
+            
+            if (reponse2.equalsIgnoreCase("non") || reponse2.equalsIgnoreCase("n")) {
+                commandeFini = true; // on quitte la boucle
+            }
+            }
+            // on ajoute les détails de commande à la commande   
+            for (DetailCommande detail : lstDetails) {
+                commande.ajouterDetailCommande(detail);
+            }
+            // on ajoute la commande à la base de données
+            commandeBD.insererCommande(commande);
+            System.out.println("✅ Votre commande a été passée avec succès !");
+            System.out.println("Voici le récapitulatif de votre commande :");
+            System.out.println(commande.editerFacture());
+        }
+        
+        
+            
     }
 
     public static void voirCommandes(){

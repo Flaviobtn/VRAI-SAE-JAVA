@@ -7,7 +7,7 @@ import java.util.*;
 public class CommandeBD {
     Connection laConnexion;
 	PreparedStatement st;
-	CommandeBD(Connection laConnexion){
+	public CommandeBD(Connection laConnexion){
 		this.laConnexion=laConnexion;
 	}
     //numcom  int NOT NULL,
@@ -41,13 +41,13 @@ public class CommandeBD {
 			String req2 = "Select * FROM DETAILCOMMANDE WHERE numcomm = ?";
 			this.st = laConnexion.prepareStatement(req);
 			st.setInt(1, nunumcomm);
-			rs = st.executeQuery(req);
+			rs = st.executeQuery();
 			while(rs.next()){
 				int numlig  = rs.getInt("numlig");
 				LivreBD livrebd = new LivreBD(laConnexion);
 				Livre livre = livrebd.getLivre(rs.getString("isbn"));
 				int qte = rs.getInt("qte");
-				commande.ajouterDetailCommande(new DetailCommande(rs.getInt(""),livre,qte,nunumcomm));
+				commande.ajouterDetailCommande(new DetailCommande(rs.getInt("numlig"),livre,qte,nunumcomm));
 			}
 		}
 		catch(SQLException e){
@@ -57,14 +57,14 @@ public class CommandeBD {
 	}
 
 
-    public String genererId(){
+    public Integer genererId(){
 		try {
 			String req = "Select MAX(numcom) max FROM COMMANDE";
 			this.st = laConnexion.prepareStatement(req);
-			ResultSet rs = st.executeQuery(req);
+			ResultSet rs = st.executeQuery();
 			while(rs.next()){
                 int max = Integer.parseInt(rs.getString("max"))+1;
-				return String.valueOf(max);
+				return max;
 			}
 			rs.close();
 		} catch (SQLException e) {
@@ -77,15 +77,22 @@ public class CommandeBD {
 		try {
 			String req = "Insert Into COMMANDE Values(?,?,?,?,?,?)";
 			this.st = laConnexion.prepareStatement(req);
+			System.out.println("ID MAGASIN utilisé : " + commande.getMagasin().getIdmag());
 			st.setInt(1, commande.getNumCommande());
 			st.setDate(2, java.sql.Date.valueOf(commande.getDatecomm()));
 			st.setString(3, commande.getEnligne()? "O":"N");
-			st.setString(3, commande.getLivraison().getCode());
-            st.setString(5, commande.getMagasin().getIdmag());
+			st.setString(4, commande.getLivraison().getCode());
+            if (commande.getMagasin().getIdmag() instanceof Integer) {
+            	st.setInt(5, Integer.parseInt(commande.getMagasin().getIdmag()));
+        	} else {
+            	st.setString(5, commande.getMagasin().getIdmag());
+        	}
 			st.setInt(6, commande.getClient().getNumeroClient());
-			st.executeUpdate(req);
-			
-			//req = "Insert Into DETAILCOMMANDE VALUES(?,?,)"
+			st.executeUpdate();
+			for(DetailCommande det : commande.getCommandeFinale()){
+				DetailCommandeBD detail = new DetailCommandeBD(laConnexion);
+				detail.insertDetailCommande(det);
+			}
 		} catch (SQLException e) {
 			System.err.println(e.getMessage());
 		}

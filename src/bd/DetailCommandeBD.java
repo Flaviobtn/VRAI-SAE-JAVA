@@ -11,9 +11,8 @@ public class DetailCommandeBD {
     }
 
     public DetailCommande getDetailCommande(int id){
-       
 		try{
-			 String req = "Select * FROM DETAILCOMMANDE WHERE numlig = ?";
+			String req = "Select * FROM DETAILCOMMANDE WHERE numlig = ?";
 			PreparedStatement st = laconnection.prepareStatement(req);
 			st.setInt(1, id);
 			ResultSet rs = st.executeQuery();
@@ -31,7 +30,38 @@ public class DetailCommandeBD {
 			System.err.println(e.getMessage());
 		}
 		return null;
-		
     }
 
+
+
+	public void insertDetailCommande(DetailCommande detailCommande){
+		try{
+			String req = "INSERT INTO DETAILCOMMANDE VALUES(?,?,?,?,?)";
+			PreparedStatement st = laconnection.prepareStatement(req);
+			st.setInt(1, detailCommande.getNumCo());
+			st.setInt(2, detailCommande.getQte());
+			st.setInt(3, detailCommande.getNumDetailCommande());
+			st.setDouble(4, detailCommande.getPrixLivres());
+			st.setString(5, detailCommande.getLivre().getIsbn());
+			st.executeUpdate();
+		}catch(SQLException e){
+			System.err.println(e.getMessage());
+		}
+	}
+
+	public Integer genererId(){
+		try {
+			String req = "Select MAX(numlig) max FROM DETAILCOMMANDE";
+			PreparedStatement st = laconnection.prepareStatement(req);
+			ResultSet rs = st.executeQuery();
+			while(rs.next()){
+                int max = rs.getInt("max")+1;
+				return max;
+			}
+			rs.close();
+		} catch (SQLException e) {
+			System.err.println(e.getMessage());
+		}
+		return null;
+	}
 }
