@@ -1,8 +1,7 @@
 package bd;
 import Modele.*;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class VendeurBD {
     Connection laConnexion;
@@ -44,6 +43,25 @@ public class VendeurBD {
         return isConnected;
     }
 
+    public Vendeur getVendeur(String id, String mdp) throws SQLException {
+        String req = "SELECT * FROM VENDEUR WHERE idVendeur = ? AND motDePasse = ?";
+        this.st = laConnexion.prepareStatement(req);
+        st.setString(1, id);
+        st.setString(2, mdp);
+        ResultSet rs = st.executeQuery();
+        if (rs.next()) {
+            String idVendeur = rs.getString("idVendeur");
+            String nom = rs.getString("nom");
+            String prenom = rs.getString("prenom");
+            String motdepasse = rs.getString("motDePasse");
+            String idmag = rs.getString("idmag");
+            MagasinBD magBD = new MagasinBD(laConnexion);
+            return new Vendeur(idVendeur, nom, prenom, motdepasse, magBD.getMagasin(idmag));
+        }
+        rs.close();
+        return null;
+    }
+
     public String genererId(){
 		try {
 			String req = "Select MAX(idVendeur) max FROM VENDEUR";
@@ -80,6 +98,10 @@ public class VendeurBD {
 			System.err.println(e.getMessage());
 		}
     }
+
+    
+
+
 }
 /*
 	public String modifierLivre(String isbn, String idmag, Integer qte ){

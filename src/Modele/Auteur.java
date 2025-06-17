@@ -44,15 +44,15 @@ public class Auteur extends Personne{
     public int getAnneeDeces(){
         return this.anneedeces;
     }
-/*
+
     public List<Livre> getLivreEcrits() {
-        return livreEcrits;
+        return this.livresEcrits;
     }
 
     public void ajouterLivreEcrit(Livre livre){
-        this.livreEcrits.add(livre);
+        this.livresEcrits.add(livre);
     }
-*/
+
     public String toString(){
         return this.nom;
     }

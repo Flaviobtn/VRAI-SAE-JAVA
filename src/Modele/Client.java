@@ -27,7 +27,6 @@ public class Client extends Personne {
     public String getIdentifiant() {
         return identifiant;
     }
-
     public int getNumeroClient() {
         return numeroClient;
     }
@@ -79,15 +78,15 @@ public class Client extends Personne {
         List<Livre> recommandations= new ArrayList<>();
         Iterator<Commande> it = toutesLesCommandes.iterator();
         while(it.hasNext()){
-        Commande commande = it.next();
-        if(!(client.commandes.contains(commande))){//si la commande qu'on regarde n'est pas celle du client
-        for(Livre livre : client.tousLesLivresClient()){// on parcourt chaque livre que le client à commandé
-        if(commande.tousLesLivres().contains(livre)){// si dans la commande qu'on regarde il y a le livre que le client a commandé 
-        // (il faut donc lui recommander les livres de cette commande)
-        for(Livre livreCommande : commande.tousLesLivres() ){// pour chaque livre de la commande
-        if(!(client.tousLesLivresClient().contains(livreCommande))&& !(recommandations.contains(livreCommande))){
-        //si le client n'a jamais commandé ce livre et qu'il n'est pas dans les recommandations
-        recommandations.add(livreCommande);// l'ajouter aux recommandations
+            Commande commande = it.next();
+            if(!(client.commandes.contains(commande))){//si la commande qu'on regarde n'est pas celle du client
+                for(Livre livre : client.tousLesLivresClient()){// on parcourt chaque livre que le client à commandé
+                if(commande.tousLesLivres().contains(livre)){// si dans la commande qu'on regarde il y a le livre que le client a commandé 
+                    // (il faut donc lui recommander les livres de cette commande)
+                    for(Livre livreCommande : commande.tousLesLivres() ){// pour chaque livre de la commande
+                        if(!(client.tousLesLivresClient().contains(livreCommande))&& !(recommandations.contains(livreCommande))){
+                            //si le client n'a jamais commandé ce livre et qu'il n'est pas dans les recommandations
+                            recommandations.add(livreCommande);// l'ajouter aux recommandations
                             }
                         }
                     }
@@ -97,5 +96,8 @@ public class Client extends Personne {
         return recommandations;
     }
 
-    
+    @Override
+    public String toString() {
+        return super.toString() + ", connecté en tant que Client";
+    }
 }

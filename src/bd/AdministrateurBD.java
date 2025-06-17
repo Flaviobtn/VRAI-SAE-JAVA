@@ -23,12 +23,26 @@ public class AdministrateurBD {
         
     }
 
+    public Administrateur getAdministrateur(String login, String mdp) throws SQLException {
+        String sql = "SELECT * FROM ADMINISTRATEUR WHERE prenom = ? AND motDePasse = ?";
+        PreparedStatement ps = laConnexion.prepareStatement(sql);
+            ps.setString(1, login);
+            ps.setString(2, mdp);
+            ResultSet rs = ps.executeQuery();
+            Administrateur admin = null;
+            while (rs.next()) {
+                admin = new Administrateur(rs.getString("idAdmin"),rs.getString("nom"), rs.getString("prenom"), rs.getString("motDePasse"));
+            }
+            rs.close(); 
+            return admin;
+    }
+
 	public void creerVendeur(Vendeur vendeur, Magasin magasin) throws SQLException {
         VendeurBD vendeurBD = new VendeurBD(laConnexion);
         vendeurBD.insertVendeur(vendeur);
     }   
 
-    public void ajouteMagasin(String idMag, String nomMag, String villeMag) throws SQLException {
+    /*public void ajouteMagasin(String idMag, String nomMag, String villeMag) throws SQLException {
         Statement st = laConnexion.createStatement();
         String req = "INSERT INTO MAGASIN VALUES ('" +
             idMag + "', '" +
@@ -36,13 +50,13 @@ public class AdministrateurBD {
             villeMag + "');";
         st.executeQuery(req); 
         st.close();
-    }
+    }*/
 
-    public void ajouterLivreAuMagasin(String idMag, String isbn, int qte) throws SQLException {
+    public void ajouterLivreAuMagasin(Livre livre, Magasin magasin, int qte) throws SQLException {
         Statement st = laConnexion.createStatement();
         String req = "INSERT INTO POSSEDER VALUES ('" +
-            idMag + "', '" +
-            isbn + "', " +
+            magasin.getIdmag() + "', '" +
+            livre.getIsbn() + "', " +
             qte + ");";
         st.executeQuery(req); 
         st.close();

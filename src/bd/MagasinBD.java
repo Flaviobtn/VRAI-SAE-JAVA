@@ -47,11 +47,12 @@ public class MagasinBD {
 
     public void insertMagasin(Magasin mag){
 		try {
-			String req = "Insert Into magasin Values(?,?,?)";
+			String req = "Insert Into MAGASIN Values(?,?,?)";
 			PreparedStatement st = laConnexion.prepareStatement(req);
 			st.setString(1, mag.getIdmag());
 			st.setString(2, mag.getNomMag());
 			st.setString(3, mag.getVilleMag());
+            st.executeUpdate();
 		} catch (SQLException e) {
 			System.err.println(e.getMessage());
 		}
@@ -59,7 +60,7 @@ public class MagasinBD {
 
     public String genererId(){
 		try {
-			String req = "Select MAX(idmag) max FROM Magasin";
+			String req = "Select MAX(idmag) max FROM MAGASIN";
 			PreparedStatement st = laConnexion.prepareStatement(req);
 			ResultSet rs = st.executeQuery();
 			while(rs.next()){
@@ -91,7 +92,6 @@ public class MagasinBD {
         return res;
     }
     
-    
     public void modifQteLivre(Magasin mag, Livre livre, int qte){
         String req = "UPDATE POSSEDER SET qte = ? WHERE idmag = ? AND isbn = ?";
         try {
@@ -106,6 +106,7 @@ public class MagasinBD {
         }            
     }
 }
+
 
 
 /*
@@ -202,6 +203,7 @@ public class MagasinBD {
             WHERE c.idmag = ?
         """;
 
+        
         try (PreparedStatement pst = laConnexion.prepareStatement(sql)) {
             pst.setString(1, idMag);
             ResultSet rs = pst.executeQuery();

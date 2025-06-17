@@ -3,8 +3,8 @@
 
 
 #on compile les fichiers .java
-javac -d bin --module-path ./lib/ --add-modules javafx.controls ./src/ihm/*/*.java
+javac -d bin --module-path /usr/share/openjfx/lib/ --add-modules javafx.controls -d bin src/ihm/*/*.java
 
 
 #on lance l'application
-java -cp bin:img --module-path ./lib/ --add-modules javafx.controls LivreExpresss
+java -cp bin:img --module-path /usr/share/openjfx/lib/ --add-modules javafx.controls -cp bin ihm.Vue.LivreExpresss

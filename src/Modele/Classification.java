@@ -4,12 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Classification {
-    private int iddewey;
+    private String iddewey;
     private String theme;
     private List<Livre> livresGenre;
 
-    public Classification(String theme){
+    public Classification(String iddewey, String theme){
         this.theme=theme;
+        this.iddewey = iddewey;
         this.livresGenre=new ArrayList<>();
     }
 
@@ -17,7 +18,7 @@ public class Classification {
         return this.theme;
     }
 
-    public int getIddewey(){
+    public String getIddewey(){
         return this.iddewey;
     }
 
