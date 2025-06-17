@@ -19,6 +19,7 @@ public class CommandeBD {
 
 
     public Commande getCommande(int nunumcomm)throws SQLException, IllegalArgumentException{
+		Commande commande = new Commande(nunumcomm, null, false, null, null, null);
 		String req = "Select * FROM COMMANDE WHERE numcomm = ?";
 		this.st = laConnexion.prepareStatement(req);
 		st.setInt(1, nunumcomm);
@@ -35,9 +36,18 @@ public class CommandeBD {
                 String idmag = rs.getString("idmag");
                 MagasinBD magBD = new MagasinBD(laConnexion);
 				ClientBD cliBD = new ClientBD(laConnexion);
-                Commande commande = new Commande(numcom, datecom, enligne, mode,  magBD.getMagasin(idmag), cliBD.getClient(idcli));
-				// faire detailCommande pour finir
-				
+                commande = new Commande(numcom, datecom, enligne, mode,  magBD.getMagasin(idmag), cliBD.getClient(idcli));
+			}
+			String req2 = "Select * FROM DETAILCOMMANDE WHERE numcomm = ?";
+			this.st = laConnexion.prepareStatement(req);
+			st.setInt(1, nunumcomm);
+			rs = st.executeQuery(req);
+			while(rs.next()){
+				int numlig  = rs.getInt("numlig");
+				LivreBD livrebd = new LivreBD(laConnexion);
+				Livre livre = livrebd.getLivre(rs.getString("isbn"));
+				int qte = rs.getInt("qte");
+				commande.ajouterDetailCommande(new DetailCommande(rs.getInt(""),livre,qte,nunumcomm));
 			}
 		}
 		catch(SQLException e){
@@ -74,7 +84,8 @@ public class CommandeBD {
             st.setString(5, commande.getMagasin().getIdmag());
 			st.setInt(6, commande.getClient().getNumeroClient());
 			st.executeUpdate(req);
-			//faire detailCommande pour pouvoir finir
+			
+			//req = "Insert Into DETAILCOMMANDE VALUES(?,?,)"
 		} catch (SQLException e) {
 			System.err.println(e.getMessage());
 		}

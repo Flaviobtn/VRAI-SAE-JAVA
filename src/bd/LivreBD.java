@@ -262,9 +262,9 @@ public class LivreBD {
             rsIsbn = st.executeQuery();
             List<Classification> listClass = new ArrayList<>();
             while (rsIsbn.next()) {
-                ClassificationBD classificationBD = new ClassificationBD(laConnexion);
-                Classification classification = classificationBD.getClassification(rsIsbn.getString("iddewey"));
-                listClass.add(classification);
+                //ClassificationBD classificationBD = new ClassificationBD(laConnexion);
+                //Classification classification = classificationBD.getClassification(rsIsbn.getString("iddewey"));
+                //listClass.add(classification);
             }
             livre.setThemes(listClass);
             return livre;

@@ -3,4 +3,4 @@
 javac -cp "./lib/mariadb-java-client-3.5.3.jar" -d bin src/bd/ConnectionBD.java
 
 # Lancer le programme
-java -cp "bin:lib/mariadb-java-client-3.5.3.jar" bd/ConnectionBD
+java -cp "bin;lib/mariadb-java-client-3.5.3.jar" bd.ConnectionBD

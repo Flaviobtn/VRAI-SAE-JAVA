@@ -18,6 +18,7 @@ public class AppMenu{
             }
         }
         largeur += 2; // marges
+        
 
         // Afficher le cadre supérieur
         System.out.println("╔" + "═".repeat(largeur) + "╗");
