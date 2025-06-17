@@ -14,7 +14,7 @@ public class Commande{
 
 
     //si demande de livraison en magasin
-    public Commande(int numCommande, LocalDate datecomm, boolean enligne, Livraison livraison, Magasin magasin, Client client) {
+    public Commande(int numCommande, LocalDate datecomm, boolean enligne, Livraison livraison, Magasin magasin, Client client){
         this.numCommande = numCommande;
         this.datecomm = datecomm;
         this.commandeFinale = new ArrayList<>();
@@ -26,12 +26,12 @@ public class Commande{
 
 
     public Client getClient() {
-        return client;
+        return this.client;
     }
 
 
     public Magasin getMagasin() {
-        return magasin;
+        return this.magasin;
     }
 
 
@@ -40,12 +40,12 @@ public class Commande{
     }
     
     public LocalDate getDatecomm() {
-        return datecomm;
+        return this.datecomm;
     }
 
 
     public List<DetailCommande> getCommandeFinale() {
-        return commandeFinale;
+        return this.commandeFinale;
     }
     
 
@@ -54,10 +54,10 @@ public class Commande{
     }
 
     public boolean getEnligne() {
-        return enligne;
+        return this. enligne;
     }
     public Livraison getLivraison() {
-        return livraison;
+        return this.livraison;
     }
 
     public List<Livre> tousLesLivres(){
@@ -99,7 +99,7 @@ public class Commande{
             facture += dc.toString() + "\n";
         }
 
-        facture += "Prix total: " + this.prixTotal() + " €\n";
+        facture += "Prix total: " + this.prixTotal() + " euros\n";
 
         return facture;
     }

@@ -29,6 +29,72 @@ public class MagasinBD {
 		return null;
 	}
 
+    public int nombreDeLivre(Magasin mag){
+        int nombre = 0;
+        String req = "SELECT SUM(qte) AS total FROM POSSEDER WHERE idmag = ?";
+        try {
+            PreparedStatement st = laConnexion.prepareStatement(req);
+            st.setString(1, mag.getIdmag());
+            ResultSet rs = st.executeQuery();
+            if (rs.next()) {
+                nombre = rs.getInt("total");
+            }
+            rs.close();
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+        }
+        return nombre;
+    }
+
+    public int nombreDeLivreVendu(Magasin mag, int annee){
+        int nombre = 0;
+        String req = "SELECT SUM(dc.qte) AS totalVendu " +
+                     "FROM COMMANDE c " +
+                     "JOIN DETAILCOMMANDE dc ON c.numcom = dc.numcom " +
+                     "WHERE c.idmag = ? AND YEAR(c.datecom) = ?";
+        try {
+            PreparedStatement st = laConnexion.prepareStatement(req);
+            st.setString(1, mag.getIdmag());
+            st.setInt(2, annee);
+            ResultSet rs = st.executeQuery();
+            if (rs.next()) {
+                nombre = rs.getInt("totalVendu");
+            }
+            rs.close();
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+        }
+        return nombre;
+    }
+
+    public Livre livreLePlusVendu(Magasin mag, int annee){
+        Livre livre = null;
+        String req = "SELECT l.isbn, l.titre, SUM(dc.qte) AS totalVendu " +
+                     "FROM COMMANDE c " +
+                     "JOIN DETAILCOMMANDE dc ON c.numcom = dc.numcom " +
+                     "JOIN POSSEDER p ON p.isbn = dc.isbn " +
+                     "JOIN LIVRE l ON p.isbn = l.isbn " +
+                     "WHERE c.idmag = ? AND YEAR(c.datecom) = ? " +
+                     "GROUP BY l.isbn, l.titre " +
+                     "ORDER BY totalVendu DESC LIMIT 1";
+        try {
+            PreparedStatement st = laConnexion.prepareStatement(req);
+            st.setString(1, mag.getIdmag());
+            st.setInt(2, annee);
+            ResultSet rs = st.executeQuery();
+            if (rs.next()) {
+                String isbn = rs.getString("isbn");
+                String titre = rs.getString("titre");
+                LivreBD livreBD = new LivreBD(laConnexion);
+                livre = livreBD.getLivre(isbn);
+            }
+            rs.close();
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+        }
+        return livre;
+    }
+
     public List<Magasin> getToutLesMagasins(){
         List<Magasin> magasins = new ArrayList<>();
         String req = "Select DISTINCT idmag FROM MAGASIN";
