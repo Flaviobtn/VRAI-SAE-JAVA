@@ -42,7 +42,7 @@ public class LivreExpresss extends Application {
     /**
      * le text qui indique l'utilisateur
      */
-    private Text lUtilisateur;
+    public Text lUtilisateur;
     
     /**
      * le panel Central qui pourra être modifié selon le mode (accueil ou jeu)
@@ -91,7 +91,7 @@ public class LivreExpresss extends Application {
      */
     private Scene laScene(){
         this.fenetre = new BorderPane();
-        fenetrePanier();
+        fenetreChoix();
         fenetre.setTop(this.banniere);
         fenetre.setLeft(this.gauche);
         fenetre.setCenter(this.panelCentral);
@@ -158,6 +158,7 @@ public class LivreExpresss extends Application {
 
         // Bouton de connexion
         Button choix = new Button("CONNEXION");
+        choix.setOnAction(new ControleurConnexion(this));
         choix.setMinWidth(200);
         choix.setMinHeight(100);
         choix.setFont(Font.font("Arial", 15));
@@ -212,7 +213,7 @@ public class LivreExpresss extends Application {
 
         // Titre "Livre Express"
         ImageView titreLVE = new ImageView(this.lesImages.get(0));
-        Text titreText = new Text("Connexion Compte " + this.lUtilisateur);
+        Text titreText = new Text("Connexion Compte " + this.lUtilisateur.getText());
         titreText.setStyle("-fx-font-size: 30px; -fx-font-weight: bold;-fx-text-fill: #2c2c2c;");
         titreLVE.setFitWidth(800);
         titreLVE.setFitHeight(200);
@@ -255,13 +256,15 @@ public class LivreExpresss extends Application {
         // Bouton de connexion et d'inscription
         HBox loginContainer = new HBox();
         Button inscription = new Button("INSCRIPTION");
+        inscription.setOnAction(new ControleurConnexion(this));
         inscription.setMinWidth(200);
         inscription.setMinHeight(100);
         inscription.setFont(Font.font("Arial", 15));
         inscription.setStyle("-fx-background-color: white; -fx-text-fill: #2c2c2c; " +
                              "-fx-border-color: #2c2c2c; -fx-border-width: 2; " +
                              "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;");
-        Button connexion = new Button("CONNEXION");
+        Button connexion = new Button("SE CONNECTER");
+        connexion.setOnAction(new ControleurConnexion(this));
         connexion.setMinWidth(200);
         connexion.setMinHeight(100);
         connexion.setFont(Font.font("Arial", 15));

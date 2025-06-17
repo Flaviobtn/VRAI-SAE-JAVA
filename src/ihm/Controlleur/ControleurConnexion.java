@@ -33,11 +33,42 @@ public class ControleurConnexion implements EventHandler<ActionEvent> {
         Button button = (Button) actionEvent.getTarget();
         String nomDuBouton = button.getText();
         System.out.println(nomDuBouton);
-        if(nomDuBouton.equals("Facile")){
-            this.vue.setNiveau(0);
+        if(nomDuBouton.equals("CONNEXION")){
+            this.vue.modeConnexion();
         }
-        if(nomDuBouton.equals("Moyen")){
-            this.vue.(1);
+        if(nomDuBouton.equals("SE CONNECTER")){
+            if(this.vue.lUtilisateur.getText().equals("CLIENT")){
+                System.out.println("Connexion en tant que Client");
+            } 
+            //else {
+            //    Alert alert = new Alert(Alert.AlertType.ERROR);
+            //    alert.setTitle("Erreur de connexion");
+            //    alert.setHeaderText(null);
+            //    alert.setContentText("Identifiants incorrects. Veuillez réessayer.");
+            //    Optional<ButtonType> result = alert.showAndWait();
+            //}
+
+             if(this.vue.lUtilisateur.getText().equals("VENDEUR")){
+                System.out.println("Connexion en tant que Vendeur");
+            } 
+            //else {
+            //    Alert alert = new Alert(Alert.AlertType.ERROR);
+            //    alert.setTitle("Erreur de connexion");
+            //    alert.setHeaderText(null);
+            //    alert.setContentText("Identifiants incorrects. Veuillez réessayer.");
+            //    Optional<ButtonType> result = alert.showAndWait();
+            //}
+
+             if(this.vue.lUtilisateur.getText().equals("ADMINISTRATEUR")){
+                System.out.println("Connexion en tant qu'Administrateur");
+            } 
+            //else {
+            //    Alert alert = new Alert(Alert.AlertType.ERROR);
+            //    alert.setTitle("Erreur de connexion");
+            //    alert.setHeaderText(null);
+            //    alert.setContentText("Identifiants incorrects. Veuillez réessayer.");
+            //    Optional<ButtonType> result = alert.showAndWait();
+            //}
         }
 }
 }
