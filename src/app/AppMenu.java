@@ -508,10 +508,23 @@ public class AppMenu{
 
     public static void consulterStat(){
         // Cette fonction sert à consulter les statistiques d'un magasin
-        String aff = "Vous consultez les statistiques";
+        Magasin mag = demanderMagasin("De quel magasin voulez vous les statistiques ?");
+        Scanner scanner = new Scanner(System.in);
+        String q1 = "Chiffre d'affaire total par année";
+        String q2 = "Le livre le plus vendu";
+        String q3 = "Le nombre de livre(s) vendu(s)";
+        String q4 = "Le nombre de livre de la librairie";
+        String quit = "Quitter";
         List<String> lstRep = new ArrayList<>();
-        lstRep.add(aff);
-        afficherMenu("Consultation statistique ", lstRep);
+        lstRep.add(q1);
+        lstRep.add(q2);
+        lstRep.add(q3);
+        lstRep.add(q4);
+        lstRep.add(quit);
+        afficherMenu("Consultation des statistiques du magasin "+mag.getNomMag(), lstRep);
+        int rep = scanner.nextInt();
+        
+
     }
 
 

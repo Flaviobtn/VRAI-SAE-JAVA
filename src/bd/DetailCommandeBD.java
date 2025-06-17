@@ -19,12 +19,12 @@ public class DetailCommandeBD {
 			while(rs.next()){
 				int numlig = rs.getInt("numlig");
 				LivreBD livrebd = new LivreBD(laconnection);
-				Livre  livre = rs.getInt("qte");
-				double ville = rs.getDouble("");
+				Livre  livre = livrebd.getLivre(rs.getString("isbn"));
+				int qte = rs.getInt("qte");
                 String mag = rs.getString("idmag");
                 
                 MagasinBD magBD = new MagasinBD(laconnection);
-                return new DetailCommande(iddc, nom,ville, magBD.getMagasin(mag));
+                return new DetailCommande(numlig, livre,ville, magBD.getMagasin(mag));
 			}
 		}
 		catch(SQLException e){
