@@ -10,23 +10,21 @@ public class DetailCommandeBD {
         this.laconnection = laconnection;
     }
 
-/*
     public DetailCommande getDetailCommande(int id){
-        String req = "Select * FROM DETAILCOMMANDE WHERE numlig = ?";
-		PreparedStatement st = laconnection.prepareStatement(req);
-		st.setInt(1, id);
-		ResultSet rs = st.executeQuery();
+       
 		try{
+			 String req = "Select * FROM DETAILCOMMANDE WHERE numlig = ?";
+			PreparedStatement st = laconnection.prepareStatement(req);
+			st.setInt(1, id);
+			ResultSet rs = st.executeQuery();
 			while(rs.next()){
 				int numlig = rs.getInt("numlig");
 				LivreBD livrebd = new LivreBD(laconnection);
 				Livre  livre = livrebd.getLivre(rs.getString("isbn"));
 				int qte = rs.getInt("qte");
-				int 
-                String mag = rs.getString("idmag");
-                
+                int numCo = rs.getInt("numcom");
                 MagasinBD magBD = new MagasinBD(laconnection);
-                return new DetailCommande(numlig, livre,qte, );
+                return new DetailCommande(numlig, livre,qte, numCo);
 			}
 		}
 		catch(SQLException e){
@@ -35,5 +33,5 @@ public class DetailCommandeBD {
 		return null;
 		
     }
-	*/
+
 }
