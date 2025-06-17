@@ -1,10 +1,15 @@
 #!/bin/bash
-# on se rend dans le dossier src
 
+# Répertoire JavaFX
+JAVAFX_PATH="./lib/JavaFx/lib"
 
-#on compile les fichiers .java
-javac -d bin --module-path /usr/share/openjfx/lib/ --add-modules javafx.controls -d bin src/ihm/*/*.java
+# Compiler tous les fichiers .java dans src
+find src/ihm -name "*.java" | while read file; do
+    echo "Compilation de $file"
+    javac --module-path "$JAVAFX_PATH" --add-modules javafx.controls -d bin -cp src "$file"
+done
 
-
-#on lance l'application
-java -cp bin:img --module-path /usr/share/openjfx/lib/ --add-modules javafx.controls -cp bin ihm.Vue.LivreExpresss
+# Exécuter la classe principale
+echo
+echo "Lancement de l'application..."
+java --module-path "$JAVAFX_PATH" --add-modules javafx.controls -cp bin ihm.Vue.LivreExpresss

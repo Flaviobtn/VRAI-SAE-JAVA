@@ -1,10 +1,6 @@
 package bd;
-import Modele.*;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Properties;
+import java.sql.*;
+import java.util.*;
 import java.io.*;
 
 public class ConnectionBD {
@@ -52,12 +48,12 @@ public class ConnectionBD {
         }
     }
 
-    /*public static void main(String[] args) {
+    public static void main(String[] args) {
         Connection conn = getConnection();
         if (conn != null) {
             System.out.println("Connexion réussie !");
         } else {
             System.out.println("Échec de la connexion.");
         }
-    }*/
+    }
 }

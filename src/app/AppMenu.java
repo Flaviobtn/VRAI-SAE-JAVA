@@ -507,25 +507,63 @@ public class AppMenu{
     }
 
     public static void consulterStat(){
-        // Cette fonction sert à consulter les statistiques d'un magasin
-        Magasin mag = demanderMagasin("De quel magasin voulez vous les statistiques ?");
-        Scanner scanner = new Scanner(System.in);
-        String q1 = "Chiffre d'affaire total par année";
-        String q2 = "Le livre le plus vendu";
-        String q3 = "Le nombre de livre(s) vendu(s)";
-        String q4 = "Le nombre de livre de la librairie";
-        String quit = "Quitter";
-        List<String> lstRep = new ArrayList<>();
-        lstRep.add(q1);
-        lstRep.add(q2);
-        lstRep.add(q3);
-        lstRep.add(q4);
-        lstRep.add(quit);
-        afficherMenu("Consultation des statistiques du magasin "+mag.getNomMag(), lstRep);
-        int rep = scanner.nextInt();
-        
+    // Cette fonction sert à consulter les statistiques d'un magasin
+    Magasin mag = demanderMagasin("De quel magasin voulez vous les statistiques ?");
+    Scanner scanner = new Scanner(System.in);
+    String q1 = "Chiffre d'affaire total par année";
+    String q2 = "Le livre le plus vendu";
+    String q3 = "Le nombre de livre(s) vendu(s)";
+    String q4 = "Le nombre de livre de la librairie";
+    String quit = "Quitter";
+    List<String> lstRep = new ArrayList<>();
+    lstRep.add(q1);
+    lstRep.add(q2);
+    lstRep.add(q3);
+    lstRep.add(q4);
+    lstRep.add(quit);
+    afficherMenu("Consultation des statistiques du magasin "+mag.getNomMag(), lstRep);
 
+    int rep = -1;
+    while (true) {
+        System.out.print("Veuillez entrer un nombre correspondant à votre choix : ");
+        if (scanner.hasNextInt()) {
+            rep = scanner.nextInt();
+            break;
+        } else {
+            System.out.println("❌ Veuillez entrer un nombre valide.");
+            scanner.next(); // Consomme l'entrée invalide
+        }
     }
+
+    switch(rep){
+        case 1 -> {
+            System.out.println("Chiffre d'affaire total par année : ");
+            MagasinBD magasinBD = new MagasinBD(ConnectionBD.getConnection());
+            //magasinBD.chiffreAffaireParAnnee(mag);
+        }
+        case 2 -> {
+            System.out.println("Le livre le plus vendu : ");
+            MagasinBD magasinBD = new MagasinBD(ConnectionBD.getConnection());
+            //magasinBD.livrePlusVendu(mag);
+        }
+        case 3 -> {
+            System.out.println("Le nombre de livre(s) vendu(s) : ");
+            MagasinBD magasinBD = new MagasinBD(ConnectionBD.getConnection());
+            //magasinBD.nombreLivresVendus(mag);
+        }
+        case 4 -> {
+            System.out.println("Le nombre de livre de la librairie : ");
+            MagasinBD magasinBD = new MagasinBD(ConnectionBD.getConnection());
+            //magasinBD.nombreLivresLibrairie(mag);
+        }
+        case 5 -> {
+            System.out.println("Vous quittez la consultation des statistiques");
+        }
+        default -> {
+            System.out.println("❌ Option invalide. Veuillez réessayer.");
+        }
+    }
+}
 
 
     // Les fonctions de vendeur ----------------------------------------------------------------------------------------------------------
