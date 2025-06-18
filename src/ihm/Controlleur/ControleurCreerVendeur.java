@@ -40,10 +40,35 @@ public class ControleurCreerVendeur implements EventHandler<ActionEvent> {
     
     @Override
     public void handle(ActionEvent actionEvent) {
+        Magasin magasin = null;
         try {
-            modeleA.creerVendeur(vue.getCreationVendeur(), vue.getMagasinCreation());
-            System.out.println("askip on a ajouté le vendeur");
-            vue.modeAccueilA();
+            magasin = magasinBD.getMagasin(vue.getComboBoxSave().getValue());
+        } catch (SQLException e) {
+            System.err.println("Erreur lors de la récupération du magasin : " + e.getMessage());
+            vue.popUpConnexionImpossible();
+            return;
+        }
+        List<TextField> champs = vue.getCreationVendeur();
+    if (champs.size() >= 3) {
+        String nom = champs.get(0).getText();
+        String prenom = champs.get(1).getText();
+        String mdp = champs.get(2).getText();
+        // ...
+    } else {
+        System.out.println("Erreur : pas assez de champs dans creationVendeur !");
+        vue.popUpConnexionImpossible();
+        return;
+    }
+        Vendeur vendeur = new Vendeur(
+            vue.getIdentifiantSave(),
+            vue.getCreationVendeur().get(0).getText(),
+            vue.getCreationVendeur().get(1).getText(),
+            vue.getCreationVendeur().get(2).getText(),
+            magasin
+        );
+        try {
+            modeleA.creerVendeur(vendeur, magasin);
+            vue.modeConnexion();
         } catch (Exception e) {
             vue.popUpConnexionImpossible();
             System.err.println("Erreur lors de l'inscription : " + e.getMessage());
