@@ -123,6 +123,11 @@ public class Client extends Personne {
         return new ArrayList<>(recommandations);
     }
 
+    public Map<Integer, List<Livre>> recotoMap(){
+        Map<Integer,List<Livre>> map = new HashMap<>();
+        map.put(1, onVousRecommande());
+        return map;
+    }
 
 
     @Override
