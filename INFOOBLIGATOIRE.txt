@@ -1,5 +1,5 @@
-host=Localhost
-port=3307
-database=librairie
-user=root
-password=
+host=servinfo-maria
+port=3306
+database=DBbouton
+user=bouton
+password=bouton

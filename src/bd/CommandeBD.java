@@ -39,7 +39,7 @@ public class CommandeBD {
                 commande = new Commande(numcom, datecom, enligne, mode,  magBD.getMagasin(idmag), cliBD.getClient(idcli));
 			}
 			String req2 = "Select * FROM DETAILCOMMANDE WHERE numcomm = ?";
-			this.st = laConnexion.prepareStatement(req);
+			this.st = laConnexion.prepareStatement(req2);
 			st.setInt(1, nunumcomm);
 			rs = st.executeQuery();
 			while(rs.next()){
@@ -47,7 +47,7 @@ public class CommandeBD {
 				LivreBD livrebd = new LivreBD(laConnexion);
 				Livre livre = livrebd.getLivre(rs.getString("isbn"));
 				int qte = rs.getInt("qte");
-				commande.ajouterDetailCommande(new DetailCommande(rs.getInt("numlig"),livre,qte,nunumcomm));
+				commande.ajouterDetailCommande(new DetailCommande(numlig,livre,qte,nunumcomm));
 			}
 		}
 		catch(SQLException e){
@@ -82,11 +82,7 @@ public class CommandeBD {
 			st.setDate(2, java.sql.Date.valueOf(commande.getDatecomm()));
 			st.setString(3, commande.getEnligne()? "O":"N");
 			st.setString(4, commande.getLivraison().getCode());
-            if (commande.getMagasin().getIdmag() instanceof Integer) {
-            	st.setInt(5, Integer.parseInt(commande.getMagasin().getIdmag()));
-        	} else {
-            	st.setString(5, commande.getMagasin().getIdmag());
-        	}
+        	st.setInt(5, Integer.parseInt(commande.getMagasin().getIdmag()));
 			st.setInt(6, commande.getClient().getNumeroClient());
 			st.executeUpdate();
 			for(DetailCommande det : commande.getCommandeFinale()){
