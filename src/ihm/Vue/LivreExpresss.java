@@ -785,7 +785,7 @@ choix.setOnMouseExited(e ->
             suPanier.setStyle("-fx-font-size: 25px;");
             livre.getChildren().addAll(titre,prix,quantite,suPanier);
             livre.setPadding(new Insets(0,0,0,50));
-            livre.setStyle("-fx-background-color: lightpink;");
+            livre.setStyle("-fx-background-color: #154c45;;");
             listLivres.getChildren().addAll(livre);
             listLivres.setMargin(livre,new Insets(0,655,0,665));
         }
@@ -813,7 +813,7 @@ choix.setOnMouseExited(e ->
 
         
         this.banniere=new BorderPane();
-        banniere.setStyle("-fx-background-color: lightpink;");
+        banniere.setStyle("-fx-background-color: #154c45;;");
         ImageView imgLogo = new ImageView(this.lesImages.get(0));
         imgLogo.setFitWidth(520);
         imgLogo.setPreserveRatio(true);
@@ -905,7 +905,7 @@ choix.setOnMouseExited(e ->
 
         
         this.banniere=new BorderPane();
-        banniere.setStyle("-fx-background-color: lightpink;");
+        banniere.setStyle("-fx-background-color: #154c45;;");
         ImageView imgLogo = new ImageView(this.lesImages.get(0));
         imgLogo.setFitWidth(520);
         imgLogo.setPreserveRatio(true);
