@@ -1,8 +1,6 @@
 package Modele;
 import bd.*;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public class Client extends Personne {
     private String identifiant;
@@ -74,8 +72,11 @@ public class Client extends Personne {
         magasin.supprimerLivre(livre);
     }
 
+    /*
     public List<Livre> onVousRecommande(Client client, List<Commande> toutesLesCommandes){
         List<Livre> recommandations= new ArrayList<>();
+        System.out.println(toutesLesCommandes);
+
         Iterator<Commande> it = toutesLesCommandes.iterator();
         while(it.hasNext()){
             Commande commande = it.next();
@@ -94,7 +95,38 @@ public class Client extends Personne {
             }
         }
         return recommandations;
+        
     }
+    */
+
+   public List<Livre> onVousRecommande(Client client, List<Commande> toutesLesCommandes) {
+    List<Livre> recommandations = new ArrayList<>();
+    Set<Livre> livresClient = new HashSet<>(client.tousLesLivresClient());
+
+    for (Commande commande : toutesLesCommandes) {
+        if (!client.commandes.contains(commande)) {
+            Set<Livre> livresCommande = new HashSet<>(commande.tousLesLivres());
+            // Intersection : est-ce qu'il y a au moins un livre en commun ?
+            boolean enCommun = false;
+            for (Livre livre : livresClient) {
+                if (livresCommande.contains(livre)) {
+                    enCommun = true;
+                    break;
+                }
+            }
+            if (enCommun) {
+                for (Livre livreCommande : livresCommande) {
+                    if (!livresClient.contains(livreCommande) && !recommandations.contains(livreCommande)) {
+                        recommandations.add(livreCommande);
+                    }
+                }
+            }
+        }
+    }
+    return recommandations;
+}
+
+
 
     @Override
     public String toString() {

@@ -11,7 +11,7 @@ public class ClientBD{
 	}
 
 	public Client getClient(int idcli)throws SQLException{
-		String req = "Select * FROM CLIENT WHERE icli = ?";
+		String req = "Select * FROM CLIENT WHERE idcli = ?";
 		this.st = laConnexion.prepareStatement(req);
 		this.st.setString(1, String.valueOf(idcli));
 		ResultSet rs = st.executeQuery();
@@ -21,7 +21,7 @@ public class ClientBD{
 				String nomCli = rs.getString("nomcli");
 				String prenomCli = rs.getString("prenomcli");
 				String identifiant = rs.getString("identifiant");
-				String addresseCli = rs.getString("addressecli");
+				String addresseCli = rs.getString("adressecli");
 				int codePostalCli = rs.getInt("codepostal");
 				String motdepasse = rs.getString("identifiant");
 				String villeCli = rs.getString("villecli");
@@ -79,7 +79,8 @@ public class ClientBD{
 		return null;
 	}
 
-	public void inscrireClient(Integer idCli, String prenom, String nom, String mdp, String adresse, String ville, int codePostal) throws SQLException {
+	public void inscrireClient(String prenom, String nom, String mdp, String adresse, String ville, int codePostal) throws SQLException {
+		Integer idCli = genererId();
 		String ident = String.valueOf(prenom.charAt(0)).toLowerCase() + nom.toLowerCase();
 		// Vérification de l'identifiant
 		

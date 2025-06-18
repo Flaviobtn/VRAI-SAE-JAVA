@@ -25,3 +25,5 @@ $mainClass = "Pendu"
 # Exécution
 Write-Host "🚀 Exécution du programme..."
 java -cp "$bin;$img" --module-path "$javafx" --add-modules javafx.controls $mainClass
+
+

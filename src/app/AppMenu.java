@@ -6,7 +6,8 @@ import java.util.*;
 import java.time.*;
 
 public class AppMenu{
-    private static Personne personneConnectee = null; // pour savoir qui est connecté
+    private static Personne personneConnectee = null;
+    private static Connection connection = ConnectionBD.getConnection();// pour savoir qui est connecté
     public static void afficherMenu(String titre, List<String> options) {
         
         //clear();
@@ -45,7 +46,6 @@ public class AppMenu{
     }
     
     public static void main(String[] args) {
-        Connection connection = ConnectionBD.getConnection();
         Scanner scanner = new Scanner(System.in);
         List<String> mainapp = List.of(
             "Administrateur",
@@ -100,8 +100,6 @@ public class AppMenu{
         int choix = 0;
         do {
             //On commence par gérer la connexion
-            
-
             // si c'est un client, il peut soit s'inscrire soit se connecter
             boolean estConnecte = false;
             while (! estConnecte){
@@ -338,7 +336,6 @@ public class AppMenu{
 
     // les fonctions d'administrateur  ----------------------------------------------------------------------------------------------------------
     public static void  creerVendeur(){
-        Connection connexion = ConnectionBD.getConnection();
         Scanner scanner = new Scanner(System.in);
         // Cette fonction sert à créer un nouveau vendeur et à l'ajouter dans la base de donnée
         
@@ -369,7 +366,7 @@ public class AppMenu{
             return;
         }
         
-        VendeurBD vendeurBD = new VendeurBD(connexion);
+        VendeurBD vendeurBD = new VendeurBD(connection);
         String idVendeur = vendeurBD.genererId();
         // on genere le mdp
         String mdp =  String.valueOf(prenom.charAt(0)) + nom.toLowerCase();
@@ -384,10 +381,9 @@ public class AppMenu{
     }
 
     public static Magasin demanderMagasin(String question){
-        Connection connexion = ConnectionBD.getConnection();
         Scanner scanner = new Scanner(System.in);
         // on récupère la liste des magasins
-        MagasinBD magasinBD = new MagasinBD(connexion);
+        MagasinBD magasinBD = new MagasinBD(connection);
         List<Magasin> lstMag = magasinBD.getToutLesMagasins();
         // on affiche le menu pour choisir un magasin
         // ------------------------------------------------------------------
@@ -403,7 +399,14 @@ public class AppMenu{
             lstRep.add("QUITTER");
             afficherMenu(question, lstRep);
 
+            // on vérifie qu'il entre bien un int
+            while (!scanner.hasNextInt()) {
+                System.out.println("❌ Veuillez entrer un nombre valide.");
+                scanner.next(); // Consomme l'entrée invalide
+                afficherMenu(question, lstRep);
+            }
             int choix = scanner.nextInt();
+
             if (choix == lstRep.size()){
                 lstRep = new ArrayList<>();
                 lstRep.add("Vous quittez " );
@@ -437,8 +440,7 @@ public class AppMenu{
         Scanner scanner = new Scanner(System.in);
         List<String> lstRep = new ArrayList<>();
         // deja pour l'id on recupere la liste des magasins existantes et on ajoute 1
-        Connection connexion = ConnectionBD.getConnection();
-        MagasinBD magasinBD = new MagasinBD(connexion);
+        MagasinBD magasinBD = new MagasinBD(connection);
         String idmag = magasinBD.genererId(); // on genere un id de magasin
         // le nom de la librairie
         String aff1 = "Quel est le nom de la librairie ?";
@@ -568,14 +570,14 @@ public class AppMenu{
 
     public static void nbLivresMag(Magasin mag){
         // Cette fonction sert à afficher le nombre de livre d'un magasin
-        MagasinBD magasinBD = new MagasinBD(ConnectionBD.getConnection());
+        MagasinBD magasinBD = new MagasinBD(connection);
         int nombreLivres = magasinBD.nombreDeLivre(mag);
         System.out.println("Le nombre de livre dans le magasin " + mag.getNomMag() + " est de : " + nombreLivres);
     }
 
     public static void nombreDeLivreVendu(Magasin mag){
         // Cette fonction sert à afficher le nombre de livre vendu d'un magasin
-        MagasinBD magasinBD = new MagasinBD(ConnectionBD.getConnection());
+        MagasinBD magasinBD = new MagasinBD(connection);
         // on récupère l'année voulu 
         Scanner scanner = new Scanner(System.in);
         System.out.println("Veuillez entrer l'année pour laquelle vous voulez le nombre de livre vendu : ");  
@@ -587,7 +589,7 @@ public class AppMenu{
 
     public static void livreLePlusVendu(Magasin mag){
         // Cette fonction sert à afficher le livre le plus vendu d'un magasin
-        MagasinBD magasinBD = new MagasinBD(ConnectionBD.getConnection());
+        MagasinBD magasinBD = new MagasinBD(connection);
         // on récupère l'année voulu 
         Scanner scanner = new Scanner(System.in);
         System.out.println("Veuillez entrer l'année pour laquelle vous voulez le livre le plus vendu : ");  
@@ -606,7 +608,7 @@ public class AppMenu{
         Scanner scanner = new Scanner(System.in);
         System.out.println("Veuillez entrer l'année pour laquelle vous voulez le chiffre d'affaire : ");
         int annee = scanner.nextInt();
-        MagasinBD magasinBD = new MagasinBD(ConnectionBD.getConnection());
+        MagasinBD magasinBD = new MagasinBD(connection);
         double chiffreAffaire = magasinBD.chiffreAffaire(mag, annee);
         System.out.println("Le chiffre d'affaire du magasin " + mag.getNomMag() + " pour l'année " + annee + " est de : " + chiffreAffaire + " euros");
     }
@@ -623,8 +625,7 @@ public class AppMenu{
             afficherMenu("Ajout d'un livre ", lstRep);
             return;
         }
-        Connection connexion = ConnectionBD.getConnection();
-        LivreBD livreBD = new LivreBD(connexion);
+        LivreBD livreBD = new LivreBD(connection);
         Vendeur vendeur = (Vendeur) personneConnectee; // on cast la personne connectée en vendeur
         livreBD.ajouterLivreMagasin(vendeur, livre);
         lstRep.add("Le livre " + livre.getTitre() + " a été ajouté à le magasin "+ vendeur.getMagasin().getNomMag() + " .");
@@ -634,8 +635,7 @@ public class AppMenu{
     public static void supprimerLivreMagasin(){
         // Cette fonction sert à supprimer un livre du magasin
         Scanner scanner = new Scanner(System.in);
-        Connection connexion = ConnectionBD.getConnection();
-        LivreBD livreBD = new LivreBD(connexion);
+        LivreBD livreBD = new LivreBD(connection);
         Vendeur vendeur = (Vendeur) personneConnectee; // on cast la personne connectée en vendeur
         Livre livre = demanderLivreExistant("Quel livre voulez vous supprimer ?", vendeur.getMagasin());
         if (livre == null) {
@@ -658,7 +658,7 @@ public class AppMenu{
     public static Livre demanderLivre(){
         // Cette fonction sert à demander les informations d'un livre
         Scanner scanner = new Scanner(System.in);
-        Connection connexion = ConnectionBD.getConnection();
+        //Connection connexion = ConnectionBD.getConnection();
         //String aff1 = "Veuillez entrer l'ISBN du livre"; //complètement con tu connais l'isbn du livre toi ?
         String aff2 = "Veuillez entrer le titre du livre";
         String aff6 = "Veuillez entrer le nombre de pages du livre";
@@ -709,7 +709,7 @@ public class AppMenu{
         afficherMenu("Ajout d'un livre ", lstRep);
         String editeurNom = scanner.nextLine();
         
-        EditeurBD editeurBD = new EditeurBD(connexion);
+        EditeurBD editeurBD = new EditeurBD(connection);
         // on vérifie si l'éditeur existe déjà
         List<Editeur> editeurs = new ArrayList<>();
         Editeur editeur = null;
@@ -729,10 +729,9 @@ public class AppMenu{
     }
 
     public static Livre demanderLivreAll(){
-        Connection connexion = ConnectionBD.getConnection();
         Scanner scanner = new Scanner(System.in);
         //on va prendre la liste des livres existants dans la base de données
-        LivreBD livreBD = new LivreBD(connexion);
+        LivreBD livreBD = new LivreBD(connection);
         List<Livre> lstLivres = new ArrayList<>();
         lstLivres = livreBD.getTousLesLivresBase();
         
@@ -778,8 +777,7 @@ public class AppMenu{
     public static Editeur demanderEditeur(String question){
         // Cette fonction sert à demander les informations d'un éditeur
         List<Editeur> lstEditeurs = new ArrayList<>();
-        Connection connexion = ConnectionBD.getConnection();
-        EditeurBD editeurBD = new EditeurBD(connexion);
+        EditeurBD editeurBD = new EditeurBD(connection);
         lstEditeurs = editeurBD.getListeEditeurs();
         Scanner scanner = new Scanner(System.in);
         Editeur editeur = null;
@@ -822,8 +820,7 @@ public class AppMenu{
     public static Auteur demanderAuteur(String question){
         // Cette fonction sert à demander les informations d'un auteur
         List<Auteur> lstAuteurs = new ArrayList<>();
-        Connection connexion = ConnectionBD.getConnection();
-        AuteurBD auteurBD = new AuteurBD(connexion);
+        AuteurBD auteurBD = new AuteurBD(connection);
         try { 
             lstAuteurs = auteurBD.getListeAuteurs();
         }
@@ -891,58 +888,59 @@ public class AppMenu{
         afficherMenu("De quel livre voulez vous modifier la quantité ? ", lstRep);
         Scanner scanner = new Scanner(System.in);
         int nouvelleQte = scanner.nextInt();
-        Connection connexion = ConnectionBD.getConnection();
+        //Connection connexion = ConnectionBD.getConnection();
 
     }
 
     public static Livre demanderLivreExistant(String question, Magasin mag){
         // on récupère la liste des livres existants
-        Connection connexion = ConnectionBD.getConnection();
-        LivreBD livreBD = new LivreBD(connexion);
+        LivreBD livreBD = new LivreBD(connection);
         List<Livre> lstLivres = new ArrayList<>();
         lstLivres = livreBD.getTousLesLivres(mag);
         Scanner scanner = new Scanner(System.in);
         Livre livre = null;
         boolean correct = false;
-        while (! correct){ 
-            List<String> lstRep = new ArrayList<>();
-            for (Livre liv : lstLivres){
-                lstRep.add(liv.getTitre());
-            }
-            lstRep.add("QUITTER");
-            afficherMenu(question, lstRep);
+        while (!correct) {
+    List<String> lstRep = new ArrayList<>();
+    for (Livre liv : lstLivres) {
+        lstRep.add(liv.getTitre());
+    }
+    lstRep.add("QUITTER");
+    afficherMenu(question, lstRep);
 
-            int choix = scanner.nextInt();
-            if (choix == lstRep.size()){
-                // on retourne au menu principal
-                // on quitte la fonction
-                lstRep = new ArrayList<>();
-                lstRep.add("Vous quittez " );
-                afficherMenu(question,lstRep);
-                livre = null; // on quitte la fonction
-                correct = true;
-            }
-            else{
-                if (choix-1 < lstRep.size()){
-                    livre = lstLivres.get(choix-1);
-                    lstRep = new ArrayList<>();
-                    lstRep.add("Vous avez choisi le livre : "+ livre.getTitre());
-                    afficherMenu(question,lstRep);
-                    correct = true;
-                }
-                else {
-                    lstRep = new ArrayList<>();
-                    lstRep.add("Veuillez choisir un livre correct ");
-                    afficherMenu(question,lstRep);
-                }
-            }
+    if (scanner.hasNextInt()) {
+        int choix = scanner.nextInt();
+        if (choix == lstRep.size()) {
+            // on retourne au menu principal
+            lstRep = new ArrayList<>();
+            lstRep.add("Vous quittez ");
+            afficherMenu(question, lstRep);
+            livre = null;
+            correct = true;
+        } else if (choix > 0 && choix <= lstLivres.size()) {
+            livre = lstLivres.get(choix - 1);
+            lstRep = new ArrayList<>();
+            lstRep.add("Vous avez choisi le livre : " + livre.getTitre());
+            afficherMenu(question, lstRep);
+            correct = true;
+        } else {
+            lstRep = new ArrayList<>();
+            lstRep.add("Veuillez choisir un livre correct ");
+            afficherMenu(question, lstRep);
         }
+    } else {
+        scanner.next(); // Consomme l'entrée invalide
+        lstRep = new ArrayList<>();
+        lstRep.add("Veuillez entrer un numéro valide.");
+        afficherMenu(question, lstRep);
+    }
+}
         return livre;
+        
     }
 
     public static void estDisponible(){
         Scanner scanner = new Scanner(System.in);
-        Connection connexion = ConnectionBD.getConnection();
         // Cette fonction sert à savoir si un livre est disponible dans un magasin
         Magasin mag = demanderMagasin("Dans quel magasin voulez vous vérifier la disponibilité ?");
         if (mag == null) {
@@ -957,7 +955,7 @@ public class AppMenu{
         lstRep.add(aff);
         afficherMenu("Disponibilité d'un livre ", lstRep);
         String titreLivre = scanner.nextLine();
-        LivreBD livreBD = new LivreBD(connexion);
+        LivreBD livreBD = new LivreBD(connection);
         Livre livre = livreBD.getLivreParTitre(titreLivre);
         if (livre != null){
             System.out.println("Le livre " + livre.getTitre() + " est disponible dans le magasin " + mag.getNomMag() + ".");
@@ -991,6 +989,72 @@ public class AppMenu{
     }
 
 
+
+    
+    /*public static void creerLivre(){
+        Scanner scanner = new Scanner(System.in);
+        // Cette fonction sert à créer un nouveau vendeur et à l'ajouter dans la base de donnée
+        
+        //on enregistre le nom
+        String aff1 = "Quel est le titre du livre?";
+        List<String> lstRep = new ArrayList<>();
+        lstRep.add(aff1);
+        afficherMenu("Vous voulez inserer le livre: ", lstRep);
+        String nom = scanner.nextLine();
+
+        //on enregistre le(s) auteur(s)
+        lstRep = new ArrayList<>();
+        aff1 = "Combien a-t-il d'auteurs?";
+        lstRep.add(aff1);
+        afficherMenu("Le livre "+lstRep.get(0), lstRep);
+        int nbauteurs = scanner.nextInt();
+        List<Auteur> lstAut = new ArrayList<>();
+        Auteur auteur = null;
+        for (int i=0; i<nbauteurs;i++){
+            auteur = demanderNouvAuteur("Quel est l'auteur");
+            lstAut.add(new Auteur(aff1, nom, i, i));
+        }
+
+        //on enregistre le magasin
+
+        // le nom du magasin
+        lstRep = new ArrayList<>();
+        String question = "Choisissez le magasin ou assigner le vendeur ";
+        Magasin mag = demanderMagasin(question);
+        if (mag == null) {
+            // si le magasin est null, on quitte la fonction
+            lstRep.add("Vous avez quitté la création du vendeur");
+            afficherMenu("Création d'un vendeur ", lstRep);
+            return;
+        }
+        
+        VendeurBD vendeurBD = new VendeurBD(connection);
+        String idVendeur = vendeurBD.genererId();
+        // on genere le mdp
+        String mdp =  String.valueOf(prenom.charAt(0)) + nom.toLowerCase();
+        Vendeur unVendeur = new Vendeur(idVendeur, nom, prenom, mdp, mag);
+        vendeurBD.insertVendeur(unVendeur);
+        lstRep.add("Le vendeur travaillera au magasin : "+ mag.getNomMag());
+        lstRep.add("Son identifiant sera : " + idVendeur);
+        lstRep.add("Son mot de passe sera : " + mdp);
+        afficherMenu("Le magasin du vendeur ", lstRep);
+    }
+
+    public static Auteur demanderNouvAuteur(String question){
+        // Cette fonction sert à demander les informations d'un auteur
+        AuteurBD auteur = new AuteurBD(connection);
+        Scanner scanner = new Scanner(System.in);
+        List<String> lstRep = new ArrayList<>();
+        lstRep.add("Quel son nom?");
+        afficherMenu(question, lstRep);
+        String nom = scanner.nextLine();
+        lstRep.add("Quel son prenom?");
+        afficherMenu(question, lstRep);
+        String prenom = scanner.nextLine();
+        //auteur.verifAuteur();     
+        //return new Auteur(idAuteur, nom, prenom);
+    }*/
+
     // les fonctions du client  ----------------------------------------------------------------------------------------------------------
     public static void accesBibli(){
         // Cette fonction sert à afficher tous les livres disponible d'un magasin
@@ -1004,8 +1068,7 @@ public class AppMenu{
             return;
         }
         List<Livre> lstLivres = new ArrayList<>();
-        Connection connexion = ConnectionBD.getConnection();
-        LivreBD livreBD = new LivreBD(connexion);
+        LivreBD livreBD = new LivreBD(connection);
         List<String> lstRep = new ArrayList<>();
         lstLivres = livreBD.getTousLesLivres(mag);
         for (Livre livre : lstLivres) {
@@ -1019,14 +1082,30 @@ public class AppMenu{
 
     public static void recommandation(){
         // Cette fonction sert à afficher les recomandations pour un client
-        String aff = "Voici vos recommandations :";
+        // il nous faut le client connecté
+        Client client = (Client) personneConnectee; // on cast la personne connectée en client
+        // il nous faut a liste de toutes les commandes
+        CommandeBD commandeBD = new CommandeBD(connection);
+        List<Commande> lstCommandes = commandeBD.getAllCommandesBD();
+        List<Livre> lesReco = new ArrayList<>();
+        lesReco = client.onVousRecommande(client, lstCommandes);
+        
+        
         List<String> lstRep = new ArrayList<>();
-        lstRep.add(aff);
-        afficherMenu("Recommandations", lstRep);
+        if (lesReco.isEmpty()) {
+            lstRep.add("Aucune recommandation pour vous.");
+        } else {
+            lstRep.add("Voici vos recommandations :");
+            for (Livre livre : lesReco) {
+                lstRep.add(livre.getTitre());
+            }
+        }
+        afficherMenu("Recommandations ", lstRep);
+
+        
     }
 
     public static void passerComm(){
-        Connection connexion = ConnectionBD.getConnection();
         Scanner scanner = new Scanner(System.in);
         // Cette fonction sert à passer une commande
         // on demande le magasin où passer la commande
@@ -1039,7 +1118,7 @@ public class AppMenu{
             return;
         }else{
             System.out.println(mag.getIdmag());
-            CommandeBD commandeBD = new CommandeBD(connexion);
+            CommandeBD commandeBD = new CommandeBD(connection);
             List<String> lstRep = new ArrayList<>();
             //  Magasin magasin, Client client
             //numero de commande 
@@ -1057,25 +1136,35 @@ public class AppMenu{
             lstRep = new ArrayList<>();
             lstRep.add("La commande est-elle livrée ? (oui/non)");
             afficherMenu("Passer une commande ", lstRep);
-            String reponse = scanner.next();
-            if (reponse.equalsIgnoreCase("oui") || reponse.equalsIgnoreCase("o")) {
-                livraison = Livraison.DOMICILE; // on appelle la fonction domicile pour créer une livraison
-            } else if (reponse.equalsIgnoreCase("non") || reponse.equalsIgnoreCase("n")) {
-                livraison = Livraison.MAGASIN; // pas de livraison
+            boolean flag = true;
+            while (flag) {
+                
+                String reponse = scanner.next();
+                if (reponse.equalsIgnoreCase("oui") || reponse.equalsIgnoreCase("o")) {
+                    livraison = Livraison.DOMICILE;
+                    System.out.println("Vous commandez à domicile.");
+                    flag = false;
+                } else if (reponse.equalsIgnoreCase("non") || reponse.equalsIgnoreCase("n")) {
+                    livraison = Livraison.MAGASIN;
+                    System.out.println("Vous commandez au magasin.");
+                    flag = false;
+                } else {
+                    System.out.println("Réponse invalide. Veuillez répondre par oui, o, non ou n.");
+                }
             }
 
             // on a deja le magasin
 
-            // on a le client
-            Client client = (Client) personneConnectee; // on cast la personne connectée en client
+        // on a le client
+        Client client = (Client) personneConnectee; // on cast la personne connectée en client
 
-            // on crée la commande
-            Commande commande = new Commande(numCommande, date, enLigne, livraison, mag, client);
+        // on crée la commande
+        Commande commande = new Commande(numCommande, date, enLigne, livraison, mag, client);
 
         // ------------------------------------------------------------------
         boolean commandeFini = false; // on initialise la commande à false
         List<DetailCommande> lstDetails = new ArrayList<>(); // on initialise la liste des détails de commande
-        DetailCommandeBD detailCommandeBD = new DetailCommandeBD(connexion);
+        DetailCommandeBD detailCommandeBD = new DetailCommandeBD(connection);
         while (!commandeFini) {
             // on demande le livre à commander
             lstRep = new ArrayList<>();
@@ -1142,7 +1231,6 @@ public class AppMenu{
 
 
     public static boolean seconnecter(int lequel){
-        Connection connexion = ConnectionBD.getConnection();
         Scanner scanner = new Scanner(System.in);
         List<String> lstRep = new ArrayList<>();
 
@@ -1167,7 +1255,7 @@ public class AppMenu{
         // on veut que ça connecte si il y a un client, un vendeur ou un admin avec ces infos
         // sinon ça return false et on revient au menu de connexion
         if (lequel == 1) { // si c'est un admin
-            AdministrateurBD adminBD = new AdministrateurBD(connexion);
+            AdministrateurBD adminBD = new AdministrateurBD(connection);
             try {
                 if (adminBD.seconnecterAdmin(ident, mdp)) {
                     // demande a la bd getAdmin ident et mdp
@@ -1184,7 +1272,7 @@ public class AppMenu{
                 return false;
             }
         } else if (lequel == 2) { // si c'est un vendeur
-            VendeurBD vendeurBD = new VendeurBD(connexion);
+            VendeurBD vendeurBD = new VendeurBD(connection);
             try {
                 if (vendeurBD.seconnecterVendeur(ident, mdp)) {
                     // demande a la bd getVendeur ident et mdp
@@ -1201,7 +1289,7 @@ public class AppMenu{
                 return false;
             }
         } else if (lequel == 3) { // si c'est un client
-            ClientBD clientBD = new ClientBD(connexion);
+            ClientBD clientBD = new ClientBD(connection);
             try {
                 if (clientBD.seconnecterClient(ident, mdp)) {
                     // demande a la bd getClient ident et mdp
@@ -1223,7 +1311,6 @@ public class AppMenu{
 
     public static boolean inscription(){
         Scanner scanner = new Scanner(System.in);
-        Connection connexion = ConnectionBD.getConnection();
         /* 
         il faudrat penser a creer une liste contenant tous les vendeurs/admin/clients existant 
         pour voir s'il y a pas deja les infos dedans (donc si l'identifiant existe deja)
@@ -1264,16 +1351,15 @@ public class AppMenu{
         afficherMenu("Connection ", lstRep);
         int cp = scanner.nextInt();
 
-        ClientBD clientBD = new ClientBD(connexion);
-        Integer idCli = clientBD.genererId();
+        ClientBD clientBD = new ClientBD(connection);
 
         String id = String.valueOf(prenom.charAt(0)).toLowerCase() + nom.toLowerCase();
         lstRep = new ArrayList<>();
         lstRep.add("D'accord, bienvenue parmi nous "+ prenom + ". Votre identifiant sera : " + id );
         afficherMenu("Connection ", lstRep);
-        ClientBD client = new ClientBD(connexion);
+        ClientBD client = new ClientBD(connection);
         try {
-            client.inscrireClient(idCli, prenom, nom, mdp, adr, ville , cp);
+            client.inscrireClient( prenom, nom, mdp, adr, ville , cp);
         } catch (SQLException e) {
             System.err.println("Erreur d'inscription : " + e.getMessage());
             return false;

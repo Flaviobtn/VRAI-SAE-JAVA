@@ -20,10 +20,10 @@ public class CommandeBD {
 
     public Commande getCommande(int nunumcomm)throws SQLException, IllegalArgumentException{
 		Commande commande = new Commande(nunumcomm, null, false, null, null, null);
-		String req = "Select * FROM COMMANDE WHERE numcomm = ?";
+		String req = "Select * FROM COMMANDE WHERE numcom = ?";
 		this.st = laConnexion.prepareStatement(req);
 		st.setInt(1, nunumcomm);
-		ResultSet rs = st.executeQuery(req);
+		ResultSet rs = st.executeQuery();
 		try{
 			while(rs.next()){
 				int numcom = rs.getInt("numcom");
@@ -38,7 +38,7 @@ public class CommandeBD {
 				ClientBD cliBD = new ClientBD(laConnexion);
                 commande = new Commande(numcom, datecom, enligne, mode,  magBD.getMagasin(idmag), cliBD.getClient(idcli));
 			}
-			String req2 = "Select * FROM DETAILCOMMANDE WHERE numcomm = ?";
+			String req2 = "Select * FROM DETAILCOMMANDE WHERE numcom = ?";
 			this.st = laConnexion.prepareStatement(req2);
 			st.setInt(1, nunumcomm);
 			rs = st.executeQuery();
@@ -49,6 +49,7 @@ public class CommandeBD {
 				int qte = rs.getInt("qte");
 				commande.ajouterDetailCommande(new DetailCommande(numlig,livre,qte,nunumcomm));
 			}
+			return commande;
 		}
 		catch(SQLException e){
 			System.err.println(e.getMessage());
@@ -56,6 +57,23 @@ public class CommandeBD {
 		return null;
 	}
 
+	public List<Commande> getAllCommandesBD(){
+		try {
+			List<Commande> lstComm = new ArrayList<>();
+			String req = "SELECT DISTINCT numcom FROM COMMANDE;";
+			this.st = laConnexion.prepareStatement(req);
+			ResultSet rs = st.executeQuery();
+			while(rs.next()){
+                lstComm.add(getCommande(rs.getInt("numcom")));
+			}
+			rs.close();
+			return lstComm;
+		} catch (SQLException e) {
+			System.err.println(e.getMessage());
+		}
+		return null;
+	}
+	
 
     public Integer genererId(){
 		try {
@@ -82,8 +100,8 @@ public class CommandeBD {
 			st.setDate(2, java.sql.Date.valueOf(commande.getDatecomm()));
 			st.setString(3, commande.getEnligne()? "O":"N");
 			st.setString(4, commande.getLivraison().getCode());
-        	st.setInt(5, Integer.parseInt(commande.getMagasin().getIdmag()));
-			st.setInt(6, commande.getClient().getNumeroClient());
+			st.setInt(5, commande.getClient().getNumeroClient());
+        	st.setString(6, commande.getMagasin().getIdmag());
 			st.executeUpdate();
 			for(DetailCommande det : commande.getCommandeFinale()){
 				DetailCommandeBD detail = new DetailCommandeBD(laConnexion);

@@ -9,6 +9,11 @@ public class AuteurBD{
 		this.laConnexion = laConnexion;
 	}
 
+    public boolean verifAuteur(String nomprenom){
+        
+        return false;
+    }
+
     public Auteur getAuteur(String id) throws SQLException{
         String req = "SELECT * FROM AUTEUR WHERE idauteur = ?";
         PreparedStatement st=laConnexion.prepareStatement(req);
