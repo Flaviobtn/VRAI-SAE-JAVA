@@ -12,6 +12,7 @@ C:\Users\tagsm\Desktop\Bureau\VRAI-SAE-JAVA\src\bd\MagasinBD.java
 C:\Users\tagsm\Desktop\Bureau\VRAI-SAE-JAVA\src\bd\VendeurBD.java
 C:\Users\tagsm\Desktop\Bureau\VRAI-SAE-JAVA\src\ihm\Controlleur\AllerPanier.java
 C:\Users\tagsm\Desktop\Bureau\VRAI-SAE-JAVA\src\ihm\Controlleur\ControleurConnexion.java
+C:\Users\tagsm\Desktop\Bureau\VRAI-SAE-JAVA\src\ihm\Controlleur\ControleurCreerVendeur.java
 C:\Users\tagsm\Desktop\Bureau\VRAI-SAE-JAVA\src\ihm\Controlleur\ControleurInfos.java
 C:\Users\tagsm\Desktop\Bureau\VRAI-SAE-JAVA\src\ihm\Controlleur\ControleurInscription.java
 C:\Users\tagsm\Desktop\Bureau\VRAI-SAE-JAVA\src\ihm\Controlleur\ControleurNiveau.java
