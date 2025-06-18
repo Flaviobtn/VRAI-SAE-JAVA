@@ -230,7 +230,7 @@ public class AppMenu{
                         switch(choix){
                             //Ajouter livre
                             case 1-> {
-                                ajouterLivreMagasin();
+                                //ajouterLivreMagasin();
                             }
 
                             //Supprimer livre
@@ -255,7 +255,7 @@ public class AppMenu{
 
                             //Transférer un livre
                             case 6-> {
-                                transfererLivre();
+                                transfererLivreMagasin();
                             }
 
                             //Profil
@@ -615,8 +615,9 @@ public class AppMenu{
 
     // Les fonctions de vendeur ----------------------------------------------------------------------------------------------------------
     
-    public static void ajouterLivreMagasin(){
+    public static void transfererLivreMagasin(){
         // Cette fonction sert à ajouter un livre à la BD
+        Scanner scanner = new Scanner(System.in);
         List<String> lstRep = new ArrayList<>();
         Livre livre = demanderLivreAll();
         if (livre == null) {
@@ -982,9 +983,11 @@ public class AppMenu{
         String aff2 = "Veuillez entrer le magasin d'où le livre provient";
         String aff3 = "Veuillez entrer le magasin où l'envoyer";
         List<String> lstRep = new ArrayList<>();
-        lstRep.add(aff1);
-        lstRep.add(aff2);
-        lstRep.add(aff3);
+        //lstRep.add(aff1);
+        afficherMenu("Selectionner le magasin d'origine du livre", lstRep);
+        //lstRep.add(aff2);
+        afficherMenu("Commande de stock", lstRep);
+        //lstRep.add(aff3);
         afficherMenu("Commande de stock", lstRep);
     }
 
@@ -1228,6 +1231,8 @@ public class AppMenu{
         List<String> lstRep = new ArrayList<>();
         lstRep.add(aff);
         afficherMenu("Vos commande", lstRep);
+        Client client = (Client) personneConnectee;
+        client.voirMesCommandes();
     }
 
     // autres fonctions ------------------------------------------

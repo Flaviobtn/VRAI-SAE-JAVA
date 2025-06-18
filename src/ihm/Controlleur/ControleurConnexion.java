@@ -1,6 +1,7 @@
 package ihm.Controlleur;
 import ihm.Vue.*;
 import bd.* ;
+import Modele.*;
 import javafx.event.ActionEvent;
 import javafx.scene.text.Text;
 import javafx.event.EventHandler;
@@ -23,18 +24,21 @@ public class ControleurConnexion implements EventHandler<ActionEvent> {
     private ClientBD modeleC;
     private VendeurBD modeleV;
     private AdministrateurBD modeleA;
+    private LivreBD modeleL;
     private Text lUtilisateur;
 
     /**
      * @param modelePendu modèle du jeu
      * @param p vue du jeu
      */
-    public ControleurConnexion(LivreExpresss vue, ClientBD modeleC, VendeurBD modeleV, AdministrateurBD modeleA) {
+    public ControleurConnexion(LivreExpresss vue, ClientBD modeleC, VendeurBD modeleV, AdministrateurBD modeleA, LivreBD modeleL) {
         this.vue = vue;
         this.modeleC = modeleC;
         this.modeleV = modeleV;
         this.modeleA = modeleA;
+        this.modeleL = modeleL;
     }
+    
 
     /**
      * L'action consiste à recommencer une partie. Il faut vérifier qu'il n'y a pas une partie en cours
@@ -47,8 +51,14 @@ public class ControleurConnexion implements EventHandler<ActionEvent> {
         if(nomDuBouton.equals("SE CONNECTER")){
             if(vue.getLUtilisateur().equals("CLIENT")){
                 try {
-                    if(this.modeleC.seconnecterClient(this.vue.getIdentifiant(), this.vue.getMotdepasse())){;
-                    this.vue.modeAccueilC();}
+                    if(this.modeleC.seconnecterClient(this.vue.getIdentifiant(), this.vue.getMotdepasse())){
+                        
+                        // recuperer les info du client connecté
+                        
+                        this.vue.setPersonneConnectee((Client) modeleC.getClient(this.vue.getIdentifiant(), this.vue.getMotdepasse()));
+                        //this.vue.SetCatalogues(modeleL.getTousLesLivresBase());
+                        this.vue.modeAccueilC();
+                        }
                     else {
                         vue.popUpConnexionImpossible();
                     }
@@ -60,7 +70,12 @@ public class ControleurConnexion implements EventHandler<ActionEvent> {
             if(vue.getLUtilisateur().equals("VENDEUR")){
                 try {
                     if(this.modeleV.seconnecterVendeur(this.vue.getIdentifiant(), this.vue.getMotdepasse())){
-                    this.vue.modeAccueilV();}
+                        
+                        // On recupere les info du vendeur connecté
+                        //Vendeur vendeur = modeleV.getVendeur(this.vue.getIdentifiant(), this.vue.getMotdepasse());
+                        this.vue.setPersonneConnectee((Vendeur) modeleV.getVendeur(this.vue.getIdentifiant(), this.vue.getMotdepasse()));
+                        this.vue.modeAccueilV();
+                    }
                     else {
                         vue.popUpConnexionImpossible();
                     }
@@ -72,7 +87,11 @@ public class ControleurConnexion implements EventHandler<ActionEvent> {
              if(vue.getLUtilisateur().equals("ADMINISTRATEUR")){
                 try {
                     if(this.modeleA.seconnecterAdmin(this.vue.getIdentifiant(), this.vue.getMotdepasse())){
-                    this.vue.modeAccueilC();
+                        this.vue.setPersonneConnectee((Administrateur) modeleA.getAdministrateur(this.vue.getIdentifiant(), this.vue.getMotdepasse()));
+                        this.vue.modeAccueilA();
+                        // On récupère les info de l'Admin
+                        
+
                     }
                     else {
                         vue.popUpConnexionImpossible();

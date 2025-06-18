@@ -45,10 +45,16 @@ public class ControleurRetourRedirection implements EventHandler<ActionEvent> {
             if(vue.getLUtilisateur().equals("VENDEUR")){
                 vue.modeAccueilV();}
             if(vue.getLUtilisateur().equals("ADMINISTRATEUR")){
-                //vue.modeAccueilA();
+                vue.modeAccueilA();
                 }
         } if(data.equals("PROFIL")) {
-            vue.modeProfil();
+            if(vue.getLUtilisateur().equals("CLIENT")){
+                vue.modeProfilC();}
+            if(vue.getLUtilisateur().equals("VENDEUR")){
+                vue.modeProfilV();}
+            if(vue.getLUtilisateur().equals("ADMINISTRATEUR")){
+                vue.modeProfilA();
+                }
         } if(data.equals("PANIER")) {
             vue.modePanier();
         } if(data.equals("DECONNEXION")) {
@@ -64,6 +70,12 @@ public class ControleurRetourRedirection implements EventHandler<ActionEvent> {
         }
         if(data.equals("ANNULERI")){
             vue.modeConnexion();
+        }
+        if(data.equals("OPTVENDEUR")){
+            vue.modeAccueilV();
+        }
+        if(data.equals("CREER VENDEUR")){
+            vue.modeCreerVendeur();
         }
     }
 }

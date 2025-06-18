@@ -37,6 +37,6 @@ public class DetailCommande{
     public String toString(){
         return "Titre du livre: "+ this.getLivre().getTitre()+"\n" +
         "Quantité: "+this.getQte()+"\n"+
-        "Prix Unitaire: "+this.livre.getPrix()+" euros";
+        "Prix Unitaire: "+this.livre.getPrix()+" euros\n";
     }
 }

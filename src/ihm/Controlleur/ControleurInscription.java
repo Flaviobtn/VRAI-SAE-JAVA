@@ -21,19 +21,15 @@ public class ControleurInscription implements EventHandler<ActionEvent> {
      **/
     private LivreExpresss vue;
     private ClientBD modeleC;
-    private VendeurBD modeleV;
-    private AdministrateurBD modeleA;
     private List<TextField> champsSaisie;
 
     /**
      * @param modelePendu modèle du jeu
      * @param p vue du jeu
      */
-    public ControleurInscription(LivreExpresss vue, ClientBD modeleC, VendeurBD modeleV, AdministrateurBD modeleA) {
+    public ControleurInscription(LivreExpresss vue, ClientBD modeleC) {
         this.vue = vue;
         this.modeleC = modeleC;
-        this.modeleV = modeleV;
-        this.modeleA = modeleA;
         this.champsSaisie = vue.getInscriptions();
     }
 
@@ -43,45 +39,18 @@ public class ControleurInscription implements EventHandler<ActionEvent> {
      */
     @Override
     public void handle(ActionEvent actionEvent) {
-        Button button = (Button) actionEvent.getTarget();
-        String nomDuBouton = button.getText();
-        if(nomDuBouton.equals("SE CONNECTER")){
-            if(vue.getLUtilisateur().equals("CLIENT")){
-                try {
-                    if(this.modeleC.seconnecterClient(this.vue.getIdentifiant(), this.vue.getMotdepasse())){;
-                    this.vue.modeAccueilC();}
-                    else {
-                        vue.popUpConnexionImpossible();
-                    }
-                } catch (SQLException e) {
-                    System.err.println("Erreur de connexion en tant que Client : " + e.getMessage());
-                }
-            } 
-        
-            if(vue.getLUtilisateur().equals("VENDEUR")){
-                try {
-                    if(this.modeleV.seconnecterVendeur(this.vue.getIdentifiant(), this.vue.getMotdepasse())){
-                    this.vue.modeAccueilV();}
-                    else {
-                        vue.popUpConnexionImpossible();
-                    }
-                } catch (SQLException e) {
-                    System.err.println("Erreur de connexion en tant qu'Vendeur : " + e.getMessage());
-                }
-            }
-
-             if(vue.getLUtilisateur().equals("ADMINISTRATEUR")){
-                try {
-                    if(this.modeleA.seconnecterAdmin(this.vue.getIdentifiant(), this.vue.getMotdepasse())){
-                    this.vue.modeAccueilC();
-                    }
-                    else {
-                        vue.popUpConnexionImpossible();
-                    }
-                } catch (SQLException e) {
-                    System.err.println("Erreur de connexion en tant qu'Administrateur : " + e.getMessage());
-                }
-            }
+        String nom = champsSaisie.get(0).getText();
+        String prenom = champsSaisie.get(1).getText();
+        String motdepasse = champsSaisie.get(2).getText();
+        String adresse = champsSaisie.get(3).getText();
+        String ville = champsSaisie.get(4).getText();
+        int codepostal = Integer.parseInt(champsSaisie.get(5).getText());
+        try {
+            modeleC.inscrireClient(nom, prenom, motdepasse, adresse, ville, codepostal);
+            vue.modeConnexion();
+        } catch (Exception e) {
+            vue.popUpConnexionImpossible();
+            System.err.println("Erreur lors de l'inscription : " + e.getMessage());
         }
     }
 }

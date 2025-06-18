@@ -62,7 +62,7 @@ public class LivreBD {
 
                 // Récupération de l'éditeur
                 List<Editeur> editeurs = new ArrayList<>();
-                String reqEditeur = "SELECT * FROM EDITER WHERE isbn = ?";
+                String reqEditeur = "SELECT * FROM EDITER WHERE isbn = ? ORDER BY titre ASC";
                 PreparedStatement stEditeur = laConnexion.prepareStatement(reqEditeur);
                 stEditeur.setString(1, isbn);
                 ResultSet rsEditeur = stEditeur.executeQuery();
@@ -87,6 +87,25 @@ public class LivreBD {
             System.err.println(e.getMessage());
         }
         return livres;       
+    }
+
+    public Map<Integer, List<Livre>> catalogue(){
+        List<Livre> livre = getTousLesLivresBase();
+        Map<Integer, List<Livre>> catalogue = new HashMap<>();
+        int index = 1;
+
+        for (int i = 0; i < livre.size(); i++) {
+            if (!catalogue.containsKey(index)) {
+                catalogue.put(index, new ArrayList<>());
+            }
+
+            catalogue.get(index).add(livre.get(i));
+
+            if ((i + 1) % 6 == 0) {
+                index++;
+            }
+        }
+        return catalogue;
     }
 
     public Livre getLivreParTitre(String titreLivre){

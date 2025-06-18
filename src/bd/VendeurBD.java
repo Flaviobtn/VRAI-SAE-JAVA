@@ -104,9 +104,6 @@ public class VendeurBD {
 
 }
 /*
-	public String modifierLivre(String isbn, String idmag, Integer qte ){
-		return null;
-	}
 
 	public void ajouterLivre(Livre livre) throws SQLException{
         String isbnStr = "";

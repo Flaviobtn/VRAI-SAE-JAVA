@@ -76,35 +76,14 @@ public class Client extends Personne {
         commande.ajouterDetailCommande(detailCommande);
         magasin.supprimerLivre(livre);
     }
-
-    /*
-    public List<Livre> onVousRecommande(Client client, List<Commande> toutesLesCommandes){
-        List<Livre> recommandations= new ArrayList<>();
-        System.out.println(toutesLesCommandes);
-
-        Iterator<Commande> it = toutesLesCommandes.iterator();
-        while(it.hasNext()){
-            Commande commande = it.next();
-            if(!(client.commandes.contains(commande))){//si la commande qu'on regarde n'est pas celle du client
-                for(Livre livre : client.tousLesLivresClient()){// on parcourt chaque livre que le client à commandé
-                if(commande.tousLesLivres().contains(livre)){// si dans la commande qu'on regarde il y a le livre que le client a commandé 
-                    // (il faut donc lui recommander les livres de cette commande)
-                    for(Livre livreCommande : commande.tousLesLivres() ){// pour chaque livre de la commande
-                        if(!(client.tousLesLivresClient().contains(livreCommande))&& !(recommandations.contains(livreCommande))){
-                            //si le client n'a jamais commandé ce livre et qu'il n'est pas dans les recommandations
-                            recommandations.add(livreCommande);// l'ajouter aux recommandations
-                            }
-                        }
-                    }
-                }
-            }
+    
+    public void voirMesCommandes(){
+        for(Commande commande : this.getCommandes()){
+            System.out.println(commande.editerFacture());
         }
-        return recommandations;
-        
     }
-    */
 
-   public List<Livre> onVousRecommande() {
+    public List<Livre> onVousRecommande() {
         Set<Livre> recommandations = new HashSet<>();
         Set<Livre> temp = new HashSet<>();
         System.out.println(this.getCommandes());
@@ -127,9 +106,19 @@ public class Client extends Personne {
                             banlivres.remove(livre);
                         }
                     }
-                        recommandations.addAll(temp);
+                    recommandations.addAll(temp);
                 }
             }
+        }
+        if(recommandations.size()>=6){
+            int cpt = 0;
+            List<Livre> lst = new ArrayList<>();
+            for(Livre livre : recommandations){
+                if(cpt<6){
+                    lst.add(livre);
+                }
+            }
+            return lst;
         }
         return new ArrayList<>(recommandations);
     }
