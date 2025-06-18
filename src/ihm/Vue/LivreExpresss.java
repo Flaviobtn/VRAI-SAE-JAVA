@@ -45,7 +45,7 @@ public class LivreExpresss extends Application {
      * le text qui indique l'utilisateur
      */
     private Text lUtilisateur;
-
+    private ComboBox<String> comboBoxSave;
     private TextField identifiant;
     private TextField motdepasse;
     private List<TextField> inscriptions;
@@ -1421,124 +1421,126 @@ choix.setOnMouseExited(e ->
 
 
     public void fenetreCreerVendeur() {
-    this.gauche = null;
+        this.gauche = null;
 
-    this.banniere = new BorderPane();
-    banniere.setStyle("-fx-background-color: lightpink;");
-    ImageView imgLogo = new ImageView(this.lesImages.get(0));
-    imgLogo.setFitWidth(520);
-    imgLogo.setPreserveRatio(true);
-    banniere.setPadding(new Insets(10, 0, 0, 0));
+        this.banniere = new BorderPane();
+        banniere.setStyle("-fx-background-color: lightpink;");
+        ImageView imgLogo = new ImageView(this.lesImages.get(0));
+        imgLogo.setFitWidth(520);
+        imgLogo.setPreserveRatio(true);
+        banniere.setPadding(new Insets(10, 0, 0, 0));
 
-    Label user = new Label("Accueil Admin : bienvenue " + personneConnectee.getNom());
-    user.setStyle("-fx-font-size: 27px;");
-    user.setPadding(new Insets(0, 125, 0, 0));
+        Label user = new Label("Accueil Admin : bienvenue " + personneConnectee.getNom());
+        user.setStyle("-fx-font-size: 27px;");
+        user.setPadding(new Insets(0, 125, 0, 0));
 
-    HBox bouttons = new HBox();
-    ImageView deco = new ImageView(this.lesImages.get(3));
-    deco.setFitWidth(75);
-    deco.setPreserveRatio(true);
+        HBox bouttons = new HBox();
+        ImageView deco = new ImageView(this.lesImages.get(3));
+        deco.setFitWidth(75);
+        deco.setPreserveRatio(true);
 
-    ImageView maison = new ImageView(this.lesImages.get(1));
-    maison.setFitWidth(75);
-    maison.setPreserveRatio(true);
+        ImageView maison = new ImageView(this.lesImages.get(1));
+        maison.setFitWidth(75);
+        maison.setPreserveRatio(true);
 
-    ImageView profil = new ImageView(this.lesImages.get(4));
-    profil.setFitWidth(75);
-    profil.setPreserveRatio(true);
+        ImageView profil = new ImageView(this.lesImages.get(4));
+        profil.setFitWidth(75);
+        profil.setPreserveRatio(true);
 
-    Button bDeconnexion = new Button(null, deco);
-    bDeconnexion.setUserData("DECONNEXION");
-    bDeconnexion.setOnAction(new ControleurRetourRedirection(this));
-    Button boutonMaison = new Button(null, maison);
-    boutonMaison.setUserData("MAISON");
-    Button boutonProfil = new Button(null, profil);
-    boutonProfil.setUserData("PROFIL");
-    boutonProfil.setOnAction(new ControleurRetourRedirection(this));
+        Button bDeconnexion = new Button(null, deco);
+        bDeconnexion.setUserData("DECONNEXION");
+        bDeconnexion.setOnAction(new ControleurRetourRedirection(this));
+        Button boutonMaison = new Button(null, maison);
+        boutonMaison.setUserData("MAISON");
+        Button boutonProfil = new Button(null, profil);
+        boutonProfil.setUserData("PROFIL");
+        boutonProfil.setOnAction(new ControleurRetourRedirection(this));
 
-    bouttons.getChildren().addAll(bDeconnexion, boutonMaison, boutonProfil);
-    bouttons.setMargin(boutonMaison, new Insets(5));
-    bouttons.setMargin(bDeconnexion, new Insets(5));
-    bouttons.setMargin(boutonProfil, new Insets(5));
-    banniere.setLeft(imgLogo);
-    banniere.setCenter(user);
-    banniere.setRight(bouttons);
+        bouttons.getChildren().addAll(bDeconnexion, boutonMaison, boutonProfil);
+        bouttons.setMargin(boutonMaison, new Insets(5));
+        bouttons.setMargin(bDeconnexion, new Insets(5));
+        bouttons.setMargin(boutonProfil, new Insets(5));
+        banniere.setLeft(imgLogo);
+        banniere.setCenter(user);
+        banniere.setRight(bouttons);
 
-    this.panelCentral = new BorderPane();
+        this.panelCentral = new BorderPane();
 
-    VBox vendeur = new VBox(80);
+        VBox vendeur = new VBox(80);
 
-    // Champs à remplir
-    TextField nom = new TextField();
-    TextField prenom = new TextField();
-    PasswordField motdepasse = new PasswordField();
+        // Champs à remplir
+        TextField nom = new TextField();
+        TextField prenom = new TextField();
+        PasswordField motdepasse = new PasswordField();
 
-    nom.setPromptText("Entrez le nom");
-    prenom.setPromptText("Entrez le prénom");
-    motdepasse.setPromptText("Entrez le mot de passe");
+        nom.setPromptText("Entrez le nom");
+        prenom.setPromptText("Entrez le prénom");
+        motdepasse.setPromptText("Entrez le mot de passe");
 
-    nom.setPrefWidth(200);
-    prenom.setPrefWidth(200);
-    motdepasse.setPrefWidth(200);
+        nom.setPrefWidth(200);
+        prenom.setPrefWidth(200);
+        motdepasse.setPrefWidth(200);
 
-    // On stocke les champs dans une liste pour le contrôleur
-    List<TextField> champsVendeur = new ArrayList<>();
-    champsVendeur.add(nom);
-    champsVendeur.add(prenom);
-    champsVendeur.add(motdepasse);
+        // Stockage des champs pour le contrôleur
+        List<TextField> champsVendeur = new ArrayList<>();
+        champsVendeur.add(nom);
+        champsVendeur.add(prenom);
+        champsVendeur.add(motdepasse);
+        this.inscriptions = champsVendeur;
 
-    // On ajoute une méthode d'accès dans la classe (voir plus bas)
-    this.inscriptions = champsVendeur;
+        HBox ligneChamps = new HBox(30);
+        ligneChamps.getChildren().addAll(
+            new VBox(new Text("Nom :"), nom),
+            new VBox(new Text("Prénom :"), prenom),
+            new VBox(new Text("Mot de passe :"), motdepasse)
+        );
 
-    HBox ligneChamps = new HBox(30);
-    ligneChamps.getChildren().addAll(
-        new VBox(new Text("Nom :"), nom),
-        new VBox(new Text("Prénom :"), prenom),
-        new VBox(new Text("Mot de passe :"), motdepasse)
-    );
+        // ComboBox pour le magasin
+        ComboBox<String> comboBox = new ComboBox<>();
+        List<Magasin> mags = magasinBD.getToutLesMagasins();
+        for (Magasin mag : mags) {
+            comboBox.getItems().add(mag.getNomMag());
+        }
+        comboBox.setValue("Choix du magasin");
+        comboBox.setMinWidth(250);
 
-    // ComboBox pour le magasin
-    ComboBox<String> comboBox = new ComboBox<>();
-    List<Magasin> mags = magasinBD.getToutLesMagasins();
-    for (Magasin mag : mags) {
-        comboBox.getItems().add(mag.getNomMag());
+        // Stockage pour accès dans le contrôleur
+        this.comboBoxSave = comboBox;
+
+        Button creerBtn = new Button("Créer");
+        creerBtn.setDisable(true);
+        creerBtn.setMinWidth(150);
+        creerBtn.setMinHeight(50);
+        creerBtn.setOnAction(new ControleurCreerVendeur(this, new AdministrateurBD(connection), magasinBD, vendeurBD));
+
+        // Activation du bouton seulement si tout est rempli
+        ChangeListener<String> listener = (obs, oldVal, newVal) -> {
+            boolean allFilled = !nom.getText().trim().isEmpty()
+                && !prenom.getText().trim().isEmpty()
+                && !motdepasse.getText().trim().isEmpty()
+                && comboBox.getValue() != null
+                && !comboBox.getValue().equals("Choix du magasin");
+            creerBtn.setDisable(!allFilled);
+        };
+        nom.textProperty().addListener(listener);
+        prenom.textProperty().addListener(listener);
+        motdepasse.textProperty().addListener(listener);
+        comboBox.valueProperty().addListener(listener);
+
+        VBox droite = new VBox(30, comboBox, creerBtn);
+        droite.setPadding(new Insets(30, 0, 0, 0));
+
+        HBox contenu = new HBox(60, ligneChamps, droite);
+        contenu.setPadding(new Insets(80, 0, 0, 80));
+        vendeur.getChildren().add(contenu);
+
+        panelCentral.setCenter(vendeur);
     }
-    comboBox.setValue("Choix du magasin");
-    comboBox.setMinWidth(250);
 
-    // Méthode d'accès pour le contrôleur
-    this.comboBoxSave = comboBox;
-
-    Button creerBtn = new Button("Créer");
-    creerBtn.setDisable(true);
-    creerBtn.setMinWidth(150);
-    creerBtn.setMinHeight(50);
-    creerBtn.setOnAction(new ControleurCreerVendeur(this, new AdministrateurBD(connection), magasinBD, vendeurBD));
-
-    // Activation du bouton seulement si tout est rempli
-    ChangeListener<String> listener = (obs, oldVal, newVal) -> {
-        boolean allFilled = !nom.getText().trim().isEmpty()
-            && !prenom.getText().trim().isEmpty()
-            && !motdepasse.getText().trim().isEmpty()
-            && comboBox.getValue() != null
-            && !comboBox.getValue().equals("Choix du magasin");
-        creerBtn.setDisable(!allFilled);
-    };
-    nom.textProperty().addListener(listener);
-    prenom.textProperty().addListener(listener);
-    motdepasse.textProperty().addListener(listener);
-    comboBox.valueProperty().addListener(listener);
-
-    VBox droite = new VBox(30, comboBox, creerBtn);
-    droite.setPadding(new Insets(30, 0, 0, 0));
-
-    HBox contenu = new HBox(60, ligneChamps, droite);
-    contenu.setPadding(new Insets(80, 0, 0, 80));
-    vendeur.getChildren().add(contenu);
-
-    panelCentral.setCenter(vendeur);
-}
-// ...existing code...
+    // Méthodes d'accès pour le contrôleur
+    public ComboBox<String> getComboBoxSave() { return this.comboBoxSave; }
+    public List<TextField> getCreationVendeur() { return this.inscriptions; }
+    public String getIdentifiantSave() { return vendeurBD.genererId(); }
 
 // Ajoute ces méthodes d'accès dans ta classe LivreExpresss :
 private ComboBox<String> comboBoxSave;
