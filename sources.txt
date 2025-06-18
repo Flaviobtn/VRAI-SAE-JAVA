@@ -1,5 +1,4 @@
 C:\Users\tagsm\Desktop\Bureau\VRAI-SAE-JAVA\src\app\AppMenu.java
-C:\Users\tagsm\Desktop\Bureau\VRAI-SAE-JAVA\src\app\Executable.java
 C:\Users\tagsm\Desktop\Bureau\VRAI-SAE-JAVA\src\bd\AdministrateurBD.java
 C:\Users\tagsm\Desktop\Bureau\VRAI-SAE-JAVA\src\bd\AuteurBD.java
 C:\Users\tagsm\Desktop\Bureau\VRAI-SAE-JAVA\src\bd\ClassificationBD.java
