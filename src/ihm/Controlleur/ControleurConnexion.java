@@ -45,15 +45,10 @@ public class ControleurConnexion implements EventHandler<ActionEvent> {
     public void handle(ActionEvent actionEvent) {
         Button button = (Button) actionEvent.getTarget();
         String nomDuBouton = button.getText();
-        System.out.println(nomDuBouton);
-        if(nomDuBouton.equals("CONNEXION")){
-            this.vue.modeConnexion();
-        }
         if(nomDuBouton.equals("SE CONNECTER")){
             if(lUtilisateur.getText().equals("CLIENT")){
-                List<String> login = this.vue.modeConnexion();
                 try {
-                    this.modeleC.seconnecterClient(login.get(0), login.get(1));
+                    this.modeleC.seconnecterClient(this.vue.getIdentifiant(), this.vue.getMotdepasse());
                 } catch (SQLException e) {
                     System.err.println("Erreur de connexion en tant que Client : " + e.getMessage());
                 }
@@ -67,9 +62,8 @@ public class ControleurConnexion implements EventHandler<ActionEvent> {
             //}
 
             if(lUtilisateur.getText().equals("VENDEUR")){
-                List<String> login = this.vue.modeConnexion();
                 try {
-                    this.modeleV.seconnecterVendeur(login.get(0), login.get(1));
+                    this.modeleV.seconnecterVendeur(this.vue.getIdentifiant(), this.vue.getMotdepasse());
                 } catch (SQLException e) {
                     System.err.println("Erreur de connexion en tant que Vendeur : " + e.getMessage());
                 }
@@ -83,9 +77,8 @@ public class ControleurConnexion implements EventHandler<ActionEvent> {
             //}
 
              if(lUtilisateur.getText().equals("ADMINISTRATEUR")){
-                List<String> login = this.vue.modeConnexion();
                 try {
-                    if(this.modeleA.seconnecterAdmin(login.get(0), login.get(1))){
+                    if(this.modeleA.seconnecterAdmin(this.vue.getIdentifiant(), this.vue.getMotdepasse())){
                     this.vue.modeAccueilC();
 
                     }

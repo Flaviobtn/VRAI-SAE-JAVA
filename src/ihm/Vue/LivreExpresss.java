@@ -44,9 +44,10 @@ public class LivreExpresss extends Application {
      * le text qui indique l'utilisateur
      */
     private Text lUtilisateur;
-    
-    private String identifiant;
-    private String motdepasse;
+
+    private TextField identifiant;
+    private TextField motdepasse;
+    private List<TextField> inscriptions;
     
     /**
      * le panel Central qui pourra être modifié selon le mode (accueil ou jeu)
@@ -89,6 +90,13 @@ public class LivreExpresss extends Application {
         this.connection = ConnectionBD.getConnection();
 
         // A terminer d'implementer
+    }
+
+    public String getIdentifiant() {
+        return this.identifiant.getText();
+    }
+    public String getMotdepasse() {
+        return this.motdepasse.getText();
     }
 
     /**
@@ -142,9 +150,9 @@ public class LivreExpresss extends Application {
 
         // Ligne décorative
         Region ligne = new Region();
-        ligne.setPrefHeight(3);
+        ligne.setPrefHeight(7);
         ligne.setPrefWidth(220);
-        ligne.setStyle("-fx-background-color: #2c2c2c;");
+        ligne.setStyle("-fx-border-color: #2c2c2c;");
 
         // Conteneur pour le titre et la ligne
         VBox titleContainer = new VBox();
@@ -163,24 +171,25 @@ public class LivreExpresss extends Application {
 
         // Bouton de connexion
         Button choix = new Button("CONNEXION");
-        choix.setOnAction(new ControleurConnexion(this,this.lUtilisateur, new ClientBD(connection), new VendeurBD(connection), new AdministrateurBD(connection)));
+        choix.setUserData("CONNEXION");
+        choix.setOnAction(new ControleurRetourRedirection(this));
         choix.setMinWidth(200);
         choix.setMinHeight(100);
         choix.setFont(Font.font("Arial", 15));
-        choix.setStyle("-fx-background-color: white; -fx-text-fill: #2c2c2c; " +
-                      "-fx-border-color: #2c2c2c; -fx-border-width: 2; " +
-                      "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;");
-        
-        // Effet de survol pour le bouton
-        choix.setOnMouseEntered(e -> 
-            choix.setStyle("-fx-background-color: #2c2c2c; -fx-text-fill: white; " +
-                          "-fx-border-color: #2c2c2c; -fx-border-width: 2; " +
-                          "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;"));
-        
-        choix.setOnMouseExited(e -> 
-            choix.setStyle("-fx-background-color: white; -fx-text-fill: #2c2c2c; " +
-                          "-fx-border-color: #2c2c2c; -fx-border-width: 2; " +
-                          "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;"));                 
+        choix.setStyle("-fx-background-color: white; -fx-text-fill: #1e1e1e; " +
+               "-fx-border-color: #1e1e1e; -fx-border-width: 2; " +
+               "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;");
+
+choix.setOnMouseEntered(e -> 
+    choix.setStyle("-fx-background-color: #1e1e1e; -fx-text-fill: white; " +
+                   "-fx-border-color: #1e1e1e; -fx-border-width: 2; " +
+                   "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;"));
+
+choix.setOnMouseExited(e -> 
+    choix.setStyle("-fx-background-color: white; -fx-text-fill: #1e1e1e; " +
+                   "-fx-border-color: #1e1e1e; -fx-border-width: 2; " +
+                   "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;"));
+                
 
         // Conteneur pour le combobox et la Connexion
         VBox choixContainer = new VBox();
@@ -206,6 +215,7 @@ public class LivreExpresss extends Application {
         this.panelCentral = new BorderPane();
         this.panelCentral.getChildren().add(centerPanel);
         this.gauche.getChildren().add(imgG);
+        this.banniere = new BorderPane();
 
     }
 
@@ -233,9 +243,9 @@ public class LivreExpresss extends Application {
 
         // Ligne décorative
         Region ligne = new Region();
-        ligne.setPrefHeight(3);
+        ligne.setPrefHeight(7);
         ligne.setPrefWidth(220);
-        ligne.setStyle("-fx-background-color: #2c2c2c;");
+        ligne.setStyle("-fx-border-color: #2c2c2c;");
 
         // Conteneur pour le titre et la ligne
         VBox titleContainer = new VBox();
@@ -245,30 +255,31 @@ public class LivreExpresss extends Application {
         // identifiant et mot de passe
         VBox idcontainer = new VBox();
         VBox motdepassecontainer = new VBox();
-        TextField Fidentifiant = new TextField();
-        PasswordField Fmotdepasse = new PasswordField();
+        this.identifiant = new TextField();
+        this.motdepasse = new PasswordField();
         Text identifiantText = new Text("Identifiant :");
         Text motdepasseText = new Text("Mot de passe :");
         identifiantText.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;-fx-text-fill: #2c2c2c;");
         motdepasseText.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;-fx-text-fill: #2c2c2c;");
-        Fidentifiant.setPromptText("Entrez votre identifiant");
-        Fmotdepasse.setPromptText("Entrez votre mot de passe");
-        Fidentifiant.setMinWidth(350);
-        Fmotdepasse.setMinWidth(350);
-        Fidentifiant.setMinHeight(50);
-        Fmotdepasse.setMinHeight(50);
-        Fidentifiant.setStyle("-fx-font-size: 20px; -fx-background-color: white; -fx-border-color: #2c2c2c; " +
-                              "-fx-border-width: 2; -fx-border-radius: 0;");
-        Fmotdepasse.setStyle("-fx-font-size: 20px; -fx-background-color: white; -fx-border-color: #2c2c2c; " +
-                              "-fx-border-width: 2; -fx-border-radius: 0;");
-        idcontainer.getChildren().addAll(identifiantText,Fidentifiant);
-        motdepassecontainer.getChildren().addAll(motdepasseText,Fmotdepasse);
+        this.identifiant.setPromptText("Entrez votre identifiant");
+        this.motdepasse.setPromptText("Entrez votre mot de passe");
+        this.identifiant.setMinWidth(350);
+        this.motdepasse.setMinWidth(350);
+        this.identifiant.setMinHeight(50);
+        this.motdepasse.setMinHeight(50);
+        this.identifiant.setStyle("-fx-font-size: 20px; -fx-background-color: white; -fx-border-color: #2c2c2c; " +
+                                   "-fx-border-width: 2; -fx-border-radius: 0;");
+        this.motdepasse.setStyle("-fx-font-size: 20px; -fx-background-color: white; -fx-border-color: #2c2c2c; " +
+                                   "-fx-border-width: 2; -fx-border-radius: 0;");
+        idcontainer.getChildren().addAll(identifiantText,this.identifiant);
+        motdepassecontainer.getChildren().addAll(motdepasseText,this.motdepasse);
 
 
         // Bouton de connexion et d'inscription
         HBox loginContainer = new HBox();
         Button inscription = new Button("INSCRIPTION");
-        inscription.setOnAction(new ControleurConnexion(this, this.lUtilisateur, new ClientBD(connection), new VendeurBD(connection), new AdministrateurBD(connection)));
+        inscription.setUserData("INSCRIPTION");
+        inscription.setOnAction(new ControleurRetourRedirection(this));
         inscription.setMinWidth(200);
         inscription.setMinHeight(100);
         inscription.setFont(Font.font("Arial", 15));
@@ -276,6 +287,7 @@ public class LivreExpresss extends Application {
                              "-fx-border-color: #2c2c2c; -fx-border-width: 2; " +
                              "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;");
         Button connexion = new Button("SE CONNECTER");
+        connexion.setUserData("CONNEXION");
         connexion.setOnAction(new ControleurConnexion(this, this.lUtilisateur, new ClientBD(connection), new VendeurBD(connection), new AdministrateurBD(connection)));
         connexion.setMinWidth(200);
         connexion.setMinHeight(100);
@@ -324,12 +336,175 @@ public class LivreExpresss extends Application {
         this.panelCentral = new BorderPane();
         this.panelCentral.getChildren().add(centerPanel);
         this.gauche.getChildren().add(imgG);
-        this.identifiant = Fidentifiant.getText();
-        this.motdepasse = Fmotdepasse.getText();
     }
 
     private void fenetreInscription(){
+        // Utilisation de l'image des livres ou placeholder
+        ImageView imgG = new ImageView(this.lesImages.get(8));
+        imgG.setFitWidth(600);
+        imgG.setFitHeight(1080);
+        imgG.setPreserveRatio(false);
+
+        // Partie droite - Formulaire de connexion dans la bannière
+        VBox centerPanel = new VBox();
+        centerPanel.setPrefWidth(450);
+        centerPanel.setPrefHeight(200);
+        centerPanel.setPadding(new Insets(100,0,0,250));
+        centerPanel.setStyle("-fx-background-color: #2c2c2c;");
+
+        // Titre "Livre Express"
+        ImageView titreLVE = new ImageView(this.lesImages.get(0));
+        Text titreText = new Text("Connexion Compte " + this.lUtilisateur.getText());
+        titreText.setStyle("-fx-font-size: 30px; -fx-font-weight: bold;-fx-text-fill: #2c2c2c;");
+        titreLVE.setFitWidth(800);
+        titreLVE.setFitHeight(200);
+        titreLVE.setPreserveRatio(true);
+
+        // Ligne décorative
+        Region ligne = new Region();
+        ligne.setPrefHeight(3);
+        ligne.setPrefWidth(220);
+        ligne.setStyle("-fx-border-color: #2c2c2c;");
+
+        // Conteneur pour le titre et la ligne
+        VBox titleContainer = new VBox();
+        titleContainer.setSpacing(5);
+        titleContainer.getChildren().addAll(titreLVE,titreText, ligne);
+
+        // identifiant et mot de passe
+        VBox dadContainer = new VBox();
+        HBox hbox1 = new HBox();
+        HBox hbox2 = new HBox();
+        HBox hbox3 = new HBox();
+        HBox hbox4 = new HBox();
+        HBox hbox5 = new HBox();
+        HBox hbox6 = new HBox();
+        HBox ligne1 = new HBox();
+        HBox ligne2 = new HBox();
+        HBox ligne3 = new HBox();
+        TextField nom = new TextField();
+        TextField prenom = new TextField();
+        TextField motdepasse = new TextField();
+        TextField adresse = new TextField();
+        TextField ville = new TextField();
+        TextField codepostal = new TextField();
+        Text nomText = new Text("Nom :");
+        Text prenomText = new Text("Prénom :");
+        Text adresseText = new Text("Adresse :");
+        Text villeText = new Text("Ville :");
+        Text codepostalText = new Text("Code Postal :");
+        Text motdepasseText = new Text("Mot de passe :");
+        nomText.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;-fx-text-fill: #2c2c2c;");
+        prenomText.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;-fx-text-fill: #2c2c2c;");
+        adresseText.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;-fx-text-fill: #2c2c2c;");
+        villeText.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;-fx-text-fill: #2c2c2c;");
+        codepostalText.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;-fx-text-fill: #2c2c2c;");
+        motdepasseText.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;-fx-text-fill: #2c2c2c;");
+        nom.setPromptText("Entrez votre nom");
+        prenom.setPromptText("Entrez votre prénom");
+        motdepasse.setPromptText("Entrez votre mot de passe");
+        adresse.setPromptText("Entrez votre adresse");
+        ville.setPromptText("Entrez votre ville");
+        codepostal.setPromptText("Entrez votre code postal");
+        nom.setMinWidth(350);
+        motdepasse.setMinWidth(350);
+        nom.setMinHeight(50);
+        motdepasse.setMinHeight(50);
+        prenom.setMinWidth(350);
+        prenom.setMinHeight(50);
+        adresse.setMinWidth(350);
+        adresse.setMinHeight(50);
+        ville.setMinWidth(350);
+        ville.setMinHeight(50);
+        codepostal.setMinWidth(350);
+        codepostal.setMinHeight(50);
+        nom.setStyle("-fx-font-size: 20px; -fx-background-color: white; -fx-border-color: #2c2c2c; " +
+                                   "-fx-border-width: 2; -fx-border-radius: 0;");
+        prenom.setStyle("-fx-font-size: 20px; -fx-background-color: white; -fx-border-color: #2c2c2c; " +
+                                   "-fx-border-width: 2; -fx-border-radius: 0;");
+        adresse.setStyle("-fx-font-size: 20px; -fx-background-color: white; -fx-border-color: #2c2c2c; " +
+                                   "-fx-border-width: 2; -fx-border-radius: 0;");
+        ville.setStyle("-fx-font-size: 20px; -fx-background-color: white; -fx-border-color: #2c2c2c; " +
+                                   "-fx-border-width: 2; -fx-border-radius: 0;");
+        codepostal.setStyle("-fx-font-size: 20px; -fx-background-color: white; -fx-border-color: #2c2c2c; " +
+                                   "-fx-border-width: 2; -fx-border-radius: 0;");
+        motdepasse.setStyle("-fx-font-size: 20px; -fx-background-color: white; -fx-border-color: #2c2c2c; " +
+                                   "-fx-border-width: 2; -fx-border-radius: 0;");
+        hbox1.getChildren().addAll(nomText, nom);
+        hbox2.getChildren().addAll(prenomText, prenom);
+        hbox3.getChildren().addAll(adresseText, adresse);
+        hbox4.getChildren().addAll(villeText, ville);
+        hbox5.getChildren().addAll(codepostalText, codepostal);
+        hbox6.getChildren().addAll(motdepasseText, motdepasse);
+        ligne1.getChildren().addAll(hbox1, hbox6, hbox3);
+        ligne2.getChildren().addAll(hbox2, hbox4);
+        ligne3.getChildren().addAll(hbox5);
+        dadContainer.getChildren().addAll(ligne1, ligne2, ligne3);
+
+
+        // Bouton de connexion et d'inscription
+        ImageView imgretour = new ImageView(this.lesImages.get(2));
+        imgretour.setFitWidth(75);
+        imgretour.setPreserveRatio(true);
+        HBox loginContainer = new HBox();
+        Button retour = new Button(null, imgretour);
+        retour.setOnAction(new ControleurRetourRedirection(this));
+        retour.setMinWidth(200);
+        retour.setMinHeight(100);
+        retour.setFont(Font.font("Arial", 15));
+        retour.setStyle("-fx-background-color: white; -fx-text-fill: #2c2c2c; " +
+                             "-fx-border-color: #2c2c2c; -fx-border-width: 2; " +
+                             "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;");
+        Button creer = new Button("CRÉER COMPTE");
+        creer.setUserData("CREER COMPTE");
+        creer.setOnAction(new ControleurRetourRedirection(this));
+        creer.setMinWidth(200);
+        creer.setMinHeight(100);
+        creer.setFont(Font.font("Arial", 15));
+        creer.setStyle("-fx-background-color: white; -fx-text-fill: #2c2c2c; " +
+                      "-fx-border-color: #2c2c2c; -fx-border-width: 2; " +
+                      "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;");
+
         
+        // Effet de survol pour le bouton
+        creer.setOnMouseEntered(e ->
+        creer.setStyle("-fx-background-color: #2c2c2c; -fx-text-fill: white; " +
+                          "-fx-border-color: #2c2c2c; -fx-border-width: 2; " +
+                          "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;"));
+
+        creer.setOnMouseExited(e ->
+        creer.setStyle("-fx-background-color: white; -fx-text-fill: #2c2c2c; " +
+                          "-fx-border-color: #2c2c2c; -fx-border-width: 2; " +
+                          "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;")); 
+        // Effet de survol pour le bouton
+        retour.setOnMouseEntered(e -> 
+        retour.setStyle("-fx-background-color: #2c2c2c; -fx-text-fill: white; " +
+                          "-fx-border-color: #2c2c2c; -fx-border-width: 2; " +
+                          "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;"));                
+        retour.setOnMouseExited(e ->
+        retour.setStyle("-fx-background-color: white; -fx-text-fill: #2c2c2c; " +
+                          "-fx-border-color: #2c2c2c; -fx-border-width: 2; " +
+                          "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;"));
+        loginContainer.getChildren().addAll(retour, creer);
+        loginContainer.setAlignment(Pos.CENTER);
+        loginContainer.setSpacing(70); 
+
+        // Conteneur pour le combobox et la Connexion
+        VBox pannelcentrale = new VBox();
+        pannelcentrale.setAlignment(Pos.CENTER);
+        // L'écart important vient de cette ligne :
+        pannelcentrale.setSpacing(100); // <-- Cette valeur crée un grand espace vertical entre les éléments du VBox
+        pannelcentrale.getChildren().addAll(dadContainer, loginContainer);
+        pannelcentrale.setPadding(new Insets(100, 0, 0, 180));
+
+        // Ajout des éléments au panel central
+        centerPanel.getChildren().addAll(titleContainer, pannelcentrale);
+
+        // Initialisation des autres panels (vides pour cette vue)
+        this.gauche = new Pane();
+        this.panelCentral = new BorderPane();
+        this.panelCentral.getChildren().add(centerPanel);
+        this.gauche.getChildren().add(imgG);
     }
     
 
@@ -366,14 +541,17 @@ public class LivreExpresss extends Application {
         profil.setPreserveRatio(true);
 
         Button bDeconnexion = new Button(null,deco);
-
+        bDeconnexion.setUserData("DECONNEXION");
+        bDeconnexion.setOnAction(new ControleurRetourRedirection(this));
         Button bPanier = new Button(null,panier);
         bPanier.setOnAction(new AllerPanier(this));
-
+        bPanier.setUserData("PANIER");
         Button boutonMaison = new Button(null,maison);
+        boutonMaison.setUserData("MAISON");
         Button boutonProfil = new Button(null,profil);
-
+        boutonProfil.setUserData("PROFIL");
         bouttons.getChildren().addAll(bDeconnexion,bPanier,boutonMaison,boutonProfil);
+        boutonProfil.setOnAction(new ControleurRetourRedirection(this));
 
         bouttons.setMargin(boutonMaison,new Insets(5));
         bouttons.setMargin(bDeconnexion,new Insets(5));
@@ -460,12 +638,16 @@ public class LivreExpresss extends Application {
         profil.setPreserveRatio(true);
 
         Button bDeconnexion = new Button(null,deco);
+        bDeconnexion.setUserData("DECONNEXION");
+        bDeconnexion.setOnAction(new ControleurRetourRedirection(this));
         Button bPanier = new Button(null,panier);
-
+        bPanier.setUserData("PANIER");
         Button boutonMaison = new Button(null,maison);
-        boutonMaison.setOnAction(new RetourAccueil(this));
-
+        boutonMaison.setUserData("MAISON");
+        boutonMaison.setOnAction(new ControleurRetourRedirection(this));
         Button boutonProfil = new Button(null,profil);
+        boutonProfil.setUserData("PROFIL");
+        boutonProfil.setOnAction(new ControleurRetourRedirection(this));
 
         bouttons.getChildren().addAll(bDeconnexion,bPanier,boutonMaison,boutonProfil);
 
@@ -559,19 +741,18 @@ public class LivreExpresss extends Application {
         return this.lUtilisateur.getText();
     }
     
-    public List<String> modeConnexion(){
+    public void modeConnexion(){
         fenetreConnexion();
         fenetre.setTop(this.banniere);
         fenetre.setLeft(this.gauche);
         fenetre.setCenter(this.panelCentral);
-        List<String> login = new ArrayList<>();
-        login.add(this.identifiant);
-        login.add(this.motdepasse);
-        return login;
     }
     
     public void modeInscription(){
         fenetreInscription();
+        fenetre.setTop(this.banniere);
+        fenetre.setLeft(this.gauche);
+        fenetre.setCenter(this.panelCentral);
     }
 
     /** lance une partie */
