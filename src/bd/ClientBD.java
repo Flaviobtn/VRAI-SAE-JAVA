@@ -25,7 +25,8 @@ public class ClientBD{
 				int codePostalCli = rs.getInt("codepostal");
 				String motdepasse = rs.getString("identifiant");
 				String villeCli = rs.getString("villecli");
-				return new Client(idClient, nomCli,prenomCli, identifiant,addresseCli, codePostalCli, motdepasse, villeCli);
+				Client client = new Client(idClient, nomCli,prenomCli, identifiant,addresseCli, codePostalCli, motdepasse, villeCli);
+			return client;
 			}
 			rs.close();
 		}
@@ -33,6 +34,31 @@ public class ClientBD{
 			System.err.println(e.getMessage());
 		}
 		return null;
+	}
+
+	public Set<Livre> getRecoLivre(int numCo,String isbn){
+		Set<Livre> livres = new HashSet<>();
+		String req = "SELECT DISTINCT d3.isbn AS idLivre FROM DETAILCOMMANDE d1 " +
+				 "JOIN DETAILCOMMANDE d2 ON d1.isbn = d2.isbn " +
+				 "JOIN DETAILCOMMANDE d3 ON d2.numcom = d3.numcom " +
+				 "WHERE d1.numcom = ? AND d2.numcom != ? " +
+				 "AND d3.isbn NOT IN (SELECT isbn FROM DETAILCOMMANDE WHERE numcom = ?) " +
+				 "LIMIT 10";
+		try {
+			PreparedStatement st = laConnexion.prepareStatement(req);
+			st.setInt(1, numCo);
+			st.setInt(2, numCo);
+			st.setInt(3, numCo);
+			ResultSet rs = st.executeQuery();
+			LivreBD livrebd = new LivreBD(laConnexion);
+			while (rs.next()) {
+				livres.add(livrebd.getLivre(rs.getString("idLivre")));
+			}
+			return livres;
+		} catch (SQLException e) {
+			System.err.println(e.getMessage());
+		}
+		return livres;
 	}
 
 	// verifier 2 clients
@@ -59,25 +85,33 @@ public class ClientBD{
 	}
 
 	public Client getClient(String id, String mdp) throws SQLException {
-		String req = "Select * FROM CLIENT WHERE identifiant = ? AND motdepasse = ?";
-		this.st = laConnexion.prepareStatement(req);
-		this.st.setString(1, id);
-		this.st.setString(2, mdp);
-		ResultSet rs = st.executeQuery();
-		if(rs.next()) {
-			int idClient = rs.getInt("idcli");
-			String nomCli = rs.getString("nomcli");
-			String prenomCli = rs.getString("prenomcli");
-			String identifiant = rs.getString("identifiant");
-			String addresseCli = rs.getString("adressecli");
-			int codePostalCli = rs.getInt("codepostal");
-			String motdepasse = rs.getString("motDePasse");
-			String villeCli = rs.getString("villecli");
-			return new Client(idClient, nomCli, prenomCli, identifiant, addresseCli, codePostalCli, motdepasse, villeCli);
-		}
+		try {
+			String req = "Select * FROM CLIENT WHERE identifiant = ? AND motdepasse = ?";
+			this.st = laConnexion.prepareStatement(req);
+			this.st.setString(1, id);
+			this.st.setString(2, mdp);
+			ResultSet rs = st.executeQuery();
+			if(rs.next()) {
+				int idClient = rs.getInt("idcli");
+				String nomCli = rs.getString("nomcli");
+				String prenomCli = rs.getString("prenomcli");
+				String identifiant = rs.getString("identifiant");
+				String addresseCli = rs.getString("adressecli");
+				int codePostalCli = rs.getInt("codepostal");
+				String motdepasse = rs.getString("motDePasse");
+				String villeCli = rs.getString("villecli");
+				Client client = new Client(idClient, nomCli, prenomCli, identifiant, addresseCli, codePostalCli, motdepasse, villeCli);
+
+				return client;
+			}
 			rs.close();
+			} catch (SQLException e) {
+				System.out.println(e.getMessage());			
+			}
 		return null;
 	}
+
+
 
 	public void inscrireClient(String prenom, String nom, String mdp, String adresse, String ville, int codePostal) throws SQLException {
 		Integer idCli = genererId();
@@ -125,6 +159,7 @@ public class ClientBD{
 			st.setString(7, client.getMotDePasse());
 			st.setString(8, client.getVille());
 			st.executeUpdate();
+
 		} catch (SQLException e) {
 			System.err.println(e.getMessage());
 		}

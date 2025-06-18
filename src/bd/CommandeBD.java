@@ -18,7 +18,7 @@ public class CommandeBD {
     //idmag   VARCHAR(42) NOT NULL
 
 
-    public Commande getCommande(int nunumcomm)throws SQLException, IllegalArgumentException{
+    public Commande getCommande(Client client, int nunumcomm)throws SQLException, IllegalArgumentException{
 		Commande commande = new Commande(nunumcomm, null, false, null, null, null);
 		String req = "Select * FROM COMMANDE WHERE numcom = ?";
 		this.st = laConnexion.prepareStatement(req);
@@ -32,11 +32,49 @@ public class CommandeBD {
 				boolean enligne = "O".equalsIgnoreCase(modeComm);
                 String livraison = rs.getString("livraison");
 				Livraison mode = Livraison.fromCode(livraison);
-                int idcli = rs.getInt("idcli");
                 String idmag = rs.getString("idmag");
                 MagasinBD magBD = new MagasinBD(laConnexion);
-				ClientBD cliBD = new ClientBD(laConnexion);
-                commande = new Commande(numcom, datecom, enligne, mode,  magBD.getMagasin(idmag), cliBD.getClient(idcli));
+                commande = new Commande(numcom, datecom, enligne, mode,  magBD.getMagasin(idmag),client);
+			}
+			String req2 = "Select * FROM DETAILCOMMANDE WHERE numcom = ?";
+			this.st = laConnexion.prepareStatement(req2);
+			st.setInt(1, nunumcomm);
+			rs = st.executeQuery();
+			while(rs.next()){
+				int numlig  = rs.getInt("numlig");
+				LivreBD livrebd = new LivreBD(laConnexion);
+				Livre livre = livrebd.getLivre(rs.getString("isbn"));
+				int qte = rs.getInt("qte");
+				commande.ajouterDetailCommande(new DetailCommande(numlig,livre,qte,nunumcomm));
+				client.ajouterCommande(commande);
+			}
+			return commande;
+		}
+		catch(SQLException e){
+			System.err.println(e.getMessage());
+		}
+		return null;
+	}
+
+	public Commande getCommande(int nunumcomm)throws SQLException, IllegalArgumentException{
+		Commande commande = new Commande(nunumcomm, null, false, null, null, null);
+		String req = "Select * FROM COMMANDE WHERE numcom = ?";
+		this.st = laConnexion.prepareStatement(req);
+		st.setInt(1, nunumcomm);
+		ResultSet rs = st.executeQuery();
+		try{
+			while(rs.next()){
+				int numcom = rs.getInt("numcom");
+				LocalDate  datecom = rs.getDate("datecom").toLocalDate();
+				String modeComm = rs.getString("enligne");
+				boolean enligne = "O".equalsIgnoreCase(modeComm);
+                String livraison = rs.getString("livraison");
+				Livraison mode = Livraison.fromCode(livraison);
+                String idmag = rs.getString("idmag");
+                MagasinBD magBD = new MagasinBD(laConnexion);
+				ClientBD clientbd = new ClientBD(laConnexion);
+				Client client = clientbd.getClient(rs.getInt("idcli"));
+                commande = new Commande(numcom, datecom, enligne, mode,  magBD.getMagasin(idmag),client);
 			}
 			String req2 = "Select * FROM DETAILCOMMANDE WHERE numcom = ?";
 			this.st = laConnexion.prepareStatement(req2);
@@ -55,6 +93,22 @@ public class CommandeBD {
 			System.err.println(e.getMessage());
 		}
 		return null;
+	}
+
+	public void setCommande(Client client){
+		String req = "Select numcom FROM COMMANDE WHERE idcli = ?";
+		try {
+			PreparedStatement st = this.laConnexion.prepareStatement(req);
+			st.setInt(1, client.getNumeroClient());
+			ResultSet rs = st.executeQuery();
+			while(rs.next()){
+				getCommande(client, rs.getInt("numcom"));
+			}
+		} catch (Exception e) {
+			System.err.println(e.getMessage());
+		}
+		
+
 	}
 
 	public List<Commande> getAllCommandesBD(){

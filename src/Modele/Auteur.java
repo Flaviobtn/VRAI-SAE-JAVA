@@ -54,7 +54,11 @@ public class Auteur extends Personne{
     }
 
     public String toString(){
-        return this.nom;
+        if (this.prenom == null){
+            return this.nom;
+        }
+        return this.nom + this.prenom;
     }
+
 
 }

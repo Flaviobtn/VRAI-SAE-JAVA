@@ -96,6 +96,12 @@ public class Livre{
     public void setDateParution(Integer dateParution) {
         this.dateParution = dateParution;
     }
+
+    @Override
+    public String toString(){
+        return this.titre + this.prix + "écrit par: "+ this.getAuteur();
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;

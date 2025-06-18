@@ -1085,10 +1085,8 @@ public class AppMenu{
         // il nous faut le client connecté
         Client client = (Client) personneConnectee; // on cast la personne connectée en client
         // il nous faut a liste de toutes les commandes
-        CommandeBD commandeBD = new CommandeBD(connection);
-        List<Commande> lstCommandes = commandeBD.getAllCommandesBD();
         List<Livre> lesReco = new ArrayList<>();
-        lesReco = client.onVousRecommande(client, lstCommandes);
+        lesReco = client.onVousRecommande();
         
         
         List<String> lstRep = new ArrayList<>();
@@ -1185,6 +1183,11 @@ public class AppMenu{
             lstRep = new ArrayList<>();
             lstRep.add("Quelle est la quantité à commander pour le livre " + livre.getTitre() + " ?");
             afficherMenu("Passer une commande ", lstRep);
+            // on verifie que la quantité est un entier
+            while (!scanner.hasNextInt()) {
+                System.out.println("❌ Veuillez entrer un nombre entier valide pour la quantité.");
+                scanner.next(); // consomme l'entrée invalide
+            }
             int quantite = scanner.nextInt();
             
             // on ajoute le détail de commande
@@ -1294,6 +1297,8 @@ public class AppMenu{
                 if (clientBD.seconnecterClient(ident, mdp)) {
                     // demande a la bd getClient ident et mdp
                     Client client = clientBD.getClient(ident, mdp);
+                    CommandeBD commande = new CommandeBD(connection);
+                    commande.setCommande(client);
                     personneConnectee = client; // on récupère le client connecté
                     System.out.println("✅ Bienvenue " + client.getPrenom() + " " + client.getNom() + " !");
                     return true;

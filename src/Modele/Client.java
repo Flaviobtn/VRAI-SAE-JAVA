@@ -46,6 +46,10 @@ public class Client extends Personne {
     public List<Commande> getCommandes() {
         return commandes;
     }
+
+    public void ajouterCommande(Commande commande){
+        this.commandes.add(commande);    
+    }
     public void setCodePostal(int codePostal) {
         this.codePostal = codePostal;
     }
@@ -62,7 +66,8 @@ public class Client extends Personne {
             for(Livre livre :commande.tousLesLivres()){
                 if(!(res.contains(livre)))
             res.add(livre);
-        }}
+            }
+        }
         return res;
     }
 
@@ -99,32 +104,35 @@ public class Client extends Personne {
     }
     */
 
-   public List<Livre> onVousRecommande(Client client, List<Commande> toutesLesCommandes) {
-    List<Livre> recommandations = new ArrayList<>();
-    Set<Livre> livresClient = new HashSet<>(client.tousLesLivresClient());
-
-    for (Commande commande : toutesLesCommandes) {
-        if (!client.commandes.contains(commande)) {
-            Set<Livre> livresCommande = new HashSet<>(commande.tousLesLivres());
-            // Intersection : est-ce qu'il y a au moins un livre en commun ?
-            boolean enCommun = false;
-            for (Livre livre : livresClient) {
-                if (livresCommande.contains(livre)) {
-                    enCommun = true;
-                    break;
-                }
+   public List<Livre> onVousRecommande() {
+        Set<Livre> recommandations = new HashSet<>();
+        Set<Livre> temp = new HashSet<>();
+        System.out.println(this.getCommandes());
+        Set<Livre> banlivres = new HashSet<>();
+        for (Commande comm : this.getCommandes()){
+            for(DetailCommande det : comm.getCommandeFinale()){
+                banlivres.add(det.getLivre());
             }
-            if (enCommun) {
-                for (Livre livreCommande : livresCommande) {
-                    if (!livresClient.contains(livreCommande) && !recommandations.contains(livreCommande)) {
-                        recommandations.add(livreCommande);
+        }
+        for (Commande comm : this.getCommandes()) {
+            System.out.println(comm.getCommandeFinale());
+            for (DetailCommande detCom : comm.getCommandeFinale()){
+                if(recommandations.size()<10){
+                    System.out.println("Dans le if");
+                    ClientBD clientBD = new ClientBD(ConnectionBD.getConnection());
+                    temp = clientBD.getRecoLivre(comm.getNumCommande(),detCom.getLivre().getIsbn());
+                    System.out.println(temp);
+                    for(Livre livre : temp){
+                        if(banlivres.contains(livre)){
+                            banlivres.remove(livre);
+                        }
                     }
+                        recommandations.addAll(temp);
                 }
             }
         }
+        return new ArrayList<>(recommandations);
     }
-    return recommandations;
-}
 
 
 
