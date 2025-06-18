@@ -35,7 +35,7 @@ public class AllerPanier implements EventHandler<ActionEvent> {
      */
     @Override
     public void handle(ActionEvent actionEvent) {
-        // A implémenter
+        
         vue.modePanier();
         
     }

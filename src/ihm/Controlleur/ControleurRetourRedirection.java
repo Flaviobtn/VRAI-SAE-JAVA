@@ -38,8 +38,15 @@ public class ControleurRetourRedirection implements EventHandler<ActionEvent> {
     public void handle(ActionEvent actionEvent) {
         Button button = (Button) actionEvent.getTarget();
         Object data = button.getUserData();
+        System.out.println(data);
         if(data.equals("MAISON")) {
-            vue.modeAccueilC();
+            if(vue.getLUtilisateur().equals("CLIENT")){
+                vue.modeAccueilC();}
+            if(vue.getLUtilisateur().equals("VENDEUR")){
+                vue.modeAccueilV();}
+            if(vue.getLUtilisateur().equals("ADMINISTRATEUR")){
+                //vue.modeAccueilA();
+                }
         } if(data.equals("PROFIL")) {
             vue.modeProfil();
         } if(data.equals("PANIER")) {
@@ -50,6 +57,12 @@ public class ControleurRetourRedirection implements EventHandler<ActionEvent> {
             vue.modeInscription();
         }
         if(data.equals("CONNEXION")){
+            vue.modeConnexion();
+        }
+        if(data.equals("ANNULERC")){
+            vue.modeChoix();
+        }
+        if(data.equals("ANNULERI")){
             vue.modeConnexion();
         }
     }

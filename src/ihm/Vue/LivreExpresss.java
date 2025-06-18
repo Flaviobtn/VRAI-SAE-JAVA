@@ -98,6 +98,13 @@ public class LivreExpresss extends Application {
     public String getMotdepasse() {
         return this.motdepasse.getText();
     }
+    public String getLUtilisateur() {
+        return this.lUtilisateur.getText();
+    }
+    
+    public List<TextField> getInscriptions() {
+        return this.inscriptions;
+    }
 
     /**
      * @return  le graphe de scène de la vue à partir de methodes précédantes
@@ -139,7 +146,7 @@ public class LivreExpresss extends Application {
         VBox centerPanel = new VBox();
         centerPanel.setPrefWidth(450);
         centerPanel.setPrefHeight(200);
-        centerPanel.setPadding(new Insets(100,0,0,250));
+        centerPanel.setPadding(new Insets(100,0,0,225));
         centerPanel.setStyle("-fx-background-color: #2c2c2c;");
 
         // Titre "Livre Express"
@@ -176,6 +183,7 @@ public class LivreExpresss extends Application {
         choix.setMinWidth(200);
         choix.setMinHeight(100);
         choix.setFont(Font.font("Arial", 15));
+        choix.setDisable(true);
         choix.setStyle("-fx-background-color: white; -fx-text-fill: #1e1e1e; " +
                "-fx-border-color: #1e1e1e; -fx-border-width: 2; " +
                "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;");
@@ -195,16 +203,18 @@ choix.setOnMouseExited(e ->
         VBox choixContainer = new VBox();
         choixContainer.setAlignment(Pos.CENTER);
         // L'écart important vient de cette ligne :
-        choixContainer.setSpacing(100); // <-- Cette valeur crée un grand espace vertical entre les éléments du VBox
+        choixContainer.setSpacing(140); // <-- Cette valeur crée un grand espace vertical entre les éléments du VBox
         choixContainer.getChildren().addAll(comboBox, choix);
-        choixContainer.setPadding(new Insets(100, 0, 0, 250));
+        choixContainer.setPadding(new Insets(100, 0, 0, 220));
 
         // Crée l'objet Text et ajoute un listener pour suivre la sélection
         this.lUtilisateur = new Text(""); // ou comboBox.getValue() si tu veux la valeur initiale
         comboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null && !newValue.equals("Choix de l'utilisateur")) {
+                choix.setDisable(false);
                 this.lUtilisateur.setText(newValue);
             }
+            
         });
 
         // Ajout des éléments au panel central
@@ -230,7 +240,7 @@ choix.setOnMouseExited(e ->
         VBox centerPanel = new VBox();
         centerPanel.setPrefWidth(450);
         centerPanel.setPrefHeight(200);
-        centerPanel.setPadding(new Insets(100,0,0,250));
+        centerPanel.setPadding(new Insets(100,0,0,225));
         centerPanel.setStyle("-fx-background-color: #2c2c2c;");
 
         // Titre "Livre Express"
@@ -286,13 +296,25 @@ choix.setOnMouseExited(e ->
         inscription.setStyle("-fx-background-color: white; -fx-text-fill: #2c2c2c; " +
                              "-fx-border-color: #2c2c2c; -fx-border-width: 2; " +
                              "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;");
+        if(!(getLUtilisateur().equals("CLIENT"))){
+            inscription.setDisable(true);
+        }
         Button connexion = new Button("SE CONNECTER");
         connexion.setUserData("CONNEXION");
-        connexion.setOnAction(new ControleurConnexion(this, this.lUtilisateur, new ClientBD(connection), new VendeurBD(connection), new AdministrateurBD(connection)));
+        connexion.setOnAction(new ControleurConnexion(this, new ClientBD(connection), new VendeurBD(connection), new AdministrateurBD(connection)));
         connexion.setMinWidth(200);
         connexion.setMinHeight(100);
         connexion.setFont(Font.font("Arial", 15));
         connexion.setStyle("-fx-background-color: white; -fx-text-fill: #2c2c2c; " +
+                      "-fx-border-color: #2c2c2c; -fx-border-width: 2; " +
+                      "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;");
+        Button retour = new Button("⟵ Annuler");
+        retour.setUserData("ANNULERC");
+        retour.setOnAction(new ControleurRetourRedirection(this));
+        retour.setMinWidth(200);
+        retour.setMinHeight(100);
+        retour.setFont(Font.font("Arial", 15));
+        retour.setStyle("-fx-background-color: white; -fx-text-fill: #2c2c2c; " +
                       "-fx-border-color: #2c2c2c; -fx-border-width: 2; " +
                       "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;");
 
@@ -316,7 +338,17 @@ choix.setOnMouseExited(e ->
         inscription.setStyle("-fx-background-color: white; -fx-text-fill: #2c2c2c; " +
                           "-fx-border-color: #2c2c2c; -fx-border-width: 2; " +
                           "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;"));
-        loginContainer.getChildren().addAll(inscription, connexion);
+
+        retour.setOnMouseEntered(e ->
+        retour.setStyle("-fx-background-color: #2c2c2c; -fx-text-fill: white; " +
+                          "-fx-border-color: #2c2c2c; -fx-border-width: 2; " +
+                          "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;"));
+
+        retour.setOnMouseExited(e ->
+        retour.setStyle("-fx-background-color: white; -fx-text-fill: #2c2c2c; " +
+                          "-fx-border-color: #2c2c2c; -fx-border-width: 2; " +
+                          "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;")); 
+        loginContainer.getChildren().addAll(retour,inscription, connexion);
         loginContainer.setAlignment(Pos.CENTER);
         loginContainer.setSpacing(70); 
 
@@ -326,7 +358,7 @@ choix.setOnMouseExited(e ->
         // L'écart important vient de cette ligne :
         pannelcentrale.setSpacing(100); // <-- Cette valeur crée un grand espace vertical entre les éléments du VBox
         pannelcentrale.getChildren().addAll(idcontainer, motdepassecontainer, loginContainer);
-        pannelcentrale.setPadding(new Insets(100, 0, 0, 180));
+        pannelcentrale.setPadding(new Insets(80, 0, 0, 30));
 
         // Ajout des éléments au panel central
         centerPanel.getChildren().addAll(titleContainer, pannelcentrale);
@@ -349,7 +381,7 @@ choix.setOnMouseExited(e ->
         VBox centerPanel = new VBox();
         centerPanel.setPrefWidth(450);
         centerPanel.setPrefHeight(200);
-        centerPanel.setPadding(new Insets(100,0,0,250));
+        centerPanel.setPadding(new Insets(100,0,0,225));
         centerPanel.setStyle("-fx-background-color: #2c2c2c;");
 
         // Titre "Livre Express"
@@ -373,15 +405,15 @@ choix.setOnMouseExited(e ->
 
         // identifiant et mot de passe
         VBox dadContainer = new VBox();
-        HBox hbox1 = new HBox();
-        HBox hbox2 = new HBox();
-        HBox hbox3 = new HBox();
-        HBox hbox4 = new HBox();
-        HBox hbox5 = new HBox();
-        HBox hbox6 = new HBox();
-        HBox ligne1 = new HBox();
-        HBox ligne2 = new HBox();
-        HBox ligne3 = new HBox();
+        VBox hbox1 = new VBox();
+        VBox hbox2 = new VBox();
+        VBox hbox3 = new VBox();
+        VBox hbox4 = new VBox();
+        VBox hbox5 = new VBox();
+        VBox hbox6 = new VBox();
+        HBox ligne1 = new HBox(70);
+        HBox ligne2 = new HBox(70);
+        HBox ligne3 = new HBox(70);
         TextField nom = new TextField();
         TextField prenom = new TextField();
         TextField motdepasse = new TextField();
@@ -406,17 +438,17 @@ choix.setOnMouseExited(e ->
         adresse.setPromptText("Entrez votre adresse");
         ville.setPromptText("Entrez votre ville");
         codepostal.setPromptText("Entrez votre code postal");
-        nom.setMinWidth(350);
-        motdepasse.setMinWidth(350);
+        nom.setPrefWidth(350);
+        motdepasse.setPrefWidth(350);
         nom.setMinHeight(50);
         motdepasse.setMinHeight(50);
-        prenom.setMinWidth(350);
+        prenom.setPrefWidth(350);
         prenom.setMinHeight(50);
-        adresse.setMinWidth(350);
+        adresse.setPrefWidth(350);
         adresse.setMinHeight(50);
-        ville.setMinWidth(350);
+        ville.setPrefWidth(350);
         ville.setMinHeight(50);
-        codepostal.setMinWidth(350);
+        codepostal.setPrefWidth(350);
         codepostal.setMinHeight(50);
         nom.setStyle("-fx-font-size: 20px; -fx-background-color: white; -fx-border-color: #2c2c2c; " +
                                    "-fx-border-width: 2; -fx-border-radius: 0;");
@@ -436,58 +468,60 @@ choix.setOnMouseExited(e ->
         hbox4.getChildren().addAll(villeText, ville);
         hbox5.getChildren().addAll(codepostalText, codepostal);
         hbox6.getChildren().addAll(motdepasseText, motdepasse);
-        ligne1.getChildren().addAll(hbox1, hbox6, hbox3);
-        ligne2.getChildren().addAll(hbox2, hbox4);
-        ligne3.getChildren().addAll(hbox5);
+        ligne1.getChildren().addAll(hbox1, hbox2);
+        ligne2.getChildren().addAll(hbox6,hbox3);
+        ligne3.getChildren().addAll(hbox4, hbox5);
+        ligne1.setPadding(new Insets(0,0,30,40));
+        ligne2.setPadding(new Insets(0,0,30,40));
+        ligne3.setPadding(new Insets(0,0,30,40));
         dadContainer.getChildren().addAll(ligne1, ligne2, ligne3);
 
 
         // Bouton de connexion et d'inscription
-        ImageView imgretour = new ImageView(this.lesImages.get(2));
-        imgretour.setFitWidth(75);
-        imgretour.setPreserveRatio(true);
         HBox loginContainer = new HBox();
-        Button retour = new Button(null, imgretour);
+        Button retour = new Button("⟵ Annuler");
+        retour.setUserData("ANNULERI");
         retour.setOnAction(new ControleurRetourRedirection(this));
         retour.setMinWidth(200);
-        retour.setMinHeight(100);
-        retour.setFont(Font.font("Arial", 15));
+        retour.setPrefHeight(50);
+        retour.setFont(Font.font("Arial", 25));
         retour.setStyle("-fx-background-color: white; -fx-text-fill: #2c2c2c; " +
-                             "-fx-border-color: #2c2c2c; -fx-border-width: 2; " +
-                             "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;");
+                      "-fx-border-color: #2c2c2c; -fx-border-width: 2; " +
+                      "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;");
         Button creer = new Button("CRÉER COMPTE");
         creer.setUserData("CREER COMPTE");
         creer.setOnAction(new ControleurRetourRedirection(this));
         creer.setMinWidth(200);
-        creer.setMinHeight(100);
-        creer.setFont(Font.font("Arial", 15));
+        creer.setPrefHeight(50);
+        creer.setFont(Font.font("Arial", 20));
         creer.setStyle("-fx-background-color: white; -fx-text-fill: #2c2c2c; " +
                       "-fx-border-color: #2c2c2c; -fx-border-width: 2; " +
                       "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;");
 
         
         // Effet de survol pour le bouton
+        retour.setOnMouseEntered(e ->
+        retour.setStyle("-fx-background-color: #2c2c2c; -fx-text-fill: white; " +
+                          "-fx-border-color: #2c2c2c; -fx-border-width: 2; " +
+                          "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;"));
+
+        retour.setOnMouseExited(e ->
+        retour.setStyle("-fx-background-color: white; -fx-text-fill: #2c2c2c; " +
+                          "-fx-border-color: #2c2c2c; -fx-border-width: 2; " +
+                          "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;")); 
+        // Effet de survol pour le bouton
         creer.setOnMouseEntered(e ->
         creer.setStyle("-fx-background-color: #2c2c2c; -fx-text-fill: white; " +
                           "-fx-border-color: #2c2c2c; -fx-border-width: 2; " +
-                          "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;"));
+                          "-fx-border-radius: 50; -fx-background-radius: 50; -fx-font-weight: bold;"));
 
         creer.setOnMouseExited(e ->
         creer.setStyle("-fx-background-color: white; -fx-text-fill: #2c2c2c; " +
                           "-fx-border-color: #2c2c2c; -fx-border-width: 2; " +
                           "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;")); 
-        // Effet de survol pour le bouton
-        retour.setOnMouseEntered(e -> 
-        retour.setStyle("-fx-background-color: #2c2c2c; -fx-text-fill: white; " +
-                          "-fx-border-color: #2c2c2c; -fx-border-width: 2; " +
-                          "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;"));                
-        retour.setOnMouseExited(e ->
-        retour.setStyle("-fx-background-color: white; -fx-text-fill: #2c2c2c; " +
-                          "-fx-border-color: #2c2c2c; -fx-border-width: 2; " +
-                          "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;"));
         loginContainer.getChildren().addAll(retour, creer);
         loginContainer.setAlignment(Pos.CENTER);
-        loginContainer.setSpacing(70); 
+        loginContainer.setSpacing(500); 
 
         // Conteneur pour le combobox et la Connexion
         VBox pannelcentrale = new VBox();
@@ -495,7 +529,7 @@ choix.setOnMouseExited(e ->
         // L'écart important vient de cette ligne :
         pannelcentrale.setSpacing(100); // <-- Cette valeur crée un grand espace vertical entre les éléments du VBox
         pannelcentrale.getChildren().addAll(dadContainer, loginContainer);
-        pannelcentrale.setPadding(new Insets(100, 0, 0, 180));
+        pannelcentrale.setPadding(new Insets(100, 0, 0, 10));
 
         // Ajout des éléments au panel central
         centerPanel.getChildren().addAll(titleContainer, pannelcentrale);
@@ -701,7 +735,81 @@ choix.setOnMouseExited(e ->
     }
 
     private void fenetreAccueilV(){
+        this.gauche=null;
 
+        
+        this.banniere=new BorderPane();
+        banniere.setStyle("-fx-background-color: lightpink;");
+        ImageView imgLogo = new ImageView(this.lesImages.get(0));
+        imgLogo.setFitWidth(520);
+        imgLogo.setPreserveRatio(true);
+        banniere.setPadding(new Insets(10,0,0,0));
+
+        Label user = new Label("Accueil V");
+        user.setStyle("-fx-font-size: 27px;");
+        user.setPadding(new Insets(0,125,0,0));
+
+
+        HBox bouttons = new HBox();
+        ImageView deco = new ImageView(this.lesImages.get(3));
+        deco.setFitWidth(75);
+        deco.setPreserveRatio(true);
+
+
+        ImageView maison = new ImageView(this.lesImages.get(1));
+        maison.setFitWidth(75);
+        maison.setPreserveRatio(true);
+
+        ImageView profil = new ImageView(this.lesImages.get(4));
+        profil.setFitWidth(75);
+        profil.setPreserveRatio(true);
+
+        Button bDeconnexion = new Button(null,deco);
+        bDeconnexion.setUserData("DECONNEXION");
+        bDeconnexion.setOnAction(new ControleurRetourRedirection(this));
+        Button bPanier = null;
+        
+        Button boutonMaison = new Button(null,maison);
+        boutonMaison.setUserData("MAISON");
+        boutonMaison.setOnAction(new ControleurRetourRedirection(this));
+        Button boutonProfil = new Button(null,profil);
+        boutonProfil.setUserData("PROFIL");
+        boutonProfil.setOnAction(new ControleurRetourRedirection(this));
+
+        bouttons.getChildren().addAll(bDeconnexion,boutonMaison,boutonProfil);
+
+        bouttons.setMargin(boutonMaison,new Insets(5));
+        bouttons.setMargin(bDeconnexion,new Insets(5));
+        bouttons.setMargin(boutonProfil,new Insets(5));
+        banniere.setLeft(imgLogo);
+        banniere.setCenter(user);
+        banniere.setRight(bouttons);
+
+
+
+        this.panelCentral= new BorderPane();
+
+        VBox listLivres = new VBox();
+        
+        Button ajLivre = new Button("Ajouter un livre");
+        ajLivre.setStyle("-fx-font-size: 25px;");
+
+        Button gererStock = new Button("Gérer le stock");
+        gererStock.setStyle("-fx-font-size: 25px;");
+
+        Button comCli = new Button("Passer une commande client");
+        ajLivre.setStyle("-fx-font-size: 25px;");
+
+        Button transLivre = new Button("Transférer un livre");
+        transLivre.setStyle("-fx-font-size: 25px;");
+        
+        
+        listLivres.setStyle("-fx-background-color: lightpink;");
+        listLivres.getChildren().addAll(ajLivre,gererStock,comCli,transLivre);
+        listLivres.setPadding(new Insets(0,655,0,665));
+        
+        panelCentral.setMargin(listLivres,new Insets(150,0,0,0));
+        panelCentral.setCenter(listLivres); 
     }
 
     private void fenetreProfil(){
@@ -733,12 +841,12 @@ choix.setOnMouseExited(e ->
     this.lesImages.add(new Image(file8.toURI().toString()));
 }
 
-    public String modeChoix(){
+    public void modeChoix(){
         fenetreChoix();
         fenetre.setTop(this.banniere);
         fenetre.setLeft(this.gauche);
         fenetre.setCenter(this.panelCentral);
-        return this.lUtilisateur.getText();
+
     }
     
     public void modeConnexion(){
@@ -770,9 +878,9 @@ choix.setOnMouseExited(e ->
     /** lance une partie */
     public void modePanier(){
         fenetrePanier();
-        this.boutonMaison.setDisable(true);
+        this.boutonMaison.setDisable(false);
         this.boutonProfil.setDisable(false);
-        this.bPanier.setDisable(false);
+        this.bPanier.setDisable(true);
         fenetre.setTop(this.banniere);
         fenetre.setLeft(this.gauche);
         fenetre.setCenter(this.panelCentral);
@@ -782,11 +890,23 @@ choix.setOnMouseExited(e ->
     /** lance une partie */
     public void modeAccueilV(){
         fenetreAccueilV();
+        this.boutonMaison.setDisable(true);
+        this.boutonProfil.setDisable(false);
+        this.bPanier.setDisable(false);
+        fenetre.setTop(this.banniere);
+        fenetre.setLeft(this.gauche);
+        fenetre.setCenter(this.panelCentral);
     }
 
      /** lance une partie */
     public void modeProfil(){
         fenetreProfil();
+        this.boutonMaison.setDisable(false);
+        this.boutonProfil.setDisable(true);
+        this.bPanier.setDisable(false);
+        fenetre.setTop(this.banniere);
+        fenetre.setLeft(this.gauche);
+        fenetre.setCenter(this.panelCentral);
     }
 
     /**
@@ -796,16 +916,20 @@ choix.setOnMouseExited(e ->
         // A implementer
     }
 
-    public Alert popUpPartieEnCours(){
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION,"La partie est en cours!\n Etes-vous sûr de l'interrompre ?", ButtonType.YES, ButtonType.NO);
-        alert.setTitle("Attention");
-        return alert;
+    public void popUpPasChoix(){
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Erreur de choix");
+        alert.setHeaderText(null);
+        alert.setContentText("Veuillez choisir un.");
+        Optional<ButtonType> result = alert.showAndWait();
     }
         
-    public Alert popUpReglesDuJeu(){
-        // A implementer
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        return alert;
+    public void popUpConnexionImpossible(){
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Erreur de connexion");
+        alert.setHeaderText(null);
+        alert.setContentText("Identifiants incorrects. Veuillez réessayer.");
+        Optional<ButtonType> result = alert.showAndWait();
     }
     
     public Alert popUpMessageGagne(){

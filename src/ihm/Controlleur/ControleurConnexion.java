@@ -29,9 +29,8 @@ public class ControleurConnexion implements EventHandler<ActionEvent> {
      * @param modelePendu modèle du jeu
      * @param p vue du jeu
      */
-    public ControleurConnexion(LivreExpresss vue, Text lUtilisateur, ClientBD modeleC, VendeurBD modeleV, AdministrateurBD modeleA) {
+    public ControleurConnexion(LivreExpresss vue, ClientBD modeleC, VendeurBD modeleV, AdministrateurBD modeleA) {
         this.vue = vue;
-        this.lUtilisateur = lUtilisateur;
         this.modeleC = modeleC;
         this.modeleV = modeleV;
         this.modeleA = modeleA;
@@ -46,48 +45,37 @@ public class ControleurConnexion implements EventHandler<ActionEvent> {
         Button button = (Button) actionEvent.getTarget();
         String nomDuBouton = button.getText();
         if(nomDuBouton.equals("SE CONNECTER")){
-            if(lUtilisateur.getText().equals("CLIENT")){
+            if(vue.getLUtilisateur().equals("CLIENT")){
                 try {
-                    this.modeleC.seconnecterClient(this.vue.getIdentifiant(), this.vue.getMotdepasse());
+                    if(this.modeleC.seconnecterClient(this.vue.getIdentifiant(), this.vue.getMotdepasse())){;
+                    this.vue.modeAccueilC();}
+                    else {
+                        vue.popUpConnexionImpossible();
+                    }
                 } catch (SQLException e) {
                     System.err.println("Erreur de connexion en tant que Client : " + e.getMessage());
                 }
             } 
-            //else {
-            //    Alert alert = new Alert(Alert.AlertType.ERROR);
-            //    alert.setTitle("Erreur de connexion");
-            //    alert.setHeaderText(null);
-            //    alert.setContentText("Identifiants incorrects. Veuillez réessayer.");
-            //    Optional<ButtonType> result = alert.showAndWait();
-            //}
-
-            if(lUtilisateur.getText().equals("VENDEUR")){
+        
+            if(vue.getLUtilisateur().equals("VENDEUR")){
                 try {
-                    this.modeleV.seconnecterVendeur(this.vue.getIdentifiant(), this.vue.getMotdepasse());
+                    if(this.modeleV.seconnecterVendeur(this.vue.getIdentifiant(), this.vue.getMotdepasse())){
+                    this.vue.modeAccueilV();}
+                    else {
+                        vue.popUpConnexionImpossible();
+                    }
                 } catch (SQLException e) {
-                    System.err.println("Erreur de connexion en tant que Vendeur : " + e.getMessage());
+                    System.err.println("Erreur de connexion en tant qu'Vendeur : " + e.getMessage());
                 }
-            } 
-            //else {
-            //    Alert alert = new Alert(Alert.AlertType.ERROR);
-            //    alert.setTitle("Erreur de connexion");
-            //    alert.setHeaderText(null);
-            //    alert.setContentText("Identifiants incorrects. Veuillez réessayer.");
-            //    Optional<ButtonType> result = alert.showAndWait();
-            //}
+            }
 
-             if(lUtilisateur.getText().equals("ADMINISTRATEUR")){
+             if(vue.getLUtilisateur().equals("ADMINISTRATEUR")){
                 try {
                     if(this.modeleA.seconnecterAdmin(this.vue.getIdentifiant(), this.vue.getMotdepasse())){
                     this.vue.modeAccueilC();
-
                     }
                     else {
-                        Alert alert = new Alert(Alert.AlertType.ERROR);
-                        alert.setTitle("Erreur de connexion");
-                        alert.setHeaderText(null);
-                        alert.setContentText("Identifiants incorrects. Veuillez réessayer.");
-                        Optional<ButtonType> result = alert.showAndWait();
+                        vue.popUpConnexionImpossible();
                     }
                 } catch (SQLException e) {
                     System.err.println("Erreur de connexion en tant qu'Administrateur : " + e.getMessage());
