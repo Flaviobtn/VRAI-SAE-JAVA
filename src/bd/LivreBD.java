@@ -16,7 +16,7 @@ public class LivreBD {
     public List<Livre> getTousLesLivres(Magasin mag){
         List<Livre> livres = new ArrayList<>();
         try {
-            String req = "SELECT * FROM LIVRE NATURAL JOIN POSSEDER NATURAL JOIN MAGASIN WHERE idmag = ?";
+            String req = "SELECT * FROM LIVRE NATURAL JOIN POSSEDER NATURAL JOIN MAGASIN WHERE idmag = ? ORDER BY titre";
             PreparedStatement st = laConnexion.prepareStatement(req);
             st.setString(1, mag.getIdmag());
             ResultSet rs = st.executeQuery();
@@ -62,7 +62,7 @@ public class LivreBD {
 
                 // Récupération de l'éditeur
                 List<Editeur> editeurs = new ArrayList<>();
-                String reqEditeur = "SELECT * FROM EDITER WHERE isbn = ? ORDER BY titre ASC";
+                String reqEditeur = "SELECT * FROM EDITER NATURAL JOIN LIVRE WHERE isbn = ? ORDER BY titre ASC";
                 PreparedStatement stEditeur = laConnexion.prepareStatement(reqEditeur);
                 stEditeur.setString(1, isbn);
                 ResultSet rsEditeur = stEditeur.executeQuery();

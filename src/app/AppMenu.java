@@ -951,9 +951,19 @@ public class AppMenu{
             afficherMenu("Vérification de la disponibilité ", lstRep);
             return;
         }
+        LivreBD livreBD = new LivreBD(connection);
         String aff = "Veuillez entrer un livre";
         List<String> lstRep = new ArrayList<>();
         lstRep.add(aff);
+        for(Livre livre : livreBD.getTousLesLivres(mag)){
+            lstRep.add(livre.getTitre());
+        }
+        if (lstRep.isEmpty()) {
+            lstRep.add("Aucun livre disponible dans ce magasin.");
+        }
+        afficherMenu(aff, lstRep);
+        
+
         afficherMenu("Disponibilité d'un livre ", lstRep);
         String titreLivre = scanner.nextLine();
         LivreBD livreBD = new LivreBD(connection);
@@ -977,7 +987,7 @@ public class AppMenu{
         afficherMenu("Commande de stock", lstRep);
     }
 
-    public static void transfererLivre(){
+    public static void ajouterLivre(){
         // Cette fonction sert à transferer un livre d'un magasin à un autre
         String aff1 = "Veuillez entrer un livre à transférer";
         String aff2 = "Veuillez entrer le magasin d'où le livre provient";

@@ -10,6 +10,6 @@ echo "----------------------------------------------------"
 ls bin
 echo "----------------------------------------------------"
 #ls bin/app
-java -cp "bin;lib/mariadb-java-client-3.5.3.jar" app.AppMenu
+java -cp "bin:lib/mariadb-java-client-3.5.3.jar" app.AppMenu
 
 #java -cp "bin:lib/mariadb-java-client-3.5.3.jar" bin/app/AppMenu

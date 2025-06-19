@@ -5,4 +5,3 @@ Vendeur:
 - ajout d'un livre
 - verif disponibilite
 - commanderStock
-- Transferer un livre
