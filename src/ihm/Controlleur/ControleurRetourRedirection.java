@@ -77,5 +77,11 @@ public class ControleurRetourRedirection implements EventHandler<ActionEvent> {
         if(data.equals("CREER VENDEUR")){
             vue.modeCreerVendeur();
         }
+        if(data.equals("AJOUTER LIVRE")){
+            vue.modeCreerLivre();
+        }
+        if(data.equals("VERIFIER DISPO")){
+            vue.modeVerfiDispo();
+        }
     }
 }

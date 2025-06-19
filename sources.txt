@@ -17,6 +17,7 @@ C:\Users\tagsm\Desktop\Bureau\VRAI-SAE-JAVA\src\ihm\Controlleur\ControleurInfos.
 C:\Users\tagsm\Desktop\Bureau\VRAI-SAE-JAVA\src\ihm\Controlleur\ControleurInscription.java
 C:\Users\tagsm\Desktop\Bureau\VRAI-SAE-JAVA\src\ihm\Controlleur\ControleurNiveau.java
 C:\Users\tagsm\Desktop\Bureau\VRAI-SAE-JAVA\src\ihm\Controlleur\ControleurRetourRedirection.java
+C:\Users\tagsm\Desktop\Bureau\VRAI-SAE-JAVA\src\ihm\Controlleur\ControleurVerifDispo.java
 C:\Users\tagsm\Desktop\Bureau\VRAI-SAE-JAVA\src\ihm\Vue\LivreExpresss.java
 C:\Users\tagsm\Desktop\Bureau\VRAI-SAE-JAVA\src\Modele\Administrateur.java
 C:\Users\tagsm\Desktop\Bureau\VRAI-SAE-JAVA\src\Modele\Auteur.java
