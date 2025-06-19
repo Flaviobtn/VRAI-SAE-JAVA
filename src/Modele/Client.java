@@ -111,13 +111,10 @@ public class Client extends Personne {
             }
         }
         for (Commande comm : this.getCommandes()) {
-            System.out.println(comm.getCommandeFinale());
             for (DetailCommande detCom : comm.getCommandeFinale()){
                 if(recommandations.size()<10){
-                    System.out.println("Dans le if");
                     ClientBD clientBD = new ClientBD(ConnectionBD.getConnection());
                     temp = clientBD.getRecoLivre(comm.getNumCommande(),detCom.getLivre().getIsbn());
-                    System.out.println(temp);
                     for(Livre livre : temp){
                         if(banlivres.contains(livre)){
                             banlivres.remove(livre);
@@ -133,6 +130,7 @@ public class Client extends Personne {
             for(Livre livre : recommandations){
                 if(cpt<6){
                     lst.add(livre);
+                    cpt++;
                 }
             }
             return lst;
