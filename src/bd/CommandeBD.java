@@ -19,7 +19,7 @@ public class CommandeBD {
 
 
     public Commande getCommande(Client client, int nunumcomm)throws SQLException, IllegalArgumentException{
-		Commande commande = new Commande(nunumcomm, null, false, null, null, null);
+		Commande commande = new Commande(nunumcomm, null, false, null, null, null,false);
 		String req = "Select * FROM COMMANDE WHERE numcom = ?";
 		this.st = laConnexion.prepareStatement(req);
 		st.setInt(1, nunumcomm);
@@ -34,7 +34,8 @@ public class CommandeBD {
 				Livraison mode = Livraison.fromCode(livraison);
                 String idmag = rs.getString("idmag");
                 MagasinBD magBD = new MagasinBD(laConnexion);
-                commande = new Commande(numcom, datecom, enligne, mode,  magBD.getMagasin(idmag),client);
+				boolean fini = "1".equalsIgnoreCase(modeComm);
+                commande = new Commande(numcom, datecom, enligne, mode,  magBD.getMagasin(idmag),client,fini);
 			}
 			String req2 = "Select * FROM DETAILCOMMANDE WHERE numcom = ?";
 			this.st = laConnexion.prepareStatement(req2);
@@ -57,7 +58,7 @@ public class CommandeBD {
 	}
 
 	public Commande getCommande(int nunumcomm)throws SQLException, IllegalArgumentException{
-		Commande commande = new Commande(nunumcomm, null, false, null, null, null);
+		Commande commande = new Commande(nunumcomm, null, false, null, null, null,false);
 		String req = "Select * FROM COMMANDE WHERE numcom = ?";
 		this.st = laConnexion.prepareStatement(req);
 		st.setInt(1, nunumcomm);
@@ -74,7 +75,8 @@ public class CommandeBD {
                 MagasinBD magBD = new MagasinBD(laConnexion);
 				ClientBD clientbd = new ClientBD(laConnexion);
 				Client client = clientbd.getClient(rs.getInt("idcli"));
-                commande = new Commande(numcom, datecom, enligne, mode,  magBD.getMagasin(idmag),client);
+				boolean fini = "1".equalsIgnoreCase(modeComm);
+                commande = new Commande(numcom, datecom, enligne, mode,  magBD.getMagasin(idmag),client,fini);
 			}
 			String req2 = "Select * FROM DETAILCOMMANDE WHERE numcom = ?";
 			this.st = laConnexion.prepareStatement(req2);
@@ -147,7 +149,7 @@ public class CommandeBD {
 
     public void insererCommande(Commande commande){
 		try {
-			String req = "Insert Into COMMANDE Values(?,?,?,?,?,?)";
+			String req = "Insert Into COMMANDE Values(?,?,?,?,?,?,?)";
 			this.st = laConnexion.prepareStatement(req);
 			System.out.println("ID MAGASIN utilisé : " + commande.getMagasin().getIdmag());
 			st.setInt(1, commande.getNumCommande());
@@ -156,6 +158,7 @@ public class CommandeBD {
 			st.setString(4, commande.getLivraison().getCode());
 			st.setInt(5, commande.getClient().getNumeroClient());
         	st.setString(6, commande.getMagasin().getIdmag());
+			st.setBoolean(7, commande.estFinie());
 			st.executeUpdate();
 			for(DetailCommande det : commande.getCommandeFinale()){
 				DetailCommandeBD detail = new DetailCommandeBD(laConnexion);

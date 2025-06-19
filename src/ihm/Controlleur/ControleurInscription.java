@@ -44,7 +44,17 @@ public class ControleurInscription implements EventHandler<ActionEvent> {
         String motdepasse = champsSaisie.get(2).getText();
         String adresse = champsSaisie.get(3).getText();
         String ville = champsSaisie.get(4).getText();
-        int codepostal = Integer.parseInt(champsSaisie.get(5).getText());
+        int codepostal;
+        // on vérifie que le code postal est un entier
+        // on try de récupérer un entier, si ça échoue on affiche une erreur
+        try{
+            codepostal = Integer.parseInt(champsSaisie.get(5).getText());
+        } catch (NumberFormatException e) {
+            vue.popUpInscriptionImpossible();
+            return;
+        }
+
+        //int codepostal = Integer.parseInt(champsSaisie.get(5).getText());
         try {
             modeleC.inscrireClient(nom, prenom, motdepasse, adresse, ville, codepostal);
             vue.modeConnexion();

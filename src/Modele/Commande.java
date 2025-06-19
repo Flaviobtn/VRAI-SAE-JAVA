@@ -11,10 +11,11 @@ public class Commande{
     private Livraison livraison;
     private Client client;
     private Magasin magasin;
+    private boolean fini;
 
 
     //si demande de livraison en magasin
-    public Commande(int numCommande, LocalDate datecomm, boolean enligne, Livraison livraison, Magasin magasin, Client client){
+    public Commande(int numCommande, LocalDate datecomm, boolean enligne, Livraison livraison, Magasin magasin, Client client, boolean fini){
         this.numCommande = numCommande;
         this.datecomm = datecomm;
         this.commandeFinale = new ArrayList<>();
@@ -22,6 +23,7 @@ public class Commande{
         this.livraison=livraison;
         this.client = client;
         this.magasin = magasin;
+        this.fini = fini;
     }
 
 
@@ -36,7 +38,7 @@ public class Commande{
 
 
     public int getNumCommande() {
-        return numCommande;
+        return this.numCommande;
     }
     
     public LocalDate getDatecomm() {
@@ -74,6 +76,10 @@ public class Commande{
             prixTotal+= dc.getLivre().getPrix()*dc.getQte();
         }
         return prixTotal;
+    }
+
+    public boolean estFinie(){
+        return this.fini;
     }
 
     public String editerFacture(){

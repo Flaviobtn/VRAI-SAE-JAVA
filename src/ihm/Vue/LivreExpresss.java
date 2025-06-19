@@ -52,10 +52,13 @@ public class LivreExpresss extends Application {
     private Vendeur creationVendeur;
     private List<TextField> infosLivre;
     private Livre creationLivre;
+    private List<TextField> infosMag;
+    private Magasin creationMagasin;   
     private Magasin magasinCreation;
     private Personne personneConnectee;
     private Map<Integer, List<Livre>> catalogues;
     private int pageCataActu;
+    private List<TextField> infoMag;
     //BD
     private MagasinBD magasinBD; 
     private VendeurBD vendeurBD;
@@ -100,13 +103,14 @@ public class LivreExpresss extends Application {
         this.bDeconnexion= new Button();
         this.bPanier= new Button();
         this.magasinCreation = null;
-        this.pageCataActu = 0;
+        this.pageCataActu = 1;
         this.boutonProfil= new Button();
         this.creationVendeur = null; 
         this.personneConnectee = null;
         this.connection = ConnectionBD.getConnection();
         this.magasinBD= new MagasinBD(this.connection);
         this.vendeurBD = new VendeurBD(this.connection);
+        this.infoMag = new ArrayList<TextField>();
 
         // A terminer d'implementer
     }
@@ -127,6 +131,10 @@ public class LivreExpresss extends Application {
 
     public Map<Integer, List<Livre>> getCatalogues() {
         return this.catalogues;
+    }
+
+    public List<TextField> getInfoMag(){
+        return this.infoMag;
     }
 
     public void SetCatalogues(Map<Integer, List<Livre>> catalogues) {
@@ -161,21 +169,33 @@ public class LivreExpresss extends Application {
         return this.pageCataActu;
     }
 
-    public void setPageActu(int pageCataActu){
-        this.pageCataActu = pageCataActu;
+    public void setPageActu(int pageactu){
+        this.pageCataActu = pageactu;
+    }
+    public void setCatalogues(Map<Integer, List<Livre>> newMap){
+        this.catalogues = newMap;
     }
 
-    public void SetCatalogues(){
+    public void setCataloguesC(){
+        System.out.println("1");
         if(this.personneConnectee instanceof Client){
+            System.out.println("2");
             Client client = (Client) this.personneConnectee;
             if(client.aCommande()){
+                CommandeBD cbd = new CommandeBD(connection);
+                cbd.setCommande(client);
+                System.out.println("3");
                 if(client.onVousRecommande().size()>0){
                     this.catalogues = client.recotoMap();
+                    System.out.println(this.catalogues.get(1));
                 }
-                else{
-                    this.catalogues = client.listLivresToMap(client.tousLesLivresClient());
-                }
+            }    
+            else{
+                LivreBD catalogueLivre = new LivreBD(connection);
+                this.catalogues = catalogueLivre.catalogue();
+                System.out.println(this.catalogues.get(1));
             }
+            
 
         }
     }
@@ -717,12 +737,14 @@ choix.setOnMouseExited(e ->
         croix.setPreserveRatio(true);
         
         Button boutonLoupe = new Button(null,loupe);
+        boutonLoupe.setOnAction(new )
         Button boutonCroix = new Button(null,croix);
         
         HBox barreRecherche = new HBox();
         barreRecherche.setAlignment(Pos.TOP_CENTER);
         
         TextField tf = new TextField();
+        tf.setPromptText("Entre un livre à rechercher ...");
         tf.setPrefWidth(500);
         tf.setStyle("-fx-font-size: 25px;");
         
@@ -732,42 +754,61 @@ choix.setOnMouseExited(e ->
         this.panelCentral.setStyle("-fx-background-color: #c8c4b8;");
         
         VBox listLivres = new VBox();
-        listLivres.setPadding(new Insets(180,150,0,600));
-        this.SetCatalogues();
-        this.setPageActu(1);
-        List<Livre> test = this.catalogues.get(this.pageCataActu);
-        if(test == null){
-            System.out.println("pas de livre pour se client");
-        }
-        else{
-            for(Livre livre: test){
-            System.out.println("Titre du livre : " + livre.getTitre());
-        }
-        for (Livre livreVue : this.catalogues.get(1)){
+        listLivres.setPadding(new Insets(110,150,0,500));
+        this.setCataloguesC();
+        int pageMax = this.catalogues.size(); // nombre total de pages
+        List<Livre> livresPage = this.catalogues.get(this.pageCataActu);
+
+        // HBox pour navigation pagination
+        HBox pagination = new HBox(20);
+        pagination.setAlignment(Pos.CENTER);
+        Button btnPrev = new Button("<");
+        btnPrev.setUserData("AVANT");
+        btnPrev.setOnAction(new ControleurDefiler(this,"CLIENT"));
+        Button btnNext = new Button(">");
+        btnNext.setUserData("APRES");
+        btnNext.setOnAction(new ControleurDefiler(this,"CLIENT"));
+        Label pageLabel = new Label("Page " + (this.pageCataActu) + " / " + pageMax);
+        pageLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+        btnPrev.setStyle("-fx-font-size: 22px; -fx-background-color: #154c45; -fx-text-fill: white;");
+        btnNext.setStyle("-fx-font-size: 22px; -fx-background-color: #154c45; -fx-text-fill: white;");
+        btnPrev.setDisable(this.pageCataActu == 0);
+        btnNext.setDisable(this.pageCataActu == pageMax);
+        pagination.getChildren().addAll(btnPrev, pageLabel, btnNext);
+        pagination.setPadding(new Insets(0,0,30,0));
+
+        int cptbtn = 0;
+        if (livresPage == null) {
+            Label noLivre = new Label("Aucun livre à afficher pour cette page.");
+            noLivre.setStyle("-fx-font-size: 22px; -fx-text-fill: #154c45;");
+            listLivres.getChildren().add(noLivre);
+        } else {
+            for (Livre livreVue : livresPage) {
             HBox livre = new HBox(30);
             Label titre = new Label(livreVue.getTitre());
             titre.setStyle("-fx-font-size: 25px;");
-            Label prix= new Label(String.format("%.2f €", livreVue.getPrix()));
+            Label prix = new Label(String.format("%.2f €", livreVue.getPrix()));
             prix.setStyle("-fx-font-size: 25px;");
-            TextField quantite = new TextField("Quel quantité souhaité vous commander");
+            TextField quantite = new TextField("Quelle quantité souhaitez vous commander");
             quantite.setStyle("-fx-font-size: 25px;");
             Button ajPanier = new Button("Ajouter Panier");
+            ajPanier.setOnAction(null);
+            cptbtn++;
+            ajPanier.setUserData(String.valueOf(cptbtn));
             ajPanier.setStyle("-fx-text-fill: white; " +
-                          "-fx-font-color:#ece3d3; --border-width: 2; " +
-                          "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold; -fx-font-size: 22px; -fx-background-color: #154c45;");
+                "-fx-font-color:#ece3d3; -fx-border-width: 2; " +
+                "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold; -fx-font-size: 22px; -fx-background-color: #154c45;");
             livre.getChildren().addAll(titre, prix, quantite, ajPanier);
             livre.setPadding(new Insets(10, 0, 10, 0));
             ajPanier.setPadding(new Insets(7, 0, 7, 0));
-            listLivres.getChildren().addAll(livre);
-            ajPanier.setStyle("-fx-text-fill: white; " +
-                          "-fx-font-color:#ece3d3; -fx-border-width: 2; " +
-                          "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold; -fx-font-size: 22px; -fx-background-color: #154c45;");
-            listLivres.getChildren().addAll(titre,prix,quantite,ajPanier);
-            listLivres.setPadding(new Insets(10,0,10,0));
-            listLivres.getChildren().addAll(livre);
-        }}
-    
-        panelCentral.setCenter(listLivres);
+            listLivres.getChildren().add(livre);
+            }
+        }
+
+        // Ajoute la pagination en bas de la liste
+        this.panelCentral.setBottom(pagination);
+        this.panelCentral.setCenter(listLivres);
+        
     }   
 
 
@@ -805,14 +846,20 @@ choix.setOnMouseExited(e ->
         Button bDeconnexion = new Button(null,deco);
         bDeconnexion.setUserData("DECONNEXION");
         bDeconnexion.setOnAction(new ControleurRetourRedirection(this));
+        bDeconnexion.setStyle("-fx-background-color: transparent; -fx-padding: 0;");
+
         this.bPanier = new Button(null,panier);
         bPanier.setUserData("PANIER");
+
         Button boutonMaison = new Button(null,maison);
         boutonMaison.setUserData("MAISON");
         boutonMaison.setOnAction(new ControleurRetourRedirection(this));
+        boutonMaison.setStyle("-fx-background-color: transparent; -fx-padding: 0;");
+
         Button boutonProfil = new Button(null,profil);
         boutonProfil.setUserData("PROFIL");
         boutonProfil.setOnAction(new ControleurRetourRedirection(this));
+        boutonProfil.setStyle("-fx-background-color: transparent; -fx-padding: 0;");
 
         bouttons.getChildren().addAll(bDeconnexion,bPanier,boutonMaison,boutonProfil);
 
@@ -828,7 +875,6 @@ choix.setOnMouseExited(e ->
 
         VBox listLivres = new VBox();
         
-        this.SetCatalogues();
         for(int i= 0; i<4;i++){
             HBox livre = new HBox(15);
             Label titre = new Label("titre"+i);
@@ -875,7 +921,7 @@ choix.setOnMouseExited(e ->
         imgLogo.setPreserveRatio(true);
         banniere.setPadding(new Insets(10,0,0,0));
 
-        Label user = new Label("Accueil V");
+        Label user = new Label("Accueil " + lUtilisateur.getText() + " : Bienvenue "+ personneConnectee.getPrenom());
         user.setStyle("-fx-font-size: 27px;");
         user.setPadding(new Insets(0,125,0,0));
 
@@ -896,14 +942,18 @@ choix.setOnMouseExited(e ->
         Button bDeconnexion = new Button(null,deco);
         bDeconnexion.setUserData("DECONNEXION");
         bDeconnexion.setOnAction(new ControleurRetourRedirection(this));
+        bDeconnexion.setStyle("-fx-background-color: transparent; -fx-padding: 0;");
+
         this.bPanier = null;
         
         Button boutonMaison = new Button(null,maison);
         boutonMaison.setUserData("MAISON");
+        boutonMaison.setStyle("-fx-background-color: transparent; -fx-padding: 0;");
 
         Button boutonProfil = new Button(null,profil);
         boutonProfil.setUserData("PROFIL");
         boutonProfil.setOnAction(new ControleurRetourRedirection(this));
+        boutonProfil.setStyle("-fx-background-color: transparent; -fx-padding: 0;");
 
         bouttons.getChildren().addAll(bDeconnexion,boutonMaison,boutonProfil);
 
@@ -961,12 +1011,9 @@ choix.setOnMouseExited(e ->
         transLivre.setPrefWidth(400);
 
         listLivres.getChildren().addAll(ajLivre,supLivre,modifQte, verifDispo,comCli,transLivre); // gererStock ?
-        listLivres.setMargin(ajLivre,new Insets(5,20,5,20));
-        //listLivres.setMargin(gererStock,new Insets(5,20,5,20));
-        listLivres.setMargin(comCli,new Insets(5,20,5,20));
-        listLivres.setMargin(transLivre,new Insets(5,20,5,20));
         
-        listLivres.setPadding(new Insets(200,600,200,780));
+        
+        listLivres.setPadding(new Insets(150,600,200,780));
         listLivres.setStyle("-fx-background-color: #2c2c2c;");
 
         panelCentral.setCenter(listLivres);
@@ -986,7 +1033,7 @@ choix.setOnMouseExited(e ->
 
         // On re cast ?
         //Administrateur admin = (Administrateur) personneConnectee;
-        Label user = new Label("Accueil Admin : bienvenue " + personneConnectee.getNom()
+        Label user = new Label("Accueil Admin : bienvenue " + personneConnectee.getPrenom()
         );
         user.setStyle("-fx-font-size: 27px;");
         user.setPadding(new Insets(0,125,0,0));
@@ -1008,14 +1055,18 @@ choix.setOnMouseExited(e ->
         Button bDeconnexion = new Button(null,deco);
         bDeconnexion.setUserData("DECONNEXION");
         bDeconnexion.setOnAction(new ControleurRetourRedirection(this));
+        bDeconnexion.setStyle("-fx-background-color: transparent; -fx-padding: 0;");
+
         this.bPanier = null;
         
         Button boutonMaison = new Button(null,maison);
         boutonMaison.setUserData("MAISON");
+        boutonMaison.setStyle("-fx-background-color: transparent; -fx-padding: 0;");
 
         Button boutonProfil = new Button(null,profil);
         boutonProfil.setUserData("PROFIL");
         boutonProfil.setOnAction(new ControleurRetourRedirection(this));
+        boutonProfil.setStyle("-fx-background-color: transparent; -fx-padding: 0;");
 
         bouttons.getChildren().addAll(bDeconnexion,boutonMaison,boutonProfil);
 
@@ -1494,7 +1545,154 @@ choix.setOnMouseExited(e ->
     } 
 
 
+    public void fenetreCreerLib(){
+    this.gauche = null;
 
+    // Configuration de la bannière
+    this.banniere = new BorderPane();
+    banniere.setStyle("-fx-background-color: #154c45;");
+    ImageView imgLogo = new ImageView(this.lesImages.get(0));
+    imgLogo.setFitWidth(520);
+    imgLogo.setPreserveRatio(true);
+    banniere.setPadding(new Insets(10, 0, 0, 0));
+
+    Label user = new Label("Création d'un vendeur");
+    user.setStyle("-fx-font-size: 27px; -fx-text-fill: white;");
+    user.setPadding(new Insets(0, 125, 0, 0));
+
+    // Boutons de navigation
+    HBox bouttons = new HBox();
+    ImageView deco = new ImageView(this.lesImages.get(3));
+    deco.setFitWidth(75);
+    deco.setPreserveRatio(true);
+
+    ImageView maison = new ImageView(this.lesImages.get(1));
+    maison.setFitWidth(75);
+    maison.setPreserveRatio(true);
+
+    ImageView profil = new ImageView(this.lesImages.get(4));
+    profil.setFitWidth(75);
+    profil.setPreserveRatio(true);
+
+    Button bDeconnexion = new Button(null, deco);
+    bDeconnexion.setUserData("DECONNEXION");
+    bDeconnexion.setOnAction(new ControleurRetourRedirection(this));
+    bDeconnexion.setStyle("-fx-background-color: transparent; -fx-padding: 0;");
+
+    Button boutonMaison = new Button(null, maison);
+    boutonMaison.setUserData("MAISON");
+    boutonMaison.setOnAction(new ControleurRetourRedirection(this));
+    boutonMaison.setStyle("-fx-background-color: transparent; -fx-padding: 0;");
+
+    Button boutonProfil = new Button(null, profil);
+    boutonProfil.setUserData("PROFIL");
+    boutonProfil.setOnAction(new ControleurRetourRedirection(this));
+    boutonProfil.setStyle("-fx-background-color: transparent; -fx-padding: 0;");
+
+    bouttons.getChildren().addAll(bDeconnexion, boutonMaison, boutonProfil);
+    bouttons.setMargin(boutonMaison, new Insets(5));
+    bouttons.setMargin(bDeconnexion, new Insets(5));
+    bouttons.setMargin(boutonProfil, new Insets(5));
+    banniere.setLeft(imgLogo);
+    banniere.setCenter(user);
+    banniere.setRight(bouttons);
+
+    // Panel central
+    this.panelCentral = new BorderPane();
+    this.panelCentral.setStyle("-fx-background-color: #c8c4b8;");
+
+    // Conteneur principal
+    VBox mainContainer = new VBox(20);
+    mainContainer.setAlignment(Pos.CENTER);
+    //mainContainer.setPadding(new Insets(50, 0, 0, 0));
+
+    // Titre
+    Text titre = new Text("Ajouter une librairie");
+    titre.setStyle("-fx-font-size: 30px; -fx-font-weight: bold;");
+    mainContainer.getChildren().add(titre);
+
+    // Conteneur pour les champs de saisie et le combo box
+    HBox fieldsContainer = new HBox(50);
+    fieldsContainer.setAlignment(Pos.CENTER);
+    fieldsContainer.setPadding(new Insets(50, 0, 0, 0));
+
+
+    // Champ Nom
+    Label nomLabel = new Label("Nom");
+    nomLabel.setStyle("-fx-font-size: 20px;");
+    TextField nomField = new TextField();
+    nomField.setPromptText("Entrez le nom de la librairie");
+    nomField.setPrefWidth(300);
+    nomField.setStyle("-fx-font-size: 18px;");
+
+    // Champ Prénom
+    Label villeLabel = new Label("Ville");
+    villeLabel.setStyle("-fx-font-size: 20px;");
+    TextField villeField = new TextField();
+    villeField.setPromptText("Entrez la ville de la librarie");
+    villeField.setPrefWidth(300);
+    villeField.setStyle("-fx-font-size: 18px;");
+
+
+
+    fieldsContainer.getChildren().addAll(nomLabel, nomField, villeLabel, villeField);
+
+
+    /*
+    // Partie droite - Combo box et bouton
+    VBox rightFields = new VBox(30);
+    rightFields.setAlignment(Pos.CENTER);
+
+    // Combo box pour les magasins
+    Label magasinLabel = new Label("Magasin");
+    magasinLabel.setStyle("-fx-font-size: 20px;");
+    this.comboBoxSave = new ComboBox<>();
+    List<Magasin> magasins = magasinBD.getToutLesMagasins();
+    for (Magasin mag : magasins) {
+        comboBoxSave.getItems().add(mag.getNomMag());
+    }
+    comboBoxSave.setPromptText("Sélectionnez un magasin");
+    comboBoxSave.setPrefWidth(300);
+    comboBoxSave.setStyle("-fx-font-size: 18px;");
+    */
+
+
+
+   
+    
+    
+
+    
+
+    // Bouton Créer
+    Button creerBtn = new Button("Créer le vendeur");
+    creerBtn.setStyle("-fx-background-color: #154c45; -fx-text-fill: white; -fx-font-size: 18px;");
+    creerBtn.setPrefWidth(200);
+    creerBtn.setPrefHeight(50);
+    creerBtn.setOnAction(new ControleurCreerLib(this, new AdministrateurBD(connection), magasinBD));
+
+    // Désactiver le bouton tant que tous les champs ne sont pas remplis
+    creerBtn.setDisable(true);
+    ChangeListener<String> listener = (observable, oldValue, newValue) -> {
+        boolean allFilled = !nomField.getText().trim().isEmpty()
+                && !villeField.getText().trim().isEmpty();
+        creerBtn.setDisable(!allFilled);
+    };
+
+    nomField.textProperty().addListener(listener);
+    villeField.textProperty().addListener(listener);
+    
+    // Stocker les champs pour le contrôleur
+    String idMag = magasinBD.genererId();
+    this.infoMag = new ArrayList<>();
+    //this.infoMag.add(idMag);
+    this.infoMag.add(nomField);
+    this.infoMag.add(villeField);
+    fieldsContainer.getChildren().addAll(creerBtn);
+    mainContainer.getChildren().add(fieldsContainer);
+
+    panelCentral.setCenter(mainContainer);
+    }
 
 
     public void fenetreCreerVendeur() {
@@ -1654,7 +1852,7 @@ choix.setOnMouseExited(e ->
     panelCentral.setCenter(mainContainer);
 }
 
-public void fenetreVerifDispo(){
+public void fenetreVerifDispo() {
     this.gauche = null;
 
     // Configuration de la bannière
@@ -1665,7 +1863,7 @@ public void fenetreVerifDispo(){
     imgLogo.setPreserveRatio(true);
     banniere.setPadding(new Insets(10, 0, 0, 0));
 
-    Label user = new Label("Création d'un vendeur");
+    Label user = new Label("Vérification de disponibilité");
     user.setStyle("-fx-font-size: 27px; -fx-text-fill: white;");
     user.setPadding(new Insets(0, 125, 0, 0));
 
@@ -1713,21 +1911,16 @@ public void fenetreVerifDispo(){
     // Conteneur principal
     VBox mainContainer = new VBox(20);
     mainContainer.setAlignment(Pos.CENTER);
-    //mainContainer.setPadding(new Insets(50, 0, 0, 0));
 
     // Titre
     Text titre = new Text("Disponibilité");
     titre.setStyle("-fx-font-size: 30px; -fx-font-weight: bold;");
     mainContainer.getChildren().add(titre);
 
-    // Conteneur pour les champs de saisie et le combo box
+    // Conteneur pour les champs de saisie
     HBox fieldsContainer = new HBox(50);
     fieldsContainer.setAlignment(Pos.CENTER);
     fieldsContainer.setPadding(new Insets(50, 0, 0, 0));
-
-    // Partie gauche - Champs de saisie
-    VBox centerTop = new VBox(20);
-    centerTop.setAlignment(Pos.CENTER);
 
     // Champ Recherche
     Label rechercheLabel = new Label("Recherche");
@@ -1737,27 +1930,87 @@ public void fenetreVerifDispo(){
     recheField.setPrefWidth(300);
     recheField.setStyle("-fx-font-size: 18px;");
 
-
-    centerTop.getChildren().addAll(rechercheLabel, recheField);
-
-    // Partie droite - bouton
-    VBox rightFields = new VBox(30);
-    rightFields.setAlignment(Pos.CENTER);
-
     // Bouton Rechercher
     Button cherBtn = new Button("Rechercher");
     cherBtn.setStyle("-fx-background-color: #154c45; -fx-text-fill: white; -fx-font-size: 18px;");
     cherBtn.setPrefWidth(200);
     cherBtn.setPrefHeight(50);
-    List<Livre> lstLivreVoulus = new ArrayList<>();
-    String nomL = String.valueOf(recheField);
+
+    // Désactiver le bouton initialement
+    cherBtn.setDisable(true);
+
+    // Listener pour activer/désactiver le bouton
+    ChangeListener<String> listener = (observable, oldValue, newValue) -> {
+        cherBtn.setDisable(recheField.getText().trim().isEmpty());
+    };
+    recheField.textProperty().addListener(listener);
+
+    // Configurer l'action du bouton
     Vendeur vend = (Vendeur) personneConnectee;
     Magasin magActu = vend.getMagasin();
-    cherBtn.setOnAction(new ControleurVerifDispo(this, new LivreBD(connection), magActu, nomL));
-    
+    cherBtn.setOnAction(new ControleurVerifDispo(this, new LivreBD(connection), magActu, recheField));
+
+    fieldsContainer.getChildren().addAll(rechercheLabel, recheField, cherBtn);
+    mainContainer.getChildren().addAll(fieldsContainer);
+    this.panelCentral.setCenter(mainContainer);
+
+    VBox listLivres = new VBox();
+        listLivres.setPadding(new Insets(50,150,0,600));
+        this.setCataloguesC();
+        int pageMax = this.catalogues.size(); // nombre total de pages
+        List<Livre> livresPage = this.catalogues.get(this.pageCataActu);
+
+        // HBox pour navigation pagination
+        HBox pagination = new HBox(20);
+        pagination.setAlignment(Pos.CENTER);
+        Button btnPrev = new Button("<");
+        btnPrev.setUserData("AVANT");
+        Button btnNext = new Button(">");
+        btnNext.setUserData("APRES");
+        Label pageLabel = new Label("Page " + (this.pageCataActu) + " / " + pageMax);
+        pageLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+        btnPrev.setStyle("-fx-font-size: 22px; -fx-background-color: #154c45; -fx-text-fill: white;");
+        btnNext.setStyle("-fx-font-size: 22px; -fx-background-color: #154c45; -fx-text-fill: white;");
+        btnPrev.setDisable(this.pageCataActu == 0);
+        btnNext.setDisable(this.pageCataActu == pageMax);
+        pagination.getChildren().addAll(btnPrev, pageLabel, btnNext);
+
+        int cptbtn = 0;
+        if (livresPage == null) {
+            Label noLivre = new Label("Aucun livre à afficher pour cette page.");
+            noLivre.setStyle("-fx-font-size: 22px; -fx-text-fill: #154c45;");
+            listLivres.getChildren().add(noLivre);
+        } else {
+            for (Livre livreVue : livresPage) {
+            HBox livre = new HBox(30);
+            Label titreLivre = new Label(livreVue.getTitre());
+            titreLivre.setStyle("-fx-font-size: 25px;");
+            Label prix = new Label(String.format("%.2f €", livreVue.getPrix()));
+            prix.setStyle("-fx-font-size: 25px;");
+            TextField quantite = new TextField("Quelle quantité souhaitez vous commander");
+            quantite.setStyle("-fx-font-size: 25px;");
+            Button ajPanier = new Button("Ajouter Panier");
+            cptbtn++;
+            ajPanier.setUserData(String.valueOf(cptbtn));
+            ajPanier.setStyle("-fx-text-fill: white; " +
+                "-fx-font-color:#ece3d3; -fx-border-width: 2; " +
+                "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold; -fx-font-size: 22px; -fx-background-color: #154c45;");
+            livre.getChildren().addAll(titre, prix, quantite, ajPanier);
+            livre.setPadding(new Insets(10, 0, 10, 0));
+            ajPanier.setPadding(new Insets(7, 0, 7, 0));
+            listLivres.getChildren().add(livre);
+            }
+        }
+
+        // Ajoute la pagination en bas de la liste
+        this.panelCentral.setBottom(pagination);
+
+        this.panelCentral.setCenter(listLivres);
+        
     }
 
-       
+
+
     //recheField.textProperty().addListener(listener);
     
 
@@ -1774,7 +2027,7 @@ public void fenetreAjouterLivre(){
 
     Label user = new Label("Création d'un livre");
     user.setStyle("-fx-font-size: 27px; -fx-text-fill: white;");
-    user.setPadding(new Insets(0, 125, 0, 0));
+    user.setPadding(new Insets(0, 250, 0, 0));
 
     // Boutons de navigation
     HBox bouttons = new HBox();
@@ -1832,7 +2085,7 @@ public void fenetreAjouterLivre(){
     mainContainer.getChildren().add(titre);
 
     // Conteneur pour les champs de saisie et le combo box
-    HBox fieldsContainer = new HBox(50);
+    HBox fieldsContainer = new HBox(70);
     fieldsContainer.setAlignment(Pos.CENTER);
     fieldsContainer.setPadding(new Insets(50, 0, 0, 0));
 
@@ -1860,13 +2113,14 @@ public void fenetreAjouterLivre(){
     Label dateLabel = new Label("Année de parution");
     dateLabel.setStyle("-fx-font-size: 20px;");
     TextField dateField = new TextField();
-    dateField.setPromptText("Entrez l'année'");
+    dateField.setPromptText("Entrez l'année");
     dateField.setPrefWidth(300);
     dateField.setStyle("-fx-font-size: 18px;");
 
     Label pageLabel = new Label("Nombre de pages");
     pageLabel.setStyle("-fx-font-size: 20px;");
     TextField pageField = new TextField();
+    pageField.setPromptText("Entrez le nombre de pages");
     pageField.setPrefWidth(300);
     pageField.setStyle("-fx-font-size: 18px;");
 
@@ -1896,7 +2150,7 @@ public void fenetreAjouterLivre(){
     Label editeurLabel = new Label("Éditeur");
     editeurLabel.setStyle("-fx-font-size: 20px;");
     TextField editeurField = new TextField();
-    editeurField.setPromptText("Entrez l'éditeur'");
+    editeurField.setPromptText("Entrez l'éditeur");
     editeurField.setPrefWidth(300);
     editeurField.setStyle("-fx-font-size: 18px;");
 
@@ -1909,7 +2163,7 @@ public void fenetreAjouterLivre(){
     creerBtn.setStyle("-fx-background-color: #154c45; -fx-text-fill: white; -fx-font-size: 18px;");
     creerBtn.setPrefWidth(200);
     creerBtn.setPrefHeight(50);
-    //creerBtn.setOnAction();////////////////////////////////////////////////////new ControleurCreerVendeur(this, new AdministrateurBD(connection), magasinBD, vendeurBD));
+    /////////////////////creerBtn.setOnAction(new ControleurCreerVendeur(this, new AdministrateurBD(connection), magasinBD, vendeurBD));
 
 
     // Désactiver le bouton tant que tous les champs ne sont pas remplis
@@ -1938,6 +2192,139 @@ public void fenetreAjouterLivre(){
     mainContainer.getChildren().add(fieldsContainer);
 
     panelCentral.setCenter(mainContainer);
+
+}
+
+public void fenetreAjouterMagasin(){
+     this.gauche = null;
+
+    // Configuration de la bannière
+    this.banniere = new BorderPane();
+    banniere.setStyle("-fx-background-color: #154c45;");
+    ImageView imgLogo = new ImageView(this.lesImages.get(0));
+    imgLogo.setFitWidth(520);
+    imgLogo.setPreserveRatio(true);
+    banniere.setPadding(new Insets(10, 0, 0, 0));
+
+    Label user = new Label("Création d'un livre");
+    user.setStyle("-fx-font-size: 27px; -fx-text-fill: white;");
+    user.setPadding(new Insets(0, 250, 0, 0));
+
+    // Boutons de navigation
+    HBox bouttons = new HBox();
+    ImageView deco = new ImageView(this.lesImages.get(3));
+    deco.setFitWidth(75);
+    deco.setPreserveRatio(true);
+
+    ImageView maison = new ImageView(this.lesImages.get(1));
+    maison.setFitWidth(75);
+    maison.setPreserveRatio(true);
+
+    ImageView profil = new ImageView(this.lesImages.get(4));
+    profil.setFitWidth(75);
+    profil.setPreserveRatio(true);
+
+    Button bDeconnexion = new Button(null, deco);
+    bDeconnexion.setUserData("DECONNEXION");
+    bDeconnexion.setOnAction(new ControleurRetourRedirection(this));
+    bDeconnexion.setStyle("-fx-background-color: transparent; -fx-padding: 0;");
+
+    Button boutonMaison = new Button(null, maison);
+    boutonMaison.setUserData("MAISON");
+    boutonMaison.setOnAction(new ControleurRetourRedirection(this));
+    boutonMaison.setStyle("-fx-background-color: transparent; -fx-padding: 0;");
+
+    Button boutonProfil = new Button(null, profil);
+    boutonProfil.setUserData("PROFIL");
+    boutonProfil.setOnAction(new ControleurRetourRedirection(this));
+    boutonProfil.setStyle("-fx-background-color: transparent; -fx-padding: 0;");
+
+    bouttons.getChildren().addAll(bDeconnexion, boutonMaison, boutonProfil);
+    bouttons.setMargin(boutonMaison, new Insets(5));
+    bouttons.setMargin(bDeconnexion, new Insets(5));
+    bouttons.setMargin(boutonProfil, new Insets(5));
+    banniere.setLeft(imgLogo);
+    banniere.setCenter(user);
+    banniere.setRight(bouttons);
+
+
+
+
+
+
+    // Panel central
+    this.panelCentral = new BorderPane();
+    this.panelCentral.setStyle("-fx-background-color: #c8c4b8;");
+
+    // Conteneur principal
+    VBox mainContainer = new VBox(20);
+    mainContainer.setAlignment(Pos.CENTER);
+
+    // Titre
+    Text titre = new Text("INSÉRER UN LIVRE");
+    titre.setStyle("-fx-font-size: 30px; -fx-font-weight: bold;");
+    mainContainer.getChildren().add(titre);
+
+    // Conteneur pour les champs de saisie et le combo box
+    HBox fieldsContainer = new HBox(70);
+    fieldsContainer.setAlignment(Pos.CENTER);
+    fieldsContainer.setPadding(new Insets(50, 0, 0, 0));
+
+    // Partie gauche - Champs de saisie
+    VBox leftFields = new VBox(20);
+    leftFields.setAlignment(Pos.CENTER);
+
+    // Champ Nom
+    Label nomLabel = new Label("Nom du magasin");
+    nomLabel.setStyle("-fx-font-size: 20px;");
+    TextField nomField = new TextField();
+    nomField.setPromptText("Entrez le nom du magasin");
+    nomField.setPrefWidth(300);
+    nomField.setStyle("-fx-font-size: 18px;");
+
+    // Champ Prénom
+    Label villeLabel = new Label("Ville");
+    villeLabel.setStyle("-fx-font-size: 20px;");
+    TextField villeField = new TextField();
+    villeField.setPromptText("Entrez la ville");
+    villeField.setPrefWidth(300);
+    villeField.setStyle("-fx-font-size: 18px;");
+
+
+    Button creerBtn = new Button("Créer le livre");
+    creerBtn.setUserData("CREER LIVRE");
+    creerBtn.setStyle("-fx-background-color: #154c45; -fx-text-fill: white; -fx-font-size: 18px;");
+    creerBtn.setPrefWidth(200);
+    creerBtn.setPrefHeight(50);
+    /////////////////////creerBtn.setOnAction(new ControleurCreerVendeur(this, new AdministrateurBD(connection), magasinBD, vendeurBD));
+
+
+    // Désactiver le bouton tant que tous les champs ne sont pas remplis
+    creerBtn.setDisable(true);
+    ChangeListener<String> listener = (observable, oldValue, newValue) -> {
+        boolean allFilled = !nomField.getText().trim().isEmpty()
+                && !villeField.getText().trim().isEmpty();
+        creerBtn.setDisable(!allFilled);
+    };
+    nomField.textProperty().addListener(listener);
+    villeField.textProperty().addListener(listener);
+
+    // Stocker les champs pour le contrôleur
+    this.infosMag = new ArrayList<>();
+    this.infosMag.add(nomField);
+    this.infosMag.add(villeField);
+
+
+
+    leftFields.getChildren().addAll(nomLabel,nomField,villeLabel,villeField,creerBtn);
+    //mainContainer.getChildren().add(leftFields);
+
+    panelCentral.setCenter(leftFields);
+
+    /* String idmag;
+     String nomMag;
+     String villeMag;
+     stock;*/
 
 }
 
@@ -2067,6 +2454,15 @@ public void fenetreAjouterLivre(){
         fenetre.setCenter(this.panelCentral);
     }
 
+    public void modeCreerLib(){
+        fenetreCreerLib();
+        this.boutonMaison.setDisable(false);
+        this.boutonProfil.setDisable(false);
+        fenetre.setTop(this.banniere);
+        fenetre.setLeft(this.gauche);
+        fenetre.setCenter(this.panelCentral);
+    }
+
     public void modeCreerLivre(){
         fenetreAjouterLivre();
         this.boutonMaison.setDisable(false);
@@ -2076,7 +2472,7 @@ public void fenetreAjouterLivre(){
         fenetre.setCenter(this.panelCentral);
     } 
 
-     public void modeVerfiDispo(){
+     public void modeVerifDispo(){
         fenetreVerifDispo();
         this.boutonMaison.setDisable(false);
         this.boutonProfil.setDisable(false);
@@ -2094,7 +2490,22 @@ public void fenetreAjouterLivre(){
         alert.setContentText("Identifiants incorrects. Veuillez réessayer.");
         Optional<ButtonType> result = alert.showAndWait();
     }
+
+    public void popUpInscriptionImpossible(){
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Erreur de connexion");
+        alert.setHeaderText(null);
+        alert.setContentText("Problème rencontré durant l'inscription. Veuillez réessayer.");
+        Optional<ButtonType> result = alert.showAndWait();
+    }
     
+    public void popUpCreaMagReussi(){
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Erreur de connexion");
+        alert.setHeaderText(null);
+        alert.setContentText("Vous avez bien créé le magasin");
+        Optional<ButtonType> result = alert.showAndWait();
+    }
 
     /**
      * créer le graphe de scène et lance le jeu

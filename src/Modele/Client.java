@@ -60,6 +60,10 @@ public class Client extends Personne {
         return this.commandes.size()>0;
     }
 
+    public Commande getDerniereCommande(){
+        return this.getCommandes().get(this.getCommandes().size()-1);
+    }
+
     public List<Livre> tousLesLivresClient(){
         List<Livre> res = new ArrayList<>();
         for(Commande commande : this.commandes){

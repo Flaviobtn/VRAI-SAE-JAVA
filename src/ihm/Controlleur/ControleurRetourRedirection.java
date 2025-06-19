@@ -80,8 +80,14 @@ public class ControleurRetourRedirection implements EventHandler<ActionEvent> {
         if(data.equals("AJOUTER LIVRE")){
             vue.modeCreerLivre();
         }
+        if(data.equals("AJOUTER MAGASIN")){
+            vue.modeCreerLivre();
+        }
         if(data.equals("VERIFIER DISPO")){
-            vue.modeVerfiDispo();
+            vue.modeVerifDispo();
+        }
+        if(data.equals("AJOUTER MAGASIN")){
+            vue.modeCreerLib();
         }
     }
 }

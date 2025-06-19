@@ -1,42 +1,85 @@
+
 package ihm.Controlleur;
 import ihm.Vue.*;
 import bd.*;
 import Modele.*;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.control.*;
+import javafx.scene.control.TextField;
 import java.util.*;
 import java.sql.*;
-
-
 
 public class ControleurVerifDispo implements EventHandler<ActionEvent> {
     private LivreExpresss vue;
     private Magasin magasin;
     private LivreBD livreBD;
-    private String rech;
+    private TextField rechField; // On stocke le TextField, pas la String
 
-    public ControleurVerifDispo(LivreExpresss vue, LivreBD livrebd, Magasin mag, String nomL) {
+    public ControleurVerifDispo(LivreExpresss vue, LivreBD livrebd, Magasin mag, TextField rechField) {
         this.vue = vue;
         this.magasin = mag;
         this.livreBD = livrebd;
-        this.rech = nomL;
+        this.rechField = rechField; // On passe le TextField
     }
 
     @Override
     public void handle(ActionEvent actionEvent) {
         try {
-            // Récupérer les valeurs des champs
-            List<Livre> lesLivres = new ArrayList<>();
-            String id = magasin.getIdmag();
-            lesLivres = livreBD.getLivresNomAPeuPres(id, this.rech);
-            if (lesLivres.isEmpty()) {
-                System.out.println("bah ouais mais ça me casse les couilles");;
+            // On récupère la valeur AU MOMENT DU CLIC
+            String recherche = rechField.getText().trim();
+            if (recherche.isEmpty()) {
+                System.out.println("Veuillez entrer un nom de livre.");
                 return;
             }
 
-        } catch (Exception e) {
-            System.err.println("Encore pire");
-        }
-    }
-}
+            List<Livre> lesLivres = new ArrayList<>();
+            String id = magasin.getIdmag();
+            System.out.println("La recherche est : " + recherche);
+
+            lesLivres = livreBD.getLivresNomAPeuPres(id, recherche);
+            Map<Integer, List<Livre>> nvDic = new HashMap<>();
+            if (lesLivres.isEmpty()) {
+                System.out.println("Aucun livre trouvé pour : " + recherche);
+            } else {
+                
+                System.out.println("Il y a " + lesLivres.size() + " livres disponibles au magasin " + magasin.getNomMag());
+                
+                for (Livre liv : lesLivres) {
+                    System.out.println("Le livre " + liv.getTitre() + " est disponible.");
+                }
+                    Integer numpage = 1;
+                    int cpt = 0;
+                    boolean fini = false;
+                    List<Livre> listeLivres = new ArrayList<>();
+                    while (!fini) {
+                        if (cpt + 6 >= lesLivres.size()) { // Si on a moins de 6 livres restants
+                            for (int i = cpt; i < lesLivres.size(); i++) {
+                                listeLivres.add(lesLivres.get(i));
+                            }
+                            fini = true; // On arrête la boucle
+                        }
+                        else{
+                            for (int i = cpt; i < cpt +6; i++) { 
+                                listeLivres.add(lesLivres.get(i));
+                        }
+                            nvDic.put(numpage, listeLivres);
+                            cpt += 6; 
+                            numpage++;
+                            listeLivres = new ArrayList<>(); // On vide la liste pour la prochaine page
+                        }
+                        }
+                        vue.setCatalogues(nvDic);
+                        vue.modeVerifDispo();
+                        }
+
+                    }catch (Exception e) {
+            System.err.println("Erreur lors de la recherche : " + e.getMessage());
+                    
+                }
+                
+                }
+            }
+
+
+
+

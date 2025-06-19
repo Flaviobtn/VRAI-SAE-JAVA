@@ -966,7 +966,7 @@ public class AppMenu{
 
         afficherMenu("Disponibilité d'un livre ", lstRep);
         String titreLivre = scanner.nextLine();
-        LivreBD livreBD = new LivreBD(connection);
+        livreBD = new LivreBD(connection);
         Livre livre = livreBD.getLivreParTitre(titreLivre);
         if (livre != null){
             System.out.println("Le livre " + livre.getTitre() + " est disponible dans le magasin " + mag.getNomMag() + ".");
@@ -1170,7 +1170,7 @@ public class AppMenu{
         Client client = (Client) personneConnectee; // on cast la personne connectée en client
 
         // on crée la commande
-        Commande commande = new Commande(numCommande, date, enLigne, livraison, mag, client);
+        Commande commande = new Commande(numCommande, date, enLigne, livraison, mag, client,false);
 
         // ------------------------------------------------------------------
         boolean commandeFini = false; // on initialise la commande à false

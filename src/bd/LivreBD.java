@@ -15,13 +15,18 @@ public class LivreBD {
     public List<Livre> getLivresNomAPeuPres(String idmag, String nomL){
         List<Livre> lesLivres = new ArrayList<>();
         try {
-        String req = "SELECT * FROM LIVRE NATURAL JOIN POSSEDER NATURAL JOIN MAGASIN WHERE idmag = ? AND nommag = ?;";
+        String req = "SELECT * FROM LIVRE NATURAL JOIN POSSEDER NATURAL JOIN MAGASIN WHERE idmag = ? AND titre LIKE ?";
+        
+        //String req = "SELECT * FROM LIVRE NATURAL JOIN POSSEDER NATURAL JOIN MAGASIN WHERE  idmag = ? AND titre LIKE '%"+"?"+"%';";
         PreparedStatement st = laConnexion.prepareStatement(req);
         st.setString(1, idmag);
-        st.setString(2, "*"+nomL+"*");
+        st.setString(2, "%" + nomL + "%");  // Ajoute les % autour de la valeur
+
+        //st.setString(1, idmag);
+        //st.setString(2, nomL);
         ResultSet rs = st.executeQuery();
         while(rs.next()){
-            //on recuper l'isbn
+                //on recuper l'isbn
                 String isbn = rs.getString("isbn");
 
                 //on recupere le titre

@@ -42,7 +42,7 @@ public class AdministrateurBD {
         vendeurBD.insertVendeur(vendeur);
     }   
 
-    /*public void ajouteMagasin(String idMag, String nomMag, String villeMag) throws SQLException {
+    public void ajouteMagasin(String idMag, String nomMag, String villeMag) throws SQLException {
         Statement st = laConnexion.createStatement();
         String req = "INSERT INTO MAGASIN VALUES ('" +
             idMag + "', '" +
@@ -50,7 +50,7 @@ public class AdministrateurBD {
             villeMag + "');";
         st.executeQuery(req); 
         st.close();
-    }*/
+    }
 
     public void ajouterLivreAuMagasin(Livre livre, Magasin magasin, int qte) throws SQLException {
         Statement st = laConnexion.createStatement();
