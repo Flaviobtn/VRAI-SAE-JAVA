@@ -71,6 +71,23 @@ public class Client extends Personne {
         return res;
     }
 
+    public Map<Integer, List<Livre>> listLivresToMap(List<Livre> livres) {
+        Map<Integer, List<Livre>> catalogue = new HashMap<>();
+        Integer page = 1;
+        Integer index = 0;
+
+        while (index < livres.size()) {
+            List<Livre> pagecatalogue = new ArrayList<>();
+            for (int i = 0; i < 6 && index < livres.size(); i++, index++) {
+                pagecatalogue.add(livres.get(index));
+            }
+            catalogue.put(page, pagecatalogue);
+            page++;
+        }
+
+        return catalogue;
+    }
+
     public void commanderLivre(Livre livre, int qte, Magasin magasin, Commande commande, int nbPlusGrandDetailCommande){
         DetailCommande detailCommande = new DetailCommande(nbPlusGrandDetailCommande+1, livre, qte, commande.getNumCommande());
         commande.ajouterDetailCommande(detailCommande);
