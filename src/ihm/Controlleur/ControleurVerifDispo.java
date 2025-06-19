@@ -14,7 +14,7 @@ public class ControleurVerifDispo implements EventHandler<ActionEvent> {
     private LivreExpresss vue;
     private Magasin magasin;
     private LivreBD livreBD;
-    private String rech
+    private String rech;
 
     public ControleurVerifDispo(LivreExpresss vue, LivreBD livrebd, Magasin mag, String nomL) {
         this.vue = vue;
