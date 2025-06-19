@@ -52,7 +52,7 @@ public class LivreExpresss extends Application {
     private Vendeur creationVendeur;
     private Magasin magasinCreation;
     private Personne personneConnectee;
-    private Map<String, List<Livre>> catalogues;
+    private Map<Integer, List<Livre>> catalogues;
 
     //BD
     private MagasinBD magasinBD; 
@@ -92,7 +92,7 @@ public class LivreExpresss extends Application {
     public void init() {
         this.lesImages = new ArrayList<Image>();
         this.roles = new ArrayList<String>();
-        this.catalogues = new HashMap<String, List<Livre>>();
+        this.catalogues = new HashMap<Integer, List<Livre>>();
         this.chargerImages(/*"../img"*/);
         this.boutonMaison= new Button();
         this.bDeconnexion= new Button();
@@ -122,11 +122,11 @@ public class LivreExpresss extends Application {
     return this.comboBoxSave;
 }
 
-    public Map<String, List<Livre>> getCatalogues() {
+    public Map<Integer, List<Livre>> getCatalogues() {
         return this.catalogues;
     }
 
-    public void SetCatalogues(Map<String, List<Livre>> catalogues) {
+    public void SetCatalogues(Map<Integer, List<Livre>> catalogues) {
         this.catalogues = catalogues;
     }
     
@@ -151,7 +151,10 @@ public class LivreExpresss extends Application {
             Client client = (Client) this.personneConnectee;
             if(client.aCommande()){
                 if(client.onVousRecommande().size()>0){
-                    //this.catalogues = client.onVousRecommande();
+                    this.catalogues = client.recotoMap();
+                }
+                else{
+                    this.catalogues = client.listLivresToMap(client.tousLesLivresClient());
                 }
             }
 
@@ -276,6 +279,7 @@ choix.setOnMouseExited(e ->
         this.gauche = new Pane();
         this.panelCentral = new BorderPane();
         this.panelCentral.getChildren().add(centerPanel);
+        this.panelCentral.setStyle("-fx-background-color: #c8c4b8;");
         this.gauche.getChildren().add(imgG);
         this.banniere = new BorderPane();
 
@@ -345,9 +349,20 @@ choix.setOnMouseExited(e ->
         inscription.setMinWidth(200);
         inscription.setMinHeight(100);
         inscription.setFont(Font.font("Arial", 15));
-        inscription.setStyle("-fx-background-color: white; -fx-text-fill: #2c2c2c; " +
-                             "-fx-border-color: #2c2c2c; -fx-border-width: 2; " +
-                             "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;");
+        inscription.setStyle("-fx-background-color: white; -fx-text-fill: #1e1e1e; " +
+               "-fx-border-color: #1e1e1e; -fx-border-width: 2; " +
+               "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;");
+
+        inscription.setOnMouseEntered(e -> 
+        inscription.setStyle("-fx-background-color: #1e1e1e; -fx-text-fill: white; " +
+                   "-fx-border-color: #1e1e1e; -fx-border-width: 2; " +
+                   "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;"));
+
+        inscription.setOnMouseExited(e -> 
+        inscription.setStyle("-fx-background-color: white; -fx-text-fill: #1e1e1e; " +
+                   "-fx-border-color: #1e1e1e; -fx-border-width: 2; " +
+                   "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;"));
+        
         if(!(getLUtilisateur().equals("CLIENT"))){
             inscription.setDisable(true);
         }
@@ -357,39 +372,49 @@ choix.setOnMouseExited(e ->
         connexion.setMinWidth(200);
         connexion.setMinHeight(100);
         connexion.setFont(Font.font("Arial", 15));
-        connexion.setStyle("-fx-background-color: white; -fx-text-fill: #2c2c2c; " +
-                      "-fx-border-color: #2c2c2c; -fx-border-width: 2; " +
-                      "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;");
-        Button retour = new Button("⟵ Annuler");
+        connexion.setStyle("-fx-background-color: white; -fx-text-fill: #1e1e1e; " +
+               "-fx-border-color: #1e1e1e; -fx-border-width: 2; " +
+               "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;");
+
+        connexion.setOnMouseEntered(e -> 
+        connexion.setStyle("-fx-background-color: #1e1e1e; -fx-text-fill: white; " +
+                   "-fx-border-color: #1e1e1e; -fx-border-width: 2; " +
+                   "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;"));
+
+        connexion.setOnMouseExited(e -> 
+        connexion.setStyle("-fx-background-color: white; -fx-text-fill: #1e1e1e; " +
+                   "-fx-border-color: #1e1e1e; -fx-border-width: 2; " +
+                   "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;"));
+        
+                      Button retour = new Button("⟵ Annuler");
         retour.setUserData("ANNULERC");
         retour.setOnAction(new ControleurRetourRedirection(this));
         retour.setMinWidth(200);
         retour.setMinHeight(100);
         retour.setFont(Font.font("Arial", 15));
-        retour.setStyle("-fx-background-color: white; -fx-text-fill: #2c2c2c; " +
-                      "-fx-border-color: #2c2c2c; -fx-border-width: 2; " +
-                      "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;");
+        retour.setStyle("-fx-background-color: white; -fx-text-fill: #1e1e1e; " +
+               "-fx-border-color: #1e1e1e; -fx-border-width: 2; " +
+               "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;");
 
-        //---------------------------------------------------------------------------------------------
+        retour.setOnMouseEntered(e -> 
+        retour.setStyle("-fx-background-color: #1e1e1e; -fx-text-fill: white; " +
+                   "-fx-border-color: #1e1e1e; -fx-border-width: 2; " +
+                   "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;"));
 
-        // on fait en sorte que quand on passe la sourist sur le bouton, il change de couleur
-        // on définit un deux styles différents pour le bouton
-    /*String styleNormal = "-fx-background-color: white; -fx-text-fill: #2c2c2c; " +
-                      "-fx-border-color: #2c2c2c; -fx-border-width: 2; " +
-                      "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;";
-
-*/
-
-        //---------------------------------------------------------------------------------------------
+        retour.setOnMouseExited(e -> 
+        retour.setStyle("-fx-background-color: white; -fx-text-fill: #1e1e1e; " +
+                   "-fx-border-color: #1e1e1e; -fx-border-width: 2; " +
+                   "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;"));
 
         // Conteneur pour le combobox et la Connexion
         VBox pannelcentrale = new VBox();
         pannelcentrale.setAlignment(Pos.CENTER);
         loginContainer.getChildren().addAll(retour, inscription, connexion);
+        loginContainer.setSpacing(30);
         // L'écart important vient de cette ligne :
         pannelcentrale.setSpacing(100); // <-- Cette valeur crée un grand espace vertical entre les éléments du VBox
         pannelcentrale.getChildren().addAll(idcontainer, motdepassecontainer, loginContainer);
-        pannelcentrale.setPadding(new Insets(80, 0, 0, 30));
+        pannelcentrale.setPadding(new Insets(80, 0, 0, 60));
 
         // Ajout des éléments au panel central
         centerPanel.getChildren().addAll(titleContainer, pannelcentrale);
@@ -518,25 +543,46 @@ choix.setOnMouseExited(e ->
 
         // Bouton de connexion et d'inscription
         HBox loginContainer = new HBox();
-        Button retour = new Button("⟵ Annuler");
+        Button retour = new Button("⟵ ANNULER");
         retour.setUserData("ANNULERI");
         retour.setOnAction(new ControleurRetourRedirection(this));
         retour.setMinWidth(200);
-        retour.setPrefHeight(50);
-        retour.setFont(Font.font("Arial", 25));
-        retour.setStyle("-fx-background-color: white; -fx-text-fill: #2c2c2c; " +
-                      "-fx-border-color: #2c2c2c; -fx-border-width: 2; " +
-                      "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;");
-        Button creer = new Button("CRÉER COMPTE");
+        retour.setMinHeight(100);
+        retour.setFont(Font.font("Arial", 15));
+        retour.setStyle("-fx-background-color: white; -fx-text-fill: #1e1e1e; " +
+               "-fx-border-color: #1e1e1e; -fx-border-width: 2; " +
+               "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;");
+
+        retour.setOnMouseEntered(e -> 
+        retour.setStyle("-fx-background-color: #1e1e1e; -fx-text-fill: white; " +
+                   "-fx-border-color: #1e1e1e; -fx-border-width: 2; " +
+                   "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;"));
+
+        retour.setOnMouseExited(e -> 
+        retour.setStyle("-fx-background-color: white; -fx-text-fill: #1e1e1e; " +
+                   "-fx-border-color: #1e1e1e; -fx-border-width: 2; " +
+                   "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;"));
+        
+        Button creer = new Button("CREER COMPTE");
         creer.setUserData("CREER COMPTE");
         creer.setOnAction(new ControleurInscription(this, new ClientBD(connection)));
         creer.setMinWidth(200);
-        creer.setPrefHeight(50);
+        creer.setMinHeight(100);
+        creer.setFont(Font.font("Arial", 15));
         creer.setDisable(true);
-        creer.setFont(Font.font("Arial", 20));
-        creer.setStyle("-fx-background-color: white; -fx-text-fill: #2c2c2c; " +
-                      "-fx-border-color: #2c2c2c; -fx-border-width: 2; " +
-                      "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;");
+        creer.setStyle("-fx-background-color: #154c45; -fx-text-fill:rgb(251, 255, 254);" +
+               "-fx-border-color: #154c45; -fx-border-width: 2; " +
+               "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;");
+
+        creer.setOnMouseEntered(e -> 
+        creer.setStyle("-fx-background-color: #154c45; -fx-text-fill: white; " +
+                   "-fx-border-color: #154c45; -fx-border-width: 2; " +
+                   "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;"));
+
+        creer.setOnMouseExited(e -> 
+        creer.setStyle("-fx-background-color: #154c45; -fx-text-fill: white; " +
+                   "-fx-border-color: #154c45; -fx-border-width: 2; " +
+                   "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;"));
 
 
         ChangeListener<String> listener = (observable, oldValue, newValue) -> {
@@ -558,26 +604,6 @@ choix.setOnMouseExited(e ->
         codepostal.textProperty().addListener(listener);
 
         
-        // Effet de survol pour le bouton
-        retour.setOnMouseEntered(e ->
-        retour.setStyle("-fx-background-color: #2c2c2c; -fx-text-fill: white; " +
-                          "-fx-border-color: #2c2c2c; -fx-border-width: 2; " +
-                          "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;"));
-
-        retour.setOnMouseExited(e ->
-        retour.setStyle("-fx-background-color: #2c2c2c; -fx-text-fill: white; " +
-                          "-fx-border-color: #2c2c2c; -fx-border-width: 2; " +
-                          "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;"));
-        // Effet de survol pour le bouton
-        creer.setOnMouseEntered(e ->
-        creer.setStyle("-fx-background-color: #2c2c2c; -fx-text-fill: white; " +
-                          "-fx-border-color: #2c2c2c; -fx-border-width: 2; " +
-                          "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;"));
-
-        creer.setOnMouseExited(e ->
-        creer.setStyle("-fx-background-color: #2c2c2c; -fx-text-fill: white; " +
-                          "-fx-border-color: #2c2c2c; -fx-border-width: 2; " +
-                          "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;"));
         loginContainer.getChildren().addAll(retour, creer);
         loginContainer.setAlignment(Pos.CENTER);
         loginContainer.setSpacing(500); 
@@ -596,6 +622,7 @@ choix.setOnMouseExited(e ->
         // Initialisation des autres panels (vides pour cette vue)
         this.gauche = new Pane();
         this.panelCentral = new BorderPane();
+        this.panelCentral.setStyle("-fx-background-color: #c8c4b8;");
         this.panelCentral.getChildren().add(centerPanel);
         this.gauche.getChildren().add(imgG);
 
@@ -686,7 +713,7 @@ choix.setOnMouseExited(e ->
     barreRecherche.getChildren().addAll(boutonLoupe,tf,boutonCroix);
     barreRecherche.setPadding(new Insets(120,0,0,0));
     panelCentral.setTop(barreRecherche);
-    panelCentral.setStyle("-fx-background-color: #ece3d3;");
+    this.panelCentral.setStyle("-fx-background-color: #c8c4b8;");
 
     VBox listLivres = new VBox();
     listLivres.setPadding(new Insets(180,150,0,600));
@@ -717,7 +744,7 @@ choix.setOnMouseExited(e ->
     private void fenetrePanier() {
         this.gauche=null;
         this.banniere=new BorderPane();
-        banniere.setStyle("-fx-background-color: #ece3d4;");
+        banniere.setStyle("-fx-background-color: #154c45;");
         ImageView imgLogo = new ImageView(this.lesImages.get(0));
         imgLogo.setFitWidth(520);
         imgLogo.setPreserveRatio(true);
@@ -767,12 +794,11 @@ choix.setOnMouseExited(e ->
         banniere.setCenter(user);
         banniere.setRight(bouttons);
 
-
-
         this.panelCentral= new BorderPane();
 
         VBox listLivres = new VBox();
         
+        this.SetCatalogues();
         for(int i= 0; i<4;i++){
             HBox livre = new HBox(15);
             Label titre = new Label("titre"+i);
@@ -785,24 +811,24 @@ choix.setOnMouseExited(e ->
             suPanier.setStyle("-fx-font-size: 25px;");
             livre.getChildren().addAll(titre,prix,quantite,suPanier);
             livre.setPadding(new Insets(0,0,0,50));
-            livre.setStyle("-fx-background-color: #154c45;;");
+            livre.setStyle("-fx-background-color: #154c45;");
             listLivres.getChildren().addAll(livre);
             listLivres.setMargin(livre,new Insets(0,655,0,665));
         }
 
 
         HBox total = new HBox(25);
-            Label prixTotal = new Label("prix Total");
-            prixTotal.setStyle("-fx-font-size: 25px;");
-            RadioButton livraison = new RadioButton("Livraison en magasin");
-            livraison.setStyle("-fx-font-size: 25px;");
-            Button comPanier = new Button("Commander Panier");
-            comPanier.setStyle("-fx-font-size: 25px;");
-            total.getChildren().addAll(prixTotal,livraison,comPanier);
-            total.setPadding(new Insets(150,0,0,650));
+        Label prixTotal = new Label("prix Total");
+        prixTotal.setStyle("-fx-font-size: 25px;");
+        RadioButton livraison = new RadioButton("Livraison en magasin");
+        livraison.setStyle("-fx-font-size: 25px;");
+        Button comPanier = new Button("Commander Panier");
+        comPanier.setStyle("-fx-font-size: 25px;");
+        total.getChildren().addAll(prixTotal,livraison,comPanier);
+        total.setPadding(new Insets(150,0,0,650));
 
         listLivres.getChildren().addAll(total);
-        
+        this.panelCentral.setStyle("-fx-background-color: #c8c4b8;");
         panelCentral.setMargin(listLivres,new Insets(150,0,150,0));
         panelCentral.setCenter(listLivres);    
     
@@ -813,7 +839,7 @@ choix.setOnMouseExited(e ->
 
         
         this.banniere=new BorderPane();
-        banniere.setStyle("-fx-background-color: #154c45;;");
+        banniere.setStyle("-fx-background-color: #154c45;");
         ImageView imgLogo = new ImageView(this.lesImages.get(0));
         imgLogo.setFitWidth(520);
         imgLogo.setPreserveRatio(true);
@@ -1025,7 +1051,7 @@ choix.setOnMouseExited(e ->
 
     // Bannière en haut
     this.banniere = new BorderPane();
-    banniere.setStyle("-fx-background-color: #5470d6;"); // Couleur bleue comme sur l'image
+    banniere.setStyle("-fx-background-color: # #154c45;"); // Couleur bleue comme sur l'image
     
     ImageView imgLogo = new ImageView(this.lesImages.get(0));
     imgLogo.setFitWidth(520);
@@ -1165,7 +1191,7 @@ choix.setOnMouseExited(e ->
         adresseLabel, villeLabel, codePostalLabel, 
         boutonsContainer
     );
-
+    this.panelCentral.setStyle("-fx-background-color: #c8c4b8;");
     panelCentral.setCenter(infoContainer);
 }
 //--------------------------------------------------------------------------------------------------------------------------
@@ -1181,7 +1207,7 @@ choix.setOnMouseExited(e ->
 
     // Bannière en haut
     this.banniere = new BorderPane();
-    banniere.setStyle("-fx-background-color: #5470d6;"); // Couleur bleue comme sur l'image
+    banniere.setStyle("-fx-background-color:  #154c45;"); // Couleur bleue comme sur l'image
     
     ImageView imgLogo = new ImageView(this.lesImages.get(0));
     imgLogo.setFitWidth(520);
@@ -1290,7 +1316,7 @@ choix.setOnMouseExited(e ->
         magasinLabel, 
         boutonsContainer
     );
-
+    this.panelCentral.setStyle("-fx-background-color: #c8c4b8;");
     panelCentral.setCenter(infoContainer);
 }
 
@@ -1309,7 +1335,7 @@ choix.setOnMouseExited(e ->
 
     // Bannière en haut
     this.banniere = new BorderPane();
-    banniere.setStyle("-fx-background-color: #5470d6;"); // Couleur bleue comme sur l'image
+    banniere.setStyle("-fx-background-color:  #154c45;"); // Couleur bleue comme sur l'image
     
     ImageView imgLogo = new ImageView(this.lesImages.get(0));
     imgLogo.setFitWidth(520);
@@ -1415,7 +1441,7 @@ choix.setOnMouseExited(e ->
     infoContainer.getChildren().addAll(
         identifiantLabel, nomLabel, prenomLabel, 
         boutonsContainer);
-
+    this.panelCentral.setStyle("-fx-background-color: #c8c4b8;");
     panelCentral.setCenter(infoContainer);
     
     } 
@@ -1478,7 +1504,7 @@ choix.setOnMouseExited(e ->
 
     // Panel central
     this.panelCentral = new BorderPane();
-    panelCentral.setStyle("-fx-background-color: #ece3d3;");
+    this.panelCentral.setStyle("-fx-background-color: #c8c4b8;");
 
     // Conteneur principal
     VBox mainContainer = new VBox(20);
