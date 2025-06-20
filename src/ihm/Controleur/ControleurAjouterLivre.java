@@ -1,4 +1,4 @@
-package ihm.Controlleur;
+package ihm.Controleur;
 import ihm.Vue.*;
 import bd.*;
 import Modele.*;
@@ -63,9 +63,14 @@ public class ControleurAjouterLivre implements EventHandler<ActionEvent> {
             }else{
                 System.out.println("La commande est en cours");
                 commande = client.getDerniereCommande();
+                System.out.println(commande.getNumCommande());
             }
+            System.out.println(commande.getNumCommande());
             DetailCommandeBD detBD = new DetailCommandeBD(this.connexion);
-            DetailCommande detailCommande = new DetailCommande(detBD.genererId(),this.livre, this.qte, commande.getNumCommande());
+            int id = detBD.genererId(commande.getNumCommande());
+            System.out.println(id);
+            System.out.println(this.qte);
+            DetailCommande detailCommande = new DetailCommande(id,this.livre, this.qte, commande.getNumCommande());
             detBD.insertDetailCommande(detailCommande);
             System.out.println("DetailCommande ajouté");
     }

@@ -1,4 +1,4 @@
-package ihm.Controlleur;
+package ihm.Controleur;
 import ihm.Vue.*;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -43,10 +43,11 @@ public class ControleurDefiler implements EventHandler<ActionEvent> {
         System.out.println(data);
         if(data.equals("AVANT")) {
             vue.setPageActu(vue.getPageActu()-1);
-
+            int ajustement = this.vue.ajouteEspace();
         }
         else{
              vue.setPageActu(vue.getPageActu()+1);
+             int ajustement = this.vue.ajouteEspace();
         }
         if(defile.equals("PANIER")){
             vue.modePanier();

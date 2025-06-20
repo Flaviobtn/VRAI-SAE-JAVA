@@ -1,5 +1,5 @@
 
-package ihm.Controlleur;
+package ihm.Controleur;
 import ihm.Vue.*;
 import bd.*;
 import Modele.*;
@@ -9,15 +9,13 @@ import javafx.scene.control.TextField;
 import java.util.*;
 import java.sql.*;
 
-public class ControleurVerifDispo implements EventHandler<ActionEvent> {
+public class ControleurRecher implements EventHandler<ActionEvent> {
     private LivreExpresss vue;
-    private Magasin magasin;
     private LivreBD livreBD;
     private TextField rechField; // On stocke le TextField, pas la String
 
-    public ControleurVerifDispo(LivreExpresss vue, LivreBD livrebd, Magasin mag, TextField rechField) {
+    public ControleurRecher(LivreExpresss vue, LivreBD livrebd, TextField rechField) {
         this.vue = vue;
-        this.magasin = mag;
         this.livreBD = livrebd;
         this.rechField = rechField; // On passe le TextField
     }
@@ -33,17 +31,15 @@ public class ControleurVerifDispo implements EventHandler<ActionEvent> {
             }
 
             List<Livre> lesLivres = new ArrayList<>();
-            String id = magasin.getIdmag();
             System.out.println("La recherche est : " + recherche);
 
-            lesLivres = livreBD.getLivresNomAPeuPres(id, recherche);
+            lesLivres = livreBD.getLivresNomAPeuPresAll(recherche);
             Map<Integer, List<Livre>> nvDic = new HashMap<>();
             if (lesLivres.isEmpty()) {
                 System.out.println("Aucun livre trouvé pour : " + recherche);
             } else {
                 
-                System.out.println("Il y a " + lesLivres.size() + " livres disponibles au magasin " + magasin.getNomMag());
-                
+                System.out.println("Il y a " + lesLivres.size() + " livres disponibles dans les magasins ");
                 for (Livre liv : lesLivres) {
                     System.out.println("Le livre " + liv.getTitre() + " est disponible.");
                 }

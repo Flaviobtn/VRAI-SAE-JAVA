@@ -1,4 +1,4 @@
-package ihm.Controlleur;
+package ihm.Controleur;
 import ihm.Vue.*;
 import bd.*;
 import Modele.*;
@@ -29,7 +29,6 @@ public class ControleurCreerLib implements EventHandler<ActionEvent> {
     public void handle(ActionEvent actionEvent) {
         try {
             if (vue.getInfoMag().isEmpty()){
-                System.out.println("ZAAAAAAAAAAAAAAAAAAAAAAAAAA");
                 return;
             }
             // Récupérer les infos du magasin

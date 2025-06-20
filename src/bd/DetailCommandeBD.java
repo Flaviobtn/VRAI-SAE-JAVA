@@ -39,8 +39,8 @@ public class DetailCommandeBD {
 			String req = "INSERT INTO DETAILCOMMANDE VALUES(?,?,?,?,?)";
 			PreparedStatement st = laconnection.prepareStatement(req);
 			st.setInt(1, detailCommande.getNumCo());
-			st.setInt(2, detailCommande.getQte());
-			st.setInt(3, detailCommande.getNumDetailCommande());
+			st.setInt(3, detailCommande.getQte());
+			st.setInt(2, detailCommande.getNumDetailCommande());
 			st.setDouble(4, detailCommande.getPrixLivres());
 			st.setString(5, detailCommande.getLivre().getIsbn());
 			st.executeUpdate();
@@ -49,19 +49,23 @@ public class DetailCommandeBD {
 		}
 	}
 
-	public Integer genererId(){
+	public Integer genererId(int numcom){
 		try {
-			String req = "Select MAX(numlig) max FROM DETAILCOMMANDE";
+			String req = "Select MAX(numlig)+1 max FROM DETAILCOMMANDE WHERE numcom = ?";
 			PreparedStatement st = laconnection.prepareStatement(req);
+			st.setInt(1,numcom);
 			ResultSet rs = st.executeQuery();
 			while(rs.next()){
-                int max = rs.getInt("max")+1;
+                int max = rs.getInt("max");
+				if (rs.wasNull() || max == 0) {
+                return 1;
+            }
 				return max;
 			}
 			rs.close();
 		} catch (SQLException e) {
 			System.err.println(e.getMessage());
 		}
-		return null;
+		return 1;
 	}
 }

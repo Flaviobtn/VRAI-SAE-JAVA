@@ -1,4 +1,4 @@
-package ihm.Controlleur;
+package ihm.Controleur;
 import ihm.Vue.*;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -76,9 +76,6 @@ public class ControleurRetourRedirection implements EventHandler<ActionEvent> {
         }
         if(data.equals("CREER VENDEUR")){
             vue.modeCreerVendeur();
-        }
-        if(data.equals("AJOUTER LIVRE")){
-            vue.modeCreerLivre();
         }
         if(data.equals("AJOUTER MAGASIN")){
             vue.modeCreerLivre();

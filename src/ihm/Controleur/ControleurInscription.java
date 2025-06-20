@@ -1,4 +1,4 @@
-package ihm.Controlleur;
+package ihm.Controleur;
 import ihm.Vue.*;
 import bd.* ;
 import javafx.event.ActionEvent;

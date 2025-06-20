@@ -1,7 +1,7 @@
 package ihm.Vue;
-import ihm.Controlleur.*;
 import Modele.*;
 import bd.*;
+import ihm.Controleur.*;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.text.Font;
@@ -23,7 +23,7 @@ import java.io.File;
 
 
 /**
- * Vue du jeu du pendu
+ * Vue de l'application
  */
 public class LivreExpresss extends Application {
     /**
@@ -31,43 +31,89 @@ public class LivreExpresss extends Application {
      */
     public Connection connection;
     /**
-     * Liste qui contient les images du jeu
+     * Liste qui contient les images de l'application
      */
     private ArrayList<Image> lesImages;
     /**
-     * Liste qui contient les noms des niveaux
+     * Liste qui contient les noms des rôles
      */    
     private List<String> roles;
 
     // les différents contrôles qui seront mis à jour ou consultés pour l'affichage
     
     /**
-     * le text qui indique l'utilisateur
+     * le texte qui indique le rôle de l'utilisateur
      */
     private Text lUtilisateur;
+    
+    /**
+     * Sert à contenir le noms des magasins dans une combo box 
+     */
     private ComboBox<String> comboBoxSave;
+
+    /**
+     * le texte qui sert à conserver l'identifiant d'un client pour l'inscrire
+     */
     private TextField identifiant;
+
+    /**
+     * le texte qui sert à conserver le mot de passe d'un client pour l'inscrire
+     */
     private TextField motdepasse;
+
+    /**
+     * la liste des éléments nécéssaires à inscrire un client
+     */
     private List<TextField> inscriptions;
+    /**
+     * Sert à créer un vendeur
+     */
     private Vendeur creationVendeur;
+    /**
+     * la liste des éléments nécéssaires à insérer un livre dans la base de données
+     */
     private List<TextField> infosLivre;
+    /**
+     * Sert à créer un livre
+     */
     private Livre creationLivre;
-    private List<TextField> infosMag;
-    private Magasin creationMagasin;   
+    /**
+     * Sert à créer un magasin
+     */
     private Magasin magasinCreation;
+    /**
+     * Personne avec les infos liées à la personne connectée
+     */
     private Personne personneConnectee;
+    /**
+     * le dictionnaire numéro de page / les livres de la page
+     */
     private Map<Integer, List<Livre>> catalogues;
+    /**
+     * le numéro de la page du catalogue sur laquelle nous sommes
+     */
     private int pageCataActu;
+    /**
+     * la liste des éléments nécéssaires à créer un magasin
+     */
     private List<TextField> infoMag;
+
+
     //BD
     private MagasinBD magasinBD; 
     private VendeurBD vendeurBD;
 
     /**
-     * le panel Central qui pourra être modifié selon le mode (accueil ou jeu)
+     * le panel Central qui pourra être modifié selon le mode
      */
     private BorderPane panelCentral;
+    /**
+     * la bannière qui pourra être modifiée selon le mode
+     */
     private BorderPane banniere;
+    /**
+     * la partie de gauche qui pourra être modifiée selon le mode
+     */
     private Pane gauche;
 
 
@@ -84,14 +130,17 @@ public class LivreExpresss extends Application {
      */ 
     private Button bPanier;
     /**
-     * le bouton qui permet de voir notre panier
+     * le bouton qui permet de se déconnecter
      */ 
     private Button bDeconnexion;
 
+    /**
+     * la fenêtre 
+     */
     private BorderPane fenetre;
 
     /**
-     * initialise les attributs (créer le modèle, charge les images, crée le chrono ...)
+     * initialise les attributs (créer les modèles, charge les images, crée les boutons ...)
      */
     @Override
     public void init() {
@@ -111,16 +160,24 @@ public class LivreExpresss extends Application {
         this.magasinBD= new MagasinBD(this.connection);
         this.vendeurBD = new VendeurBD(this.connection);
         this.infoMag = new ArrayList<TextField>();
-
-        // A terminer d'implementer
     }
 
+    /**
+     * récupère l'identifiant de l'utilisateur
+     */
     public String getIdentifiant() {
         return this.identifiant.getText();
     }
+
+    /**
+     * récupère le mot de passe de l'utilisateur
+     */
     public String getMotdepasse() {
         return this.motdepasse.getText();
     }
+    /**
+     * récupère le rôle de l'utilisateur
+     */
     public String getLUtilisateur() {
         return this.lUtilisateur.getText();
     }
@@ -176,6 +233,24 @@ public class LivreExpresss extends Application {
         this.catalogues = newMap;
     }
 
+    
+    public int ajouteEspace() {
+    Integer max = null;
+    for (Livre livre : this.catalogues.get(this.pageCataActu)) {
+        int longueur = livre.getTitre().length();
+        if (max == null || longueur > max) {
+            max = longueur;
+        }
+    }
+    return max != null ? max : 0;
+    }
+
+
+    /**
+     * Crée le catalogue à afficher dans l'accueil client
+     * Si il n'a jamais passé de commande : on affiche tout les livres
+     * Sinon, on affiche les livres recommandés
+     */
     public void setCataloguesC(){
         if(this.personneConnectee instanceof Client){;
             Client client = (Client) this.personneConnectee;
@@ -191,8 +266,6 @@ public class LivreExpresss extends Application {
                 LivreBD catalogueLivre = new LivreBD(connection);
                 this.catalogues = catalogueLivre.catalogue();
             }
-            
-
         }
     }
 
@@ -208,25 +281,11 @@ public class LivreExpresss extends Application {
         return new Scene(fenetre, 1920, 1000, Color.WHITE);
     }
 
-
-    // /**
-     // * @return la fenêtre de jeu avec le mot crypté, l'image, la barre
-     // *         de progression et le clavier
-     // */
-    // private Pane fenetreJeu(){
-        // A implementer
-        // Pane res = new Pane();
-        // return res;
-    // }
-
-    // /**
-     // * @return la fenêtre d'accueil sur laquelle on peut choisir les paramètres de jeu
-     // */
-    
-
-
+    /**
+     * création de la fenetre de choix d'utilisateur
+     */
     private void fenetreChoix() {
-        // Utilisation de l'image des livres ou placeholder
+        // Utilisation de l'image des livres 
         ImageView imgG = new ImageView(this.lesImages.get(8));
         imgG.setFitWidth(600);
         imgG.setFitHeight(1080);
@@ -237,9 +296,9 @@ public class LivreExpresss extends Application {
         centerPanel.setPrefWidth(450);
         centerPanel.setPrefHeight(200);
         centerPanel.setPadding(new Insets(100,0,0,225));
-        centerPanel.setStyle("-fx-background-color: #2c2c2c;");
+        centerPanel.setStyle("-fx-background-color: #154c45;");
 
-        // Titre "Livre Express"
+        // Image logo "Livre Express"
         ImageView titreLVE = new ImageView(this.lesImages.get(0));
         titreLVE.setFitWidth(800);
         titreLVE.setFitHeight(200);
@@ -278,27 +337,28 @@ public class LivreExpresss extends Application {
                "-fx-border-color: #1e1e1e; -fx-border-width: 2; " +
                "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;");
 
-choix.setOnMouseEntered(e -> 
-    choix.setStyle("-fx-background-color: #1e1e1e; -fx-text-fill: white; " +
-                   "-fx-border-color: #1e1e1e; -fx-border-width: 2; " +
-                   "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;"));
+        choix.setOnMouseEntered(e -> 
+            choix.setStyle("-fx-background-color: #1e1e1e; -fx-text-fill: white; " +
+                        "-fx-border-color: #1e1e1e; -fx-border-width: 2; " +
+                        "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;"));
 
-choix.setOnMouseExited(e -> 
-    choix.setStyle("-fx-background-color: white; -fx-text-fill: #1e1e1e; " +
-                   "-fx-border-color: #1e1e1e; -fx-border-width: 2; " +
-                   "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;"));
-                
+        choix.setOnMouseExited(e -> 
+            choix.setStyle("-fx-background-color: white; -fx-text-fill: #1e1e1e; " +
+                        "-fx-border-color: #1e1e1e; -fx-border-width: 2; " +
+                        "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;"));
+                        
 
         // Conteneur pour le combobox et la Connexion
         VBox choixContainer = new VBox();
         choixContainer.setAlignment(Pos.CENTER);
+
         // L'écart important vient de cette ligne :
-        choixContainer.setSpacing(140); // <-- Cette valeur crée un grand espace vertical entre les éléments du VBox
+        choixContainer.setSpacing(140); 
         choixContainer.getChildren().addAll(comboBox, choix);
         choixContainer.setPadding(new Insets(100, 0, 0, 220));
 
         // Crée l'objet Text et ajoute un listener pour suivre la sélection
-        this.lUtilisateur = new Text(""); // ou comboBox.getValue() si tu veux la valeur initiale
+        this.lUtilisateur = new Text("");
         comboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null && !newValue.equals("Choix de l'utilisateur")) {
                 choix.setDisable(false);
@@ -310,7 +370,7 @@ choix.setOnMouseExited(e ->
         // Ajout des éléments au panel central
         centerPanel.getChildren().addAll(titleContainer, choixContainer);
 
-        // Initialisation des autres panels (vides pour cette vue)
+        // Initialisation des autres panels 
         this.gauche = new Pane();
         this.panelCentral = new BorderPane();
         this.panelCentral.getChildren().add(centerPanel);
@@ -320,21 +380,24 @@ choix.setOnMouseExited(e ->
 
     }
 
+    /**
+     * création de la fenetre de connexion
+     */
     private void fenetreConnexion(){
-        // Utilisation de l'image des livres ou placeholder
+        // Utilisation de l'image des livres 
         ImageView imgG = new ImageView(this.lesImages.get(8));
         imgG.setFitWidth(600);
         imgG.setFitHeight(1080);
         imgG.setPreserveRatio(false);
 
-        // Partie droite - Formulaire de connexion dans la bannière
+        // Partie droite - Formulaire de connexion 
         VBox centerPanel = new VBox();
         centerPanel.setPrefWidth(450);
         centerPanel.setPrefHeight(200);
         centerPanel.setPadding(new Insets(100,0,0,225));
         centerPanel.setStyle("-fx-background-color: #2c2c2c;");
 
-        // Titre "Livre Express"
+        // Image logo "Livre Express"
         ImageView titreLVE = new ImageView(this.lesImages.get(0));
         Text titreText = new Text("Connexion Compte " + this.lUtilisateur.getText());
         titreText.setStyle("-fx-font-size: 30px; -fx-font-weight: bold;-fx-text-fill: #2c2c2c;");
@@ -353,7 +416,7 @@ choix.setOnMouseExited(e ->
         titleContainer.setSpacing(5);
         titleContainer.getChildren().addAll(titreLVE,titreText, ligne);
 
-        // identifiant et mot de passe
+        // deux VBox : une pour contenir le texte identifiant et son textefield, une pour le mot de passe
         VBox idcontainer = new VBox();
         VBox motdepassecontainer = new VBox();
         this.identifiant = new TextField();
@@ -376,7 +439,7 @@ choix.setOnMouseExited(e ->
         motdepassecontainer.getChildren().addAll(motdepasseText,this.motdepasse);
 
 
-        // Bouton de connexion et d'inscription
+        // Bouton de connexion, d'inscription et annuler
         HBox loginContainer = new HBox();
         Button inscription = new Button("INSCRIPTION");
         inscription.setUserData("INSCRIPTION");
@@ -397,7 +460,7 @@ choix.setOnMouseExited(e ->
         inscription.setStyle("-fx-background-color: white; -fx-text-fill: #1e1e1e; " +
                    "-fx-border-color: #1e1e1e; -fx-border-width: 2; " +
                    "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;"));
-        
+        //griser le bouton s'inscrire pour les admins et vendeurs
         if(!(getLUtilisateur().equals("CLIENT"))){
             inscription.setDisable(true);
         }
@@ -421,7 +484,7 @@ choix.setOnMouseExited(e ->
                    "-fx-border-color: #1e1e1e; -fx-border-width: 2; " +
                    "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;"));
         
-                      Button retour = new Button("⟵ Annuler");
+        Button retour = new Button("⟵ Annuler");
         retour.setUserData("ANNULERC");
         retour.setOnAction(new ControleurRetourRedirection(this));
         retour.setMinWidth(200);
@@ -441,35 +504,38 @@ choix.setOnMouseExited(e ->
                    "-fx-border-color: #1e1e1e; -fx-border-width: 2; " +
                    "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;"));
 
-        // Conteneur pour le combobox et la Connexion
+        // création du pannel central
         VBox pannelcentrale = new VBox();
         pannelcentrale.setAlignment(Pos.CENTER);
         loginContainer.getChildren().addAll(retour, inscription, connexion);
         loginContainer.setSpacing(30);
+
         // L'écart important vient de cette ligne :
-        pannelcentrale.setSpacing(100); // <-- Cette valeur crée un grand espace vertical entre les éléments du VBox
+        pannelcentrale.setSpacing(100); 
         pannelcentrale.getChildren().addAll(idcontainer, motdepassecontainer, loginContainer);
         pannelcentrale.setPadding(new Insets(80, 0, 0, 60));
 
         // Ajout des éléments au panel central
         centerPanel.getChildren().addAll(titleContainer, pannelcentrale);
 
-        // Initialisation des autres panels (vides pour cette vue)
+        // Initialisation des autres panels
         this.gauche = new Pane();
         this.panelCentral = new BorderPane();
         this.panelCentral.getChildren().add(centerPanel);
         this.panelCentral.setStyle("-fx-background-color: #c8c4b8;"); // couleur de fond du panel central
         this.gauche.getChildren().add(imgG);
     }
-
+    /**
+     * création de la fenetre d'inscription d'un client
+     */
     private void fenetreInscription(){
-        // Utilisation de l'image des livres ou placeholder
+        // Utilisation de l'image des livres 
         ImageView imgG = new ImageView(this.lesImages.get(8));
         imgG.setFitWidth(600);
         imgG.setFitHeight(1080);
         imgG.setPreserveRatio(false);
 
-        // Partie droite - Formulaire de connexion dans la bannière
+        // Partie droite - Formulaire d'inscription
         VBox centerPanel = new VBox();
         centerPanel.setPrefWidth(450);
         centerPanel.setPrefHeight(200);
@@ -495,17 +561,20 @@ choix.setOnMouseExited(e ->
         titleContainer.setSpacing(5);
         titleContainer.getChildren().addAll(titreLVE,titreText, ligne);
 
-        // identifiant et mot de passe
+        // Vbox contenant toutes les HBox "ligne"
         VBox dadContainer = new VBox();
+        //chaque vbox sert à contenir un label et un textfield
         VBox hbox1 = new VBox();
         VBox hbox2 = new VBox();
         VBox hbox3 = new VBox();
         VBox hbox4 = new VBox();
         VBox hbox5 = new VBox();
         VBox hbox6 = new VBox();
+        //chaque ligne contient 2 vbox
         HBox ligne1 = new HBox(70);
         HBox ligne2 = new HBox(70);
         HBox ligne3 = new HBox(70);
+        //création des textfield et labels
         TextField nom = new TextField();
         TextField prenom = new TextField();
         PasswordField motdepasse = new PasswordField();
@@ -576,7 +645,7 @@ choix.setOnMouseExited(e ->
         dadContainer.getChildren().addAll(ligne1, ligne2, ligne3);
 
 
-        // Bouton de connexion et d'inscription
+        // Bouton d'inscription et annuler
         HBox loginContainer = new HBox();
         Button retour = new Button("⟵ ANNULER");
         retour.setUserData("ANNULERI");
@@ -619,7 +688,7 @@ choix.setOnMouseExited(e ->
                    "-fx-border-color: #154c45; -fx-border-width: 2; " +
                    "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold;"));
 
-
+        //grise le bouton s'inscrire tant que tous les textfield ne sont pas remplis
         ChangeListener<String> listener = (observable, oldValue, newValue) -> {
         boolean allFilled = !nom.getText().trim().isEmpty()
                       && !prenom.getText().trim().isEmpty()
@@ -643,18 +712,19 @@ choix.setOnMouseExited(e ->
         loginContainer.setAlignment(Pos.CENTER);
         loginContainer.setSpacing(500); 
 
-        // Conteneur pour le combobox et la Connexion
+        // Conteneur de la partie centrale de la page
         VBox pannelcentrale = new VBox();
         pannelcentrale.setAlignment(Pos.CENTER);
+        
         // L'écart important vient de cette ligne :
-        pannelcentrale.setSpacing(100); // <-- Cette valeur crée un grand espace vertical entre les éléments du VBox
+        pannelcentrale.setSpacing(100); 
         pannelcentrale.getChildren().addAll(dadContainer, loginContainer);
         pannelcentrale.setPadding(new Insets(100, 0, 0, 10));
 
         // Ajout des éléments au panel central
         centerPanel.getChildren().addAll(titleContainer, pannelcentrale);
 
-        // Initialisation des autres panels (vides pour cette vue)
+        // Initialisation des autres panels 
         this.gauche = new Pane();
         this.panelCentral = new BorderPane();
         this.panelCentral.setStyle("-fx-background-color: #c8c4b8;");
@@ -663,20 +733,26 @@ choix.setOnMouseExited(e ->
 
     }
     
-
+    /**
+     * création de la fenetre d'accueil du client
+     */
     private void fenetreAccueilC() {
+        //pas de partie de gauche
         this.gauche=null;
+
+        //créer la bannière
         this.banniere=new BorderPane();
         banniere.setStyle("-fx-background-color: #084a48;");
-        ImageView imgLogo = new ImageView(this.lesImages.get(0));
+        //logo
+        ImageView imgLogo = new ImageView(this.lesImages.get(9));
         imgLogo.setFitWidth(520);
         imgLogo.setPreserveRatio(true);
         banniere.setPadding(new Insets(10,0,0,0));
         
         Label user = new Label("Bienvenue");
-        user.setStyle("-fx-font-size: 27px;");
+        user.setStyle("-fx-font-size: 27px; -fx-text-fill: white; -fx-font-weight: bold;");
         user.setPadding(new Insets(0,125,0,0));
-        
+        //boutons de droite
         HBox bouttons = new HBox();
         ImageView deco = new ImageView(this.lesImages.get(3));
         deco.setFitWidth(75);
@@ -723,7 +799,9 @@ choix.setOnMouseExited(e ->
         banniere.setCenter(user);
         banniere.setRight(bouttons);
         
+        //panel central
         this.panelCentral= new BorderPane();
+        //création de la barre de recherche: un bouton, un textfield, un bouton
         ImageView loupe = new ImageView(this.lesImages.get(5));
         loupe.setFitWidth(43);
         loupe.setPreserveRatio(true);
@@ -753,11 +831,13 @@ choix.setOnMouseExited(e ->
         panelCentral.setTop(barreRecherche);
         this.panelCentral.setStyle("-fx-background-color: #c8c4b8;");
 
+        // livres recommandés à afficher
         VBox listLivres = new VBox();
         listLivres.setPadding(new Insets(110, 150, 0, 500));
         this.setCataloguesC();
         int pageMax = this.catalogues.size(); // nombre total de pages
         List<Livre> livresPage = this.catalogues.get(this.pageCataActu);
+        int ajustement = ajouteEspace();
 
         // HBox pour navigation pagination
         HBox pagination = new HBox(20);
@@ -792,11 +872,12 @@ choix.setOnMouseExited(e ->
             listLivres.getChildren().add(noLivre);
         } else {
             for (Livre livreVue : livresPage) {
+                //ligne qui correspond à un livre
                 HBox livre = new HBox(30);
-                Label titre = new Label(livreVue.getTitre());
+                Label titre = new Label(livreVue.getTitre()+ " ".repeat(ajustement-livreVue.getTitre().length())); //" ".repeat(ajustement-livreVue.getTitre().length()));
                 titre.setStyle("-fx-font-size: 25px;");
                 Label prix = new Label(String.format("%.2f €", livreVue.getPrix()));
-                 prix.setStyle("-fx-font-size: 25px;");
+                prix.setStyle("-fx-font-size: 25px;");
                 TextField quantite = new TextField("0");
                 quantite.setStyle("-fx-font-size: 25px;");
                 Button ajPanier = new Button("Ajouter Panier");
@@ -826,58 +907,64 @@ choix.setOnMouseExited(e ->
         
     }   
 
-
+    /**
+     * création de la fenetre du panier
+     */
     private void fenetrePanier() {
+        //pas de partie de gauche
         this.gauche=null;
+
+        //créer la bannière
         this.banniere=new BorderPane();
-        banniere.setStyle("-fx-background-color: #154c45;");
-        ImageView imgLogo = new ImageView(this.lesImages.get(0));
+        banniere.setStyle("-fx-background-color: #084a48;");
+        //logo
+        ImageView imgLogo = new ImageView(this.lesImages.get(9));
         imgLogo.setFitWidth(520);
         imgLogo.setPreserveRatio(true);
         banniere.setPadding(new Insets(10,0,0,0));
-
-        Label user = new Label("Panier");
-        user.setStyle("-fx-font-size: 27px;");
+        
+        Label user = new Label("Bienvenue");
+        user.setStyle("-fx-font-size: 27px; -fx-text-fill: white; -fx-font-weight: bold;");
         user.setPadding(new Insets(0,125,0,0));
-
-
+        //boutons de droite
         HBox bouttons = new HBox();
         ImageView deco = new ImageView(this.lesImages.get(3));
         deco.setFitWidth(75);
         deco.setPreserveRatio(true);
-
+        
         ImageView panier = new ImageView(this.lesImages.get(6));
         panier.setFitWidth(75);
         panier.setPreserveRatio(true);
-
+        
         ImageView maison = new ImageView(this.lesImages.get(1));
         maison.setFitWidth(75);
         maison.setPreserveRatio(true);
-
+        
         ImageView profil = new ImageView(this.lesImages.get(4));
         profil.setFitWidth(75);
         profil.setPreserveRatio(true);
-
-        Button bDeconnexion = new Button(null,deco);
+        
+        this.bDeconnexion = new Button(null,deco);
         bDeconnexion.setUserData("DECONNEXION");
         bDeconnexion.setOnAction(new ControleurRetourRedirection(this));
         bDeconnexion.setStyle("-fx-background-color: transparent; -fx-padding: 0;");
-
+        
         this.bPanier = new Button(null,panier);
+        bPanier.setOnAction(new ControleurRetourRedirection(this));
         bPanier.setUserData("PANIER");
-
-        Button boutonMaison = new Button(null,maison);
+        bPanier.setStyle("-fx-background-color: transparent; -fx-padding: 0;");
+        
+        this.boutonMaison = new Button(null,maison);
         boutonMaison.setUserData("MAISON");
-        boutonMaison.setOnAction(new ControleurRetourRedirection(this));
         boutonMaison.setStyle("-fx-background-color: transparent; -fx-padding: 0;");
-
+        
         Button boutonProfil = new Button(null,profil);
         boutonProfil.setUserData("PROFIL");
         boutonProfil.setOnAction(new ControleurRetourRedirection(this));
         boutonProfil.setStyle("-fx-background-color: transparent; -fx-padding: 0;");
-
+        
         bouttons.getChildren().addAll(bDeconnexion,bPanier,boutonMaison,boutonProfil);
-
+        
         bouttons.setMargin(boutonMaison,new Insets(5));
         bouttons.setMargin(bDeconnexion,new Insets(5));
         bouttons.setMargin(bPanier,new Insets(5));
@@ -886,11 +973,14 @@ choix.setOnMouseExited(e ->
         banniere.setCenter(user);
         banniere.setRight(bouttons);
 
+        //panel central
         this.panelCentral= new BorderPane();
 
+        //livres dans le panier
         VBox listLivres = new VBox();
         
         for(int i= 0; i<4;i++){
+            //ligne pour un livre
             HBox livre = new HBox(15);
             Label titre = new Label("titre"+i);
             titre.setStyle("-fx-font-size: 25px;");
@@ -907,7 +997,7 @@ choix.setOnMouseExited(e ->
             listLivres.setMargin(livre,new Insets(0,655,0,665));
         }
 
-
+        // ligne sous le panier pour idiquer les informations générales
         HBox total = new HBox(25);
         Label prixTotal = new Label("prix Total");
         prixTotal.setStyle("-fx-font-size: 25px;");
@@ -925,53 +1015,56 @@ choix.setOnMouseExited(e ->
     
     }
 
+    /**
+     * crée la fenetre d'accueil du vendeur
+     */
     private void fenetreAccueilV(){
+        //pas de partie de gauche
         this.gauche=null;
 
-        
+        //créer la bannière
         this.banniere=new BorderPane();
-        banniere.setStyle("-fx-background-color: #154c45;");
-        ImageView imgLogo = new ImageView(this.lesImages.get(0));
+        banniere.setStyle("-fx-background-color: #084a48;");
+        //logo
+        ImageView imgLogo = new ImageView(this.lesImages.get(9));
         imgLogo.setFitWidth(520);
         imgLogo.setPreserveRatio(true);
         banniere.setPadding(new Insets(10,0,0,0));
-
-        Label user = new Label("Accueil " + lUtilisateur.getText() + " : Bienvenue "+ personneConnectee.getPrenom());
-        user.setStyle("-fx-font-size: 27px;");
+        
+        Label user = new Label("Bienvenue");
+        user.setStyle("-fx-font-size: 27px; -fx-text-fill: white; -fx-font-weight: bold;");
         user.setPadding(new Insets(0,125,0,0));
 
-
+        //boutons de droite
         HBox bouttons = new HBox();
         ImageView deco = new ImageView(this.lesImages.get(3));
         deco.setFitWidth(75);
         deco.setPreserveRatio(true);
-
+        
         ImageView maison = new ImageView(this.lesImages.get(1));
         maison.setFitWidth(75);
         maison.setPreserveRatio(true);
-
+        
         ImageView profil = new ImageView(this.lesImages.get(4));
         profil.setFitWidth(75);
         profil.setPreserveRatio(true);
-
-        Button bDeconnexion = new Button(null,deco);
+        
+        this.bDeconnexion = new Button(null,deco);
         bDeconnexion.setUserData("DECONNEXION");
         bDeconnexion.setOnAction(new ControleurRetourRedirection(this));
         bDeconnexion.setStyle("-fx-background-color: transparent; -fx-padding: 0;");
-
-        this.bPanier = null;
         
-        Button boutonMaison = new Button(null,maison);
+        this.boutonMaison = new Button(null,maison);
         boutonMaison.setUserData("MAISON");
         boutonMaison.setStyle("-fx-background-color: transparent; -fx-padding: 0;");
-
+        
         Button boutonProfil = new Button(null,profil);
         boutonProfil.setUserData("PROFIL");
         boutonProfil.setOnAction(new ControleurRetourRedirection(this));
         boutonProfil.setStyle("-fx-background-color: transparent; -fx-padding: 0;");
-
+        
         bouttons.getChildren().addAll(bDeconnexion,boutonMaison,boutonProfil);
-
+        
         bouttons.setMargin(boutonMaison,new Insets(5));
         bouttons.setMargin(bDeconnexion,new Insets(5));
         bouttons.setMargin(boutonProfil,new Insets(5));
@@ -979,11 +1072,13 @@ choix.setOnMouseExited(e ->
         banniere.setCenter(user);
         banniere.setRight(bouttons);
 
-
+        //panel central
         this.panelCentral= new BorderPane();
 
+        //liste des options (boutons) du vendeur
         VBox listLivres = new VBox(50);
         
+        //les boutons
         Button ajLivre = new Button("Ajouter un livre");
         ajLivre.setUserData("AJOUTER LIVRE");
         ajLivre.setOnAction( new ControleurRetourRedirection(this));
@@ -1029,75 +1124,75 @@ choix.setOnMouseExited(e ->
         
         
         listLivres.setPadding(new Insets(150,600,200,780));
-        listLivres.setStyle("-fx-background-color: #2c2c2c;");
+        listLivres.setStyle(" -fx-background-color: #c8c4b8;");
 
         panelCentral.setCenter(listLivres);
         
     }
-
+    
     private void fenetreAccueilA(){
+        //pas de partie de gauche
         this.gauche=null;
 
-        
+        //créer la bannière
         this.banniere=new BorderPane();
-        banniere.setStyle("-fx-background-color: #154c45;;");
-        ImageView imgLogo = new ImageView(this.lesImages.get(0));
+        banniere.setStyle("-fx-background-color: #084a48;");
+        //logo
+        ImageView imgLogo = new ImageView(this.lesImages.get(9));
         imgLogo.setFitWidth(520);
         imgLogo.setPreserveRatio(true);
         banniere.setPadding(new Insets(10,0,0,0));
-
-        // On re cast ?
-        //Administrateur admin = (Administrateur) personneConnectee;
-        Label user = new Label("Accueil Admin : bienvenue " + personneConnectee.getPrenom()
-        );
-        user.setStyle("-fx-font-size: 27px;");
+        
+        Label user = new Label("Bienvenue");
+        user.setStyle("-fx-font-size: 27px; -fx-text-fill: white; -fx-font-weight: bold;");
         user.setPadding(new Insets(0,125,0,0));
-
-
+        //boutons de droite
         HBox bouttons = new HBox();
         ImageView deco = new ImageView(this.lesImages.get(3));
         deco.setFitWidth(75);
         deco.setPreserveRatio(true);
-
+        
+        
         ImageView maison = new ImageView(this.lesImages.get(1));
         maison.setFitWidth(75);
         maison.setPreserveRatio(true);
-
+        
         ImageView profil = new ImageView(this.lesImages.get(4));
         profil.setFitWidth(75);
         profil.setPreserveRatio(true);
-
-        Button bDeconnexion = new Button(null,deco);
+        
+        this.bDeconnexion = new Button(null,deco);
         bDeconnexion.setUserData("DECONNEXION");
         bDeconnexion.setOnAction(new ControleurRetourRedirection(this));
         bDeconnexion.setStyle("-fx-background-color: transparent; -fx-padding: 0;");
-
-        this.bPanier = null;
         
-        Button boutonMaison = new Button(null,maison);
+        
+        this.boutonMaison = new Button(null,maison);
         boutonMaison.setUserData("MAISON");
         boutonMaison.setStyle("-fx-background-color: transparent; -fx-padding: 0;");
-
+        
         Button boutonProfil = new Button(null,profil);
         boutonProfil.setUserData("PROFIL");
         boutonProfil.setOnAction(new ControleurRetourRedirection(this));
         boutonProfil.setStyle("-fx-background-color: transparent; -fx-padding: 0;");
-
+        
         bouttons.getChildren().addAll(bDeconnexion,boutonMaison,boutonProfil);
-
+        
         bouttons.setMargin(boutonMaison,new Insets(5));
         bouttons.setMargin(bDeconnexion,new Insets(5));
+
         bouttons.setMargin(boutonProfil,new Insets(5));
         banniere.setLeft(imgLogo);
         banniere.setCenter(user);
         banniere.setRight(bouttons);
 
 
-
+        //panel central
         this.panelCentral= new BorderPane();
 
+        //liste des actions (boutons) de l'administrateur
         VBox listLivres = new VBox(40);
-        
+        //les boutons
         Button stats = new Button("Consulter les statistiques");
         stats.setUserData("STATS");
         stats.setOnAction(new ControleurRetourRedirection(this));
@@ -1146,12 +1241,14 @@ choix.setOnMouseExited(e ->
         listLivres.setMargin(optVendeur, new Insets(5,20,5,20));
         
         listLivres.setPadding(new Insets(200,600,200,780));
-        listLivres.setStyle("-fx-background-color: #2c2c2c;");
-
+        //listLivres.setStyle("-fx-background-color: #2c2c2c;");   
+        listLivres.setStyle("-fx-background-color: #c8c4b8;");
 
         panelCentral.setCenter(listLivres);
     }
-
+    /**
+     * fenetre du profil du client
+     */
     private void fenetreProfilC(){
     // Image à gauche
     ImageView imgG = new ImageView(this.lesImages.get(8));
@@ -1164,9 +1261,9 @@ choix.setOnMouseExited(e ->
 
     // Bannière en haut
     this.banniere = new BorderPane();
-    banniere.setStyle("-fx-background-color: # #154c45;"); // Couleur bleue comme sur l'image
+    banniere.setStyle("-fx-background-color:  #154c45;"); 
     
-    ImageView imgLogo = new ImageView(this.lesImages.get(0));
+    ImageView imgLogo = new ImageView(this.lesImages.get(9));
     imgLogo.setFitWidth(520);
     imgLogo.setPreserveRatio(true);
     banniere.setPadding(new Insets(10,0,0,0));
@@ -1224,7 +1321,7 @@ choix.setOnMouseExited(e ->
 
     // Panel central avec les informations du profil
     this.panelCentral = new BorderPane();
-    panelCentral.setStyle("-fx-background-color: #f5f5f5;");
+    panelCentral.setStyle("-fx-background-color: #c8c4b8;");
 
     // Container principal pour les informations
     VBox infoContainer = new VBox();
@@ -1308,6 +1405,9 @@ choix.setOnMouseExited(e ->
     panelCentral.setCenter(infoContainer);
 }
 //--------------------------------------------------------------------------------------------------------------------------
+    /**
+     * fenetre du profil vendeur
+     */
     public void fenetreProfilV(){
     // Image à gauche
     ImageView imgG = new ImageView(this.lesImages.get(8));
@@ -1320,9 +1420,8 @@ choix.setOnMouseExited(e ->
 
     // Bannière en haut
     this.banniere = new BorderPane();
-    banniere.setStyle("-fx-background-color:  #154c45;"); // Couleur bleue comme sur l'image
-    
-    ImageView imgLogo = new ImageView(this.lesImages.get(0));
+    banniere.setStyle("-fx-background-color:  #154c45;"); 
+    ImageView imgLogo = new ImageView(this.lesImages.get(9));
     imgLogo.setFitWidth(520);
     imgLogo.setPreserveRatio(true);
     banniere.setPadding(new Insets(10,0,0,0));
@@ -1373,7 +1472,7 @@ choix.setOnMouseExited(e ->
 
     // Panel central avec les informations du profil
     this.panelCentral = new BorderPane();
-    panelCentral.setStyle("-fx-background-color: #f5f5f5;");
+    panelCentral.setStyle("-fx-background-color: #c8c4b8;");
 
     // Container principal pour les informations
     VBox infoContainer = new VBox();
@@ -1391,9 +1490,16 @@ choix.setOnMouseExited(e ->
 
     Label prenomLabel = new Label("PRÉNOM :  " + vend.getPrenom());
     prenomLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #333333;");
-    
-    Label magasinLabel = new Label("MAGASIN :  " + vend.getMagasin().getNomMag());
-    magasinLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #333333;");
+    Label magasinLabel;
+    if (vend.getMagasin() == null) {
+        magasinLabel = new Label("MAGASIN :  Aucun magasin associé");
+        magasinLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #333333;");
+        infoContainer.getChildren().add(magasinLabel);
+    }
+    else {
+        magasinLabel = new Label("MAGASIN :  " + vend.getMagasin().getNomMag());
+        magasinLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #333333;");
+    }
 ;
 
 
@@ -1435,7 +1541,9 @@ choix.setOnMouseExited(e ->
 
 
 //--------------------------------------------------------------------------------------------------------------------
-
+    /**
+     * fenetre du profil administrateur
+     */
     public void fenetreProfilA(){
     // Image à gauche
     ImageView imgG = new ImageView(this.lesImages.get(8));
@@ -1448,9 +1556,8 @@ choix.setOnMouseExited(e ->
 
     // Bannière en haut
     this.banniere = new BorderPane();
-    banniere.setStyle("-fx-background-color:  #154c45;"); // Couleur bleue comme sur l'image
-    
-    ImageView imgLogo = new ImageView(this.lesImages.get(0));
+    banniere.setStyle("-fx-background-color:  #154c45;"); 
+    ImageView imgLogo = new ImageView(this.lesImages.get(9));
     imgLogo.setFitWidth(520);
     imgLogo.setPreserveRatio(true);
     banniere.setPadding(new Insets(10,0,0,0));
@@ -1501,7 +1608,7 @@ choix.setOnMouseExited(e ->
 
     // Panel central avec les informations du profil
     this.panelCentral = new BorderPane();
-    panelCentral.setStyle("-fx-background-color: #f5f5f5;");
+    panelCentral.setStyle("-fx-background-color: #c8c4b8;");
 
     // Container principal pour les informations
     VBox infoContainer = new VBox();
@@ -1520,8 +1627,7 @@ choix.setOnMouseExited(e ->
     Label prenomLabel = new Label("PRÉNOM :  " + admin.getPrenom());
     prenomLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #333333;");
     
-    
-;
+
 
 
     // Boutons en bas
@@ -1559,19 +1665,22 @@ choix.setOnMouseExited(e ->
     
     } 
 
-
+    /**
+     * fenetre pour créer une librairie
+     */
     public void fenetreCreerLib(){
+    //pas de partie gauche
     this.gauche = null;
 
     // Configuration de la bannière
     this.banniere = new BorderPane();
     banniere.setStyle("-fx-background-color: #154c45;");
-    ImageView imgLogo = new ImageView(this.lesImages.get(0));
+    ImageView imgLogo = new ImageView(this.lesImages.get(9));
     imgLogo.setFitWidth(520);
     imgLogo.setPreserveRatio(true);
     banniere.setPadding(new Insets(10, 0, 0, 0));
 
-    Label user = new Label("Création d'un vendeur");
+    Label user = new Label("Création d'une librairie");
     user.setStyle("-fx-font-size: 27px; -fx-text-fill: white;");
     user.setPadding(new Insets(0, 125, 0, 0));
 
@@ -1619,14 +1728,13 @@ choix.setOnMouseExited(e ->
     // Conteneur principal
     VBox mainContainer = new VBox(20);
     mainContainer.setAlignment(Pos.CENTER);
-    //mainContainer.setPadding(new Insets(50, 0, 0, 0));
 
     // Titre
     Text titre = new Text("Ajouter une librairie");
     titre.setStyle("-fx-font-size: 30px; -fx-font-weight: bold;");
     mainContainer.getChildren().add(titre);
 
-    // Conteneur pour les champs de saisie et le combo box
+    // Conteneur pour les champs de saisie 
     HBox fieldsContainer = new HBox(50);
     fieldsContainer.setAlignment(Pos.CENTER);
     fieldsContainer.setPadding(new Insets(50, 0, 0, 0));
@@ -1640,7 +1748,7 @@ choix.setOnMouseExited(e ->
     nomField.setPrefWidth(300);
     nomField.setStyle("-fx-font-size: 18px;");
 
-    // Champ Prénom
+    // Champ ville
     Label villeLabel = new Label("Ville");
     villeLabel.setStyle("-fx-font-size: 20px;");
     TextField villeField = new TextField();
@@ -1653,34 +1761,8 @@ choix.setOnMouseExited(e ->
     fieldsContainer.getChildren().addAll(nomLabel, nomField, villeLabel, villeField);
 
 
-    /*
-    // Partie droite - Combo box et bouton
-    VBox rightFields = new VBox(30);
-    rightFields.setAlignment(Pos.CENTER);
-
-    // Combo box pour les magasins
-    Label magasinLabel = new Label("Magasin");
-    magasinLabel.setStyle("-fx-font-size: 20px;");
-    this.comboBoxSave = new ComboBox<>();
-    List<Magasin> magasins = magasinBD.getToutLesMagasins();
-    for (Magasin mag : magasins) {
-        comboBoxSave.getItems().add(mag.getNomMag());
-    }
-    comboBoxSave.setPromptText("Sélectionnez un magasin");
-    comboBoxSave.setPrefWidth(300);
-    comboBoxSave.setStyle("-fx-font-size: 18px;");
-    */
-
-
-
-   
-    
-    
-
-    
-
     // Bouton Créer
-    Button creerBtn = new Button("Créer le vendeur");
+    Button creerBtn = new Button("Créer la librairie");
     creerBtn.setStyle("-fx-background-color: #154c45; -fx-text-fill: white; -fx-font-size: 18px;");
     creerBtn.setPrefWidth(200);
     creerBtn.setPrefHeight(50);
@@ -1709,14 +1791,16 @@ choix.setOnMouseExited(e ->
     panelCentral.setCenter(mainContainer);
     }
 
-
+    /**
+     * fenetre pour créer un vendeur
+     */
     public void fenetreCreerVendeur() {
     this.gauche = null;
 
     // Configuration de la bannière
     this.banniere = new BorderPane();
     banniere.setStyle("-fx-background-color: #154c45;");
-    ImageView imgLogo = new ImageView(this.lesImages.get(0));
+    ImageView imgLogo = new ImageView(this.lesImages.get(9));
     imgLogo.setFitWidth(520);
     imgLogo.setPreserveRatio(true);
     banniere.setPadding(new Insets(10, 0, 0, 0));
@@ -1769,7 +1853,6 @@ choix.setOnMouseExited(e ->
     // Conteneur principal
     VBox mainContainer = new VBox(20);
     mainContainer.setAlignment(Pos.CENTER);
-    //mainContainer.setPadding(new Insets(50, 0, 0, 0));
 
     // Titre
     Text titre = new Text("CRÉER UN VENDEUR");
@@ -1867,13 +1950,16 @@ choix.setOnMouseExited(e ->
     panelCentral.setCenter(mainContainer);
 }
 
+/**
+ * fenetre pour verifier la disponibilité d'un livre
+ */
 public void fenetreVerifDispo() {
     this.gauche = null;
 
     // Configuration de la bannière
     this.banniere = new BorderPane();
     banniere.setStyle("-fx-background-color: #154c45;");
-    ImageView imgLogo = new ImageView(this.lesImages.get(0));
+    ImageView imgLogo = new ImageView(this.lesImages.get(9));
     imgLogo.setFitWidth(520);
     imgLogo.setPreserveRatio(true);
     banniere.setPadding(new Insets(10, 0, 0, 0));
@@ -1971,7 +2057,7 @@ public void fenetreVerifDispo() {
 
     fieldsContainer.getChildren().addAll(rechercheLabel, recheField, cherBtn);
     mainContainer.getChildren().addAll(fieldsContainer);
-
+    //afficher les livres liés à la recherche
     VBox listLivres = new VBox();
         listLivres.setPadding(new Insets(50,150,0,600));
         this.setCataloguesC();
@@ -2038,14 +2124,16 @@ public void fenetreVerifDispo() {
         this.panelCentral.setBottom(pagination);
         this.panelCentral.setCenter(center);
     }
-
+/**
+ * fenetre pour ajouter un livre à la bd
+ */
 public void fenetreAjouterLivre(){
      this.gauche = null;
 
     // Configuration de la bannière
     this.banniere = new BorderPane();
     banniere.setStyle("-fx-background-color: #154c45;");
-    ImageView imgLogo = new ImageView(this.lesImages.get(0));
+    ImageView imgLogo = new ImageView(this.lesImages.get(9));
     imgLogo.setFitWidth(520);
     imgLogo.setPreserveRatio(true);
     banniere.setPadding(new Insets(10, 0, 0, 0));
@@ -2109,7 +2197,7 @@ public void fenetreAjouterLivre(){
     titre.setStyle("-fx-font-size: 30px; -fx-font-weight: bold;");
     mainContainer.getChildren().add(titre);
 
-    // Conteneur pour les champs de saisie et le combo box
+    // Conteneur pour les champs de saisie 
     HBox fieldsContainer = new HBox(70);
     fieldsContainer.setAlignment(Pos.CENTER);
     fieldsContainer.setPadding(new Insets(50, 0, 0, 0));
@@ -2118,7 +2206,7 @@ public void fenetreAjouterLivre(){
     VBox leftFields = new VBox(20);
     leftFields.setAlignment(Pos.CENTER_LEFT);
 
-    // Champ Nom
+    // Champ titre
     Label titreLabel = new Label("Titre");
     titreLabel.setStyle("-fx-font-size: 20px;");
     TextField titreField = new TextField();
@@ -2126,7 +2214,7 @@ public void fenetreAjouterLivre(){
     titreField.setPrefWidth(300);
     titreField.setStyle("-fx-font-size: 18px;");
 
-    // Champ Prénom
+    // Champ auteur
     Label auteurLabel = new Label("Auteur");
     auteurLabel.setStyle("-fx-font-size: 20px;");
     TextField auteurField = new TextField();
@@ -2134,7 +2222,7 @@ public void fenetreAjouterLivre(){
     auteurField.setPrefWidth(300);
     auteurField.setStyle("-fx-font-size: 18px;");
 
-    // Champ Mot de passe
+    // Champ date
     Label dateLabel = new Label("Année de parution");
     dateLabel.setStyle("-fx-font-size: 20px;");
     TextField dateField = new TextField();
@@ -2142,6 +2230,7 @@ public void fenetreAjouterLivre(){
     dateField.setPrefWidth(300);
     dateField.setStyle("-fx-font-size: 18px;");
 
+    //champ nb page
     Label pageLabel = new Label("Nombre de pages");
     pageLabel.setStyle("-fx-font-size: 20px;");
     TextField pageField = new TextField();
@@ -2155,7 +2244,7 @@ public void fenetreAjouterLivre(){
     VBox rightFields = new VBox(30);
     rightFields.setAlignment(Pos.CENTER_LEFT);
 
-    // Champ Nom
+    // Champ prix
     Label prixLabel = new Label("Prix");
     prixLabel.setStyle("-fx-font-size: 20px;");
     TextField prixField = new TextField();
@@ -2163,7 +2252,7 @@ public void fenetreAjouterLivre(){
     prixField.setPrefWidth(300);
     prixField.setStyle("-fx-font-size: 18px;");
 
-    // Champ Prénom
+    // Champ theme
     Label themeLabel = new Label("Thème");
     themeLabel.setStyle("-fx-font-size: 20px;");
     TextField themeField = new TextField();
@@ -2171,7 +2260,7 @@ public void fenetreAjouterLivre(){
     themeField.setPrefWidth(300);
     themeField.setStyle("-fx-font-size: 18px;");
 
-    // Champ Mot de passe
+    // Champ editeur
     Label editeurLabel = new Label("Éditeur");
     editeurLabel.setStyle("-fx-font-size: 20px;");
     TextField editeurField = new TextField();
@@ -2220,144 +2309,10 @@ public void fenetreAjouterLivre(){
 
 }
 
-public void fenetreAjouterMagasin(){
-     this.gauche = null;
-
-    // Configuration de la bannière
-    this.banniere = new BorderPane();
-    banniere.setStyle("-fx-background-color: #154c45;");
-    ImageView imgLogo = new ImageView(this.lesImages.get(0));
-    imgLogo.setFitWidth(520);
-    imgLogo.setPreserveRatio(true);
-    banniere.setPadding(new Insets(10, 0, 0, 0));
-
-    Label user = new Label("Création d'un livre");
-    user.setStyle("-fx-font-size: 27px; -fx-text-fill: white;");
-    user.setPadding(new Insets(0, 250, 0, 0));
-
-    // Boutons de navigation
-    HBox bouttons = new HBox();
-    ImageView deco = new ImageView(this.lesImages.get(3));
-    deco.setFitWidth(75);
-    deco.setPreserveRatio(true);
-
-    ImageView maison = new ImageView(this.lesImages.get(1));
-    maison.setFitWidth(75);
-    maison.setPreserveRatio(true);
-
-    ImageView profil = new ImageView(this.lesImages.get(4));
-    profil.setFitWidth(75);
-    profil.setPreserveRatio(true);
-
-    Button bDeconnexion = new Button(null, deco);
-    bDeconnexion.setUserData("DECONNEXION");
-    bDeconnexion.setOnAction(new ControleurRetourRedirection(this));
-    bDeconnexion.setStyle("-fx-background-color: transparent; -fx-padding: 0;");
-
-    Button boutonMaison = new Button(null, maison);
-    boutonMaison.setUserData("MAISON");
-    boutonMaison.setOnAction(new ControleurRetourRedirection(this));
-    boutonMaison.setStyle("-fx-background-color: transparent; -fx-padding: 0;");
-
-    Button boutonProfil = new Button(null, profil);
-    boutonProfil.setUserData("PROFIL");
-    boutonProfil.setOnAction(new ControleurRetourRedirection(this));
-    boutonProfil.setStyle("-fx-background-color: transparent; -fx-padding: 0;");
-
-    bouttons.getChildren().addAll(bDeconnexion, boutonMaison, boutonProfil);
-    bouttons.setMargin(boutonMaison, new Insets(5));
-    bouttons.setMargin(bDeconnexion, new Insets(5));
-    bouttons.setMargin(boutonProfil, new Insets(5));
-    banniere.setLeft(imgLogo);
-    banniere.setCenter(user);
-    banniere.setRight(bouttons);
-
-
-
-
-
-
-    // Panel central
-    this.panelCentral = new BorderPane();
-    this.panelCentral.setStyle("-fx-background-color: #c8c4b8;");
-
-    // Conteneur principal
-    VBox mainContainer = new VBox(20);
-    mainContainer.setAlignment(Pos.CENTER);
-
-    // Titre
-    Text titre = new Text("INSÉRER UN LIVRE");
-    titre.setStyle("-fx-font-size: 30px; -fx-font-weight: bold;");
-    mainContainer.getChildren().add(titre);
-
-    // Conteneur pour les champs de saisie et le combo box
-    HBox fieldsContainer = new HBox(70);
-    fieldsContainer.setAlignment(Pos.CENTER);
-    fieldsContainer.setPadding(new Insets(50, 0, 0, 0));
-
-    // Partie gauche - Champs de saisie
-    VBox leftFields = new VBox(20);
-    leftFields.setAlignment(Pos.CENTER);
-
-    // Champ Nom
-    Label nomLabel = new Label("Nom du magasin");
-    nomLabel.setStyle("-fx-font-size: 20px;");
-    TextField nomField = new TextField();
-    nomField.setPromptText("Entrez le nom du magasin");
-    nomField.setPrefWidth(300);
-    nomField.setStyle("-fx-font-size: 18px;");
-
-    // Champ Prénom
-    Label villeLabel = new Label("Ville");
-    villeLabel.setStyle("-fx-font-size: 20px;");
-    TextField villeField = new TextField();
-    villeField.setPromptText("Entrez la ville");
-    villeField.setPrefWidth(300);
-    villeField.setStyle("-fx-font-size: 18px;");
-
-
-    Button creerBtn = new Button("Créer le livre");
-    creerBtn.setUserData("CREER LIVRE");
-    creerBtn.setStyle("-fx-background-color: #154c45; -fx-text-fill: white; -fx-font-size: 18px;");
-    creerBtn.setPrefWidth(200);
-    creerBtn.setPrefHeight(50);
-    /////////////////////creerBtn.setOnAction(new ControleurCreerVendeur(this, new AdministrateurBD(connection), magasinBD, vendeurBD));
-
-
-    // Désactiver le bouton tant que tous les champs ne sont pas remplis
-    creerBtn.setDisable(true);
-    ChangeListener<String> listener = (observable, oldValue, newValue) -> {
-        boolean allFilled = !nomField.getText().trim().isEmpty()
-                && !villeField.getText().trim().isEmpty();
-        creerBtn.setDisable(!allFilled);
-    };
-    nomField.textProperty().addListener(listener);
-    villeField.textProperty().addListener(listener);
-
-    // Stocker les champs pour le contrôleur
-    this.infosMag = new ArrayList<>();
-    this.infosMag.add(nomField);
-    this.infosMag.add(villeField);
-
-
-
-    leftFields.getChildren().addAll(nomLabel,nomField,villeLabel,villeField,creerBtn);
-    //mainContainer.getChildren().add(leftFields);
-
-    panelCentral.setCenter(leftFields);
-
-    /* String idmag;
-     String nomMag;
-     String villeMag;
-     stock;*/
-
-}
-
     /**
-     * charge les images à afficher en fonction des erreurs
-     * @param repertoire répertoire où se trouvent les images
+     * charge les images à afficher
      */
-    private void chargerImages(/*String repertoire*/){
+    private void chargerImages(){
     File file = new File("src/ihm/img/LivreExpress.png");
     File file1 = new File("src/ihm/img/home.png");
     File file2 = new File("src/ihm/img/croix.png");
@@ -2367,6 +2322,7 @@ public void fenetreAjouterMagasin(){
     File file6 = new File("src/ihm/img/panier.png");
     File file7 = new File("src/ihm/img/retour.png");
     File file8 = new File("src/ihm/img/livre.png");
+    File file9 = new File("src/ihm/img/LivreExpressFondVert.png");
     this.lesImages.add(new Image(file.toURI().toString()));
     this.lesImages.add(new Image(file1.toURI().toString()));
     this.lesImages.add(new Image(file2.toURI().toString()));
@@ -2376,8 +2332,13 @@ public void fenetreAjouterMagasin(){
     this.lesImages.add(new Image(file6.toURI().toString()));
     this.lesImages.add(new Image(file7.toURI().toString()));
     this.lesImages.add(new Image(file8.toURI().toString()));
-}
+    this.lesImages.add(new Image(file9.toURI().toString()));
+    }
 
+    
+    /**
+     * Affiche la fenêtre de choix de l'utilisateur.
+     */
     public void modeChoix(){
         fenetreChoix();
         fenetre.setTop(this.banniere);
@@ -2386,13 +2347,18 @@ public void fenetreAjouterMagasin(){
 
     }
     
+    /**
+     * Affiche la fenêtre de connexion de l'utilisateur.
+     */
     public void modeConnexion(){
         fenetreConnexion();
         fenetre.setTop(this.banniere);
         fenetre.setLeft(this.gauche);
         fenetre.setCenter(this.panelCentral);
     }
-    
+    /**
+     * Affiche la fenêtre d'inscription d'un client
+     */
     public void modeInscription(){
         fenetreInscription();
         fenetre.setTop(this.banniere);
@@ -2400,6 +2366,9 @@ public void fenetreAjouterMagasin(){
         fenetre.setCenter(this.panelCentral);
     }
 
+    /**
+     * Affiche la fenêtre d'accueil du client.
+     */
     public void modeAccueilC(){
         fenetreAccueilC();
         this.boutonMaison.setDisable(true);
@@ -2410,7 +2379,9 @@ public void fenetreAjouterMagasin(){
         fenetre.setCenter(this.panelCentral);
         
     }
-
+    /**
+     * Affiche la fenêtre du panier du client.
+     */
     public void modePanier(){
         fenetrePanier();
         this.boutonMaison.setDisable(false);
@@ -2421,7 +2392,9 @@ public void fenetreAjouterMagasin(){
         fenetre.setCenter(this.panelCentral);
        
     }
-
+    /**
+     * Affiche la fenêtre d'accueil du vendeur.
+     */
     public void modeAccueilV(){
         fenetreAccueilV();
         this.boutonMaison.setDisable(true);
@@ -2431,6 +2404,9 @@ public void fenetreAjouterMagasin(){
         fenetre.setCenter(this.panelCentral);
     }
 
+    /**
+     * Affiche la fenêtre d'accueil de l'administrateur.
+     */
     public void modeAccueilA(){
         fenetreAccueilA();
         this.boutonMaison.setDisable(true);
@@ -2439,7 +2415,9 @@ public void fenetreAjouterMagasin(){
         fenetre.setLeft(this.gauche);
         fenetre.setCenter(this.panelCentral);
     }
-
+    /**
+     * Affiche la fenêtre du profil du client.
+     */
     public void modeProfilC(){
         fenetreProfilC();
         this.boutonMaison.setDisable(false);
@@ -2450,8 +2428,9 @@ public void fenetreAjouterMagasin(){
         fenetre.setCenter(this.panelCentral);
     } 
 
-   
-
+    /**
+     * Affiche la fenêtre du profil du vendeur.
+     */
     public void modeProfilV(){
         fenetreProfilV();
         this.boutonMaison.setDisable(false);
@@ -2461,6 +2440,9 @@ public void fenetreAjouterMagasin(){
         fenetre.setCenter(this.panelCentral);
     }
 
+    /**
+     * Affiche la fenêtre du profil de l'administrateur.
+     */
     public void modeProfilA(){
         fenetreProfilA();
         this.boutonMaison.setDisable(false);
@@ -2469,7 +2451,9 @@ public void fenetreAjouterMagasin(){
         fenetre.setLeft(this.gauche);
         fenetre.setCenter(this.panelCentral);
     } 
-
+    /**
+     * Affiche la fenêtre pour créer un vendeur.
+     */
     public void modeCreerVendeur(){
         fenetreCreerVendeur();
         this.boutonMaison.setDisable(false);
@@ -2478,7 +2462,9 @@ public void fenetreAjouterMagasin(){
         fenetre.setLeft(this.gauche);
         fenetre.setCenter(this.panelCentral);
     }
-
+    /**
+     * Affiche la fenêtre pour créer une librairie.
+     */
     public void modeCreerLib(){
         fenetreCreerLib();
         this.boutonMaison.setDisable(false);
@@ -2487,7 +2473,9 @@ public void fenetreAjouterMagasin(){
         fenetre.setLeft(this.gauche);
         fenetre.setCenter(this.panelCentral);
     }
-
+    /**
+     * Affiche la fenêtre pour créer un livre.
+     */
     public void modeCreerLivre(){
         fenetreAjouterLivre();
         this.boutonMaison.setDisable(false);
@@ -2496,7 +2484,9 @@ public void fenetreAjouterMagasin(){
         fenetre.setLeft(this.gauche);
         fenetre.setCenter(this.panelCentral);
     } 
-
+    /**
+     * Affiche la fenêtre de vérification de disponibilité d'un livre.
+     */
      public void modeVerifDispo(){
         fenetreVerifDispo();
         this.boutonMaison.setDisable(false);
@@ -2507,7 +2497,9 @@ public void fenetreAjouterMagasin(){
     } 
 
 
-        
+    /**
+     * Affiche une alerte d'erreur de connexion.
+     */
     public void popUpConnexionImpossible(){
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Erreur de connexion");
@@ -2515,7 +2507,9 @@ public void fenetreAjouterMagasin(){
         alert.setContentText("Identifiants incorrects. Veuillez réessayer.");
         Optional<ButtonType> result = alert.showAndWait();
     }
-
+    /**
+     * Affiche une alerte d'erreur d'inscription.
+     */
     public void popUpInscriptionImpossible(){
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Erreur de connexion");
@@ -2523,7 +2517,9 @@ public void fenetreAjouterMagasin(){
         alert.setContentText("Problème rencontré durant l'inscription. Veuillez réessayer.");
         Optional<ButtonType> result = alert.showAndWait();
     }
-    
+    /**
+     * Affiche une alerte de succès de création de librairie.
+     */
     public void popUpCreaMagReussi(){
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Erreur de connexion");

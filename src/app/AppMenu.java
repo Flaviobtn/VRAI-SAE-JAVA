@@ -1205,10 +1205,9 @@ public class AppMenu{
             
             // on ajoute le détail de commande
             //int numDetailCommande, Livre livre, int qte, int numCo
-            int numIdDetCo = detailCommandeBD.genererId(); // on génère un numéro de détail de commande
+            int numIdDetCo = detailCommandeBD.genererId(commande.getNumCommande()); // on génère un numéro de détail de commande
             DetailCommande detailCommande = new DetailCommande(numIdDetCo,livre, quantite, numCommande);
             lstDetails.add(detailCommande); // on ajoute le détail de commande à la liste
-            
             
             // on demande si l'utilisateur veut continuer ou pas
             lstRep = new ArrayList<>();

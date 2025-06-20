@@ -1,4 +1,4 @@
-package ihm.Controlleur;
+package ihm.Controleur;
 import ihm.Vue.*;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
