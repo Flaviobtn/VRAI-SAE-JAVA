@@ -10,7 +10,105 @@ public class LivreBD {
     public LivreBD(Connection laConnection) {
         this.laConnexion = laConnection;
     }
+    
 
+    public Magasin premierMagDispo(Livre livre){
+        String req = "Select idmag from POSSEDER WHERE ISBN = ? LIMIT 1";
+        try {
+            PreparedStatement st = laConnexion.prepareStatement(req);
+            st.setString(1,livre.getIsbn());
+            ResultSet rs = st.executeQuery();
+            while(rs.next()){
+                MagasinBD magasinBD = new MagasinBD(laConnexion);
+                return magasinBD.getMagasin(rs.getString("idmag"));
+            }
+           
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return null;
+    }
+    public List<Livre> getLivresNomAPeuPresAll(String noml){
+        List<Livre> lesLivres = new ArrayList<>();
+        try {
+        String req = "SELECT * FROM LIVRE WHERE titre LIKE ?";
+        
+        //String req = "SELECT * FROM LIVRE NATURAL JOIN POSSEDER NATURAL JOIN MAGASIN WHERE  idmag = ? AND titre LIKE '%"+"?"+"%';";
+        PreparedStatement st = laConnexion.prepareStatement(req);
+        st.setString(1, "%" + noml + "%");  // Ajoute les % autour de la valeur
+
+        //st.setString(1, idmag);
+        //st.setString(2, nomL);
+        ResultSet rs = st.executeQuery();
+        while(rs.next()){
+                //on recuper l'isbn
+                String isbn = rs.getString("isbn");
+
+                //on recupere le titre
+                String titre = rs.getString("titre");
+
+                
+                // on recupere le nombre de pages
+                int nbpages = rs.getInt("nbpages");
+
+                //on recupere le prix
+                double prix = rs.getDouble("prix");
+
+                //on recupere la date de publication
+                int datepub = rs.getInt("datepubli");
+
+                // Récupération de l'auteur
+                String reqAuteur = "SELECT * FROM ECRIRE WHERE isbn = ?";
+                PreparedStatement stAuteur = laConnexion.prepareStatement(reqAuteur);
+                stAuteur.setString(1, isbn);
+                ResultSet rsAuteur = stAuteur.executeQuery();
+                List<Auteur> auteurs = new ArrayList<>();
+                while (rsAuteur.next()){
+                    // comme il y a plusieurs auteurs, on les ajoutes tous à une liste
+                    String idAuteur = rsAuteur.getString("idauteur");
+                    String reqAuteurDetails = "SELECT * FROM AUTEUR WHERE idauteur = ?";
+                    PreparedStatement stAuteurDetails = laConnexion.prepareStatement(reqAuteurDetails);
+                    stAuteurDetails.setString(1, idAuteur);
+                    ResultSet rsAuteurDetails = stAuteurDetails.executeQuery();
+                    while (rsAuteurDetails.next()) {
+                        String nom = rsAuteurDetails.getString("nomauteur");
+                        int anneeNais = rsAuteurDetails.getInt("anneenais");
+                        int anneeDeces = rsAuteurDetails.getInt("anneedeces");
+                        auteurs.add(new Auteur(idAuteur, nom, anneeNais, anneeDeces));
+                    }
+                }
+
+
+                // Récupération de l'éditeur
+                List<Editeur> editeurs = new ArrayList<>();
+                String reqEditeur = "SELECT * FROM EDITER WHERE isbn = ?";
+                PreparedStatement stEditeur = laConnexion.prepareStatement(reqEditeur);
+                stEditeur.setString(1, isbn);
+                ResultSet rsEditeur = stEditeur.executeQuery();
+                while (rsEditeur.next()) {
+                    // on récupère les différents éditeurs s'il y en a plusieurs
+                    int idedit = rsEditeur.getInt("idedit");
+                    String reqEditeurDetails = "SELECT * FROM EDITEUR WHERE idedit = ?";
+                    PreparedStatement stEditeurDetails = laConnexion.prepareStatement(reqEditeurDetails);
+                    stEditeurDetails.setInt(1, idedit);
+                    ResultSet rsEditeurDetails = stEditeurDetails.executeQuery();
+                    
+                    while (rsEditeurDetails.next()) {
+                        String nomEditeur = rsEditeurDetails.getString("nomedit");
+                        editeurs.add(new Editeur(idedit, nomEditeur));
+                    }
+                }
+
+                
+                lesLivres.add(new Livre(isbn, titre, auteurs, datepub, nbpages, prix, editeurs));
+            }
+        
+        }
+        catch (SQLException e) {
+            System.err.println(e.getMessage());
+        }
+        return lesLivres;
+    }
 
     public List<Livre> getLivresNomAPeuPres(String idmag, String nomL){
         List<Livre> lesLivres = new ArrayList<>();
@@ -258,7 +356,26 @@ public class LivreBD {
     }
 
     public List<Livre> getTousLesLivresBase(){
-        String req = "SELECT * FROM LIVRE";
+        String req = "SELECT isbn FROM LIVRE";
+        List<Livre> livres = new ArrayList<>();
+        Livre livre = null;
+        try {
+            PreparedStatement st = laConnexion.prepareStatement(req);
+            ResultSet rs = st.executeQuery();
+            while (rs.next()) {
+                String isbn = rs.getString("isbn");
+                livre = getLivre(isbn);
+                livres.add(livre);
+        }
+        } 
+        catch (SQLException e) {
+            System.err.println(e.getMessage());
+        }   
+        return livres;  
+    }
+
+    public List<Livre> getTousLesLivresenStock(){
+        String req = "SELECT isbn FROM LIVRE NATURAL JOIN POSSEDER NATURAL JOIN MAGASIN";
         List<Livre> livres = new ArrayList<>();
         Livre livre = null;
         try {

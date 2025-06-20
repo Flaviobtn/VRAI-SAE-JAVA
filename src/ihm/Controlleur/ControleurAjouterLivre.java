@@ -18,8 +18,10 @@ public class ControleurAjouterLivre implements EventHandler<ActionEvent> {
      **/
     private LivreExpresss vue;
     //private ClientBD modeleC;
-    Connection connexion;
+    private Connection connexion;
     private Client client;
+    private Livre livre;
+    private int qte;
     
     
 
@@ -27,10 +29,12 @@ public class ControleurAjouterLivre implements EventHandler<ActionEvent> {
      * @param modelePendu modèle du jeu
      * @param p vue du jeu
      */
-    public ControleurAjouterLivre(LivreExpresss vue, Client client, Livre livre, ConnectionBD connectionBD) {
+    public ControleurAjouterLivre(LivreExpresss vue, Client client,Livre livre,int qte, Connection connexion) {
         this.vue = vue;
-        this.connexion = ConnectionBD.getConnection();
+        this.connexion = connexion;
         this.client = client;
+        this.livre = livre;
+        this.qte = qte;
     }
     
 
@@ -40,31 +44,29 @@ public class ControleurAjouterLivre implements EventHandler<ActionEvent> {
      */
     @Override
     public void handle(ActionEvent actionEvent) {
+        System.out.println("");
+        LivreBD livrebd = new LivreBD(connexion);
         Button button = (Button) actionEvent.getTarget();
         Object data = button.getUserData();
-        if(data.equals(1)){
             CommandeBD commandeBD = new CommandeBD(this.connexion);
-            Commande commande = new Commande(commandeBD.genererId(), null, false, null, null, null,false);
+            Commande commande = new Commande(commandeBD.genererId(), java.time.LocalDate.now(), true, Livraison.DOMICILE, livrebd.premierMagDispo(this.livre), this.client,false);
             commandeBD.setCommande(client);
-            if(client.getDerniereCommande().estFinie()){
+            System.out.println("On a les commandes du client");
+            if(client.getDerniereCommande() == null || client.getDerniereCommande().estFinie()){ 
+                System.out.println(client.getDerniereCommande());
+                System.out.println("La commande est finie");
                 client.ajouterCommande(commande);
-                
+                System.out.println("commande créée");
+                CommandeBD coBD = new CommandeBD(connexion);
+                coBD.insererCommande(commande);
+                System.out.println("La commande est dans la bd");
+            }else{
+                System.out.println("La commande est en cours");
+                commande = client.getDerniereCommande();
             }
-        }
-        if(data.equals(2)){
-            
-        }
-        if(data.equals(3)){
-            
-        }
-        if(data.equals(4)){
-            
-        }
-        if(data.equals(5)){
-            
-        }
-        if(data.equals(6)){
-            
-        }
+            DetailCommandeBD detBD = new DetailCommandeBD(this.connexion);
+            DetailCommande detailCommande = new DetailCommande(detBD.genererId(),this.livre, this.qte, commande.getNumCommande());
+            detBD.insertDetailCommande(detailCommande);
+            System.out.println("DetailCommande ajouté");
     }
 }

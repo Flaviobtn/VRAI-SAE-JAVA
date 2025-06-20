@@ -34,7 +34,7 @@ public class CommandeBD {
 				Livraison mode = Livraison.fromCode(livraison);
                 String idmag = rs.getString("idmag");
                 MagasinBD magBD = new MagasinBD(laConnexion);
-				boolean fini = "1".equalsIgnoreCase(modeComm);
+				boolean fini = rs.getBoolean("finie");
                 commande = new Commande(numcom, datecom, enligne, mode,  magBD.getMagasin(idmag),client,fini);
 			}
 			String req2 = "Select * FROM DETAILCOMMANDE WHERE numcom = ?";
@@ -75,7 +75,7 @@ public class CommandeBD {
                 MagasinBD magBD = new MagasinBD(laConnexion);
 				ClientBD clientbd = new ClientBD(laConnexion);
 				Client client = clientbd.getClient(rs.getInt("idcli"));
-				boolean fini = "1".equalsIgnoreCase(modeComm);
+				boolean fini = rs.getBoolean("finie");
                 commande = new Commande(numcom, datecom, enligne, mode,  magBD.getMagasin(idmag),client,fini);
 			}
 			String req2 = "Select * FROM DETAILCOMMANDE WHERE numcom = ?";
@@ -151,13 +151,13 @@ public class CommandeBD {
 		try {
 			String req = "Insert Into COMMANDE Values(?,?,?,?,?,?,?)";
 			this.st = laConnexion.prepareStatement(req);
-			System.out.println("ID MAGASIN utilisé : " + commande.getMagasin().getIdmag());
+			//System.out.println("ID MAGASIN utilisé : " + commande.getMagasin().getIdmag());
 			st.setInt(1, commande.getNumCommande());
 			st.setDate(2, java.sql.Date.valueOf(commande.getDatecomm()));
 			st.setString(3, commande.getEnligne()? "O":"N");
 			st.setString(4, commande.getLivraison().getCode());
 			st.setInt(5, commande.getClient().getNumeroClient());
-        	st.setString(6, commande.getMagasin().getIdmag());
+			st.setString(6, commande.getMagasin().getIdmag());
 			st.setBoolean(7, commande.estFinie());
 			st.executeUpdate();
 			for(DetailCommande det : commande.getCommandeFinale()){

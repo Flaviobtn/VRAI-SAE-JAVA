@@ -55,7 +55,7 @@ public class ControleurDefiler implements EventHandler<ActionEvent> {
             vue.modeAccueilC();
         }
         if(defile.equals("VENDEUR")){
-            vue.modeAccueilV();
+            vue.modeVerifDispo();
         }
     }
 }

@@ -177,14 +177,11 @@ public class LivreExpresss extends Application {
     }
 
     public void setCataloguesC(){
-        System.out.println("1");
-        if(this.personneConnectee instanceof Client){
-            System.out.println("2");
+        if(this.personneConnectee instanceof Client){;
             Client client = (Client) this.personneConnectee;
             if(client.aCommande()){
                 CommandeBD cbd = new CommandeBD(connection);
                 cbd.setCommande(client);
-                System.out.println("3");
                 if(client.onVousRecommande().size()>0){
                     this.catalogues = client.recotoMap();
                     System.out.println(this.catalogues.get(1));
@@ -193,7 +190,6 @@ public class LivreExpresss extends Application {
             else{
                 LivreBD catalogueLivre = new LivreBD(connection);
                 this.catalogues = catalogueLivre.catalogue();
-                System.out.println(this.catalogues.get(1));
             }
             
 
@@ -736,25 +732,29 @@ choix.setOnMouseExited(e ->
         croix.setFitWidth(43);
         croix.setPreserveRatio(true);
         
-        Button boutonLoupe = new Button(null,loupe);
-        boutonLoupe.setOnAction(new )
-        Button boutonCroix = new Button(null,croix);
         
         HBox barreRecherche = new HBox();
         barreRecherche.setAlignment(Pos.TOP_CENTER);
         
+
         TextField tf = new TextField();
         tf.setPromptText("Entre un livre à rechercher ...");
         tf.setPrefWidth(500);
         tf.setStyle("-fx-font-size: 25px;");
-        
-        barreRecherche.getChildren().addAll(boutonLoupe,tf,boutonCroix);
-        barreRecherche.setPadding(new Insets(120,0,0,0));
+
+        Button boutonLoupe = new Button(null, loupe);
+        Client cli = (Client) this.personneConnectee;
+        boutonLoupe.setOnAction(new ControleurRecher(this, new LivreBD(connection), tf) );
+        Button boutonCroix = new Button(null, croix);
+
+
+        barreRecherche.getChildren().addAll(boutonLoupe, tf, boutonCroix);
+        barreRecherche.setPadding(new Insets(120, 0, 0, 0));
         panelCentral.setTop(barreRecherche);
         this.panelCentral.setStyle("-fx-background-color: #c8c4b8;");
-        
+
         VBox listLivres = new VBox();
-        listLivres.setPadding(new Insets(110,150,0,500));
+        listLivres.setPadding(new Insets(110, 150, 0, 500));
         this.setCataloguesC();
         int pageMax = this.catalogues.size(); // nombre total de pages
         List<Livre> livresPage = this.catalogues.get(this.pageCataActu);
@@ -764,44 +764,59 @@ choix.setOnMouseExited(e ->
         pagination.setAlignment(Pos.CENTER);
         Button btnPrev = new Button("<");
         btnPrev.setUserData("AVANT");
-        btnPrev.setOnAction(new ControleurDefiler(this,"CLIENT"));
+        btnPrev.setOnAction(new ControleurDefiler(this, "CLIENT"));
         Button btnNext = new Button(">");
         btnNext.setUserData("APRES");
-        btnNext.setOnAction(new ControleurDefiler(this,"CLIENT"));
-        Label pageLabel = new Label("Page " + (this.pageCataActu) + " / " + pageMax);
+        btnNext.setOnAction(new ControleurDefiler(this, "CLIENT"));
+
+        // Correction pagination et affichage page
+        int currentPage = (livresPage == null || livresPage.isEmpty()) ? 0 : this.pageCataActu;
+        int totalPages = (pageMax == 0) ? 0 : pageMax;
+        Label pageLabel = new Label("Page " + currentPage + " / " + totalPages);
         pageLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
         btnPrev.setStyle("-fx-font-size: 22px; -fx-background-color: #154c45; -fx-text-fill: white;");
         btnNext.setStyle("-fx-font-size: 22px; -fx-background-color: #154c45; -fx-text-fill: white;");
-        btnPrev.setDisable(this.pageCataActu == 0);
-        btnNext.setDisable(this.pageCataActu == pageMax);
+        btnPrev.setDisable(totalPages <= 1 || currentPage <= 1);
+        btnNext.setDisable(totalPages <= 1 || currentPage >= totalPages);
+        if (totalPages == 0) {
+            btnPrev.setDisable(true);
+            btnNext.setDisable(true);
+        }
         pagination.getChildren().addAll(btnPrev, pageLabel, btnNext);
-        pagination.setPadding(new Insets(0,0,30,0));
-
+        pagination.setPadding(new Insets(0, 0, 30, 0));
+        Client commandecli = (Client)this.personneConnectee;
         int cptbtn = 0;
-        if (livresPage == null) {
+        if (livresPage == null || livresPage.isEmpty()) {
             Label noLivre = new Label("Aucun livre à afficher pour cette page.");
             noLivre.setStyle("-fx-font-size: 22px; -fx-text-fill: #154c45;");
             listLivres.getChildren().add(noLivre);
         } else {
             for (Livre livreVue : livresPage) {
-            HBox livre = new HBox(30);
-            Label titre = new Label(livreVue.getTitre());
-            titre.setStyle("-fx-font-size: 25px;");
-            Label prix = new Label(String.format("%.2f €", livreVue.getPrix()));
-            prix.setStyle("-fx-font-size: 25px;");
-            TextField quantite = new TextField("Quelle quantité souhaitez vous commander");
-            quantite.setStyle("-fx-font-size: 25px;");
-            Button ajPanier = new Button("Ajouter Panier");
-            ajPanier.setOnAction(null);
-            cptbtn++;
-            ajPanier.setUserData(String.valueOf(cptbtn));
-            ajPanier.setStyle("-fx-text-fill: white; " +
-                "-fx-font-color:#ece3d3; -fx-border-width: 2; " +
-                "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold; -fx-font-size: 22px; -fx-background-color: #154c45;");
-            livre.getChildren().addAll(titre, prix, quantite, ajPanier);
-            livre.setPadding(new Insets(10, 0, 10, 0));
-            ajPanier.setPadding(new Insets(7, 0, 7, 0));
-            listLivres.getChildren().add(livre);
+                HBox livre = new HBox(30);
+                Label titre = new Label(livreVue.getTitre());
+                titre.setStyle("-fx-font-size: 25px;");
+                Label prix = new Label(String.format("%.2f €", livreVue.getPrix()));
+                 prix.setStyle("-fx-font-size: 25px;");
+                TextField quantite = new TextField("0");
+                quantite.setStyle("-fx-font-size: 25px;");
+                Button ajPanier = new Button("Ajouter Panier");
+                ChangeListener<String> listener = (observable, oldValue, newValue) -> {
+                    boolean allFilled = !quantite.getText().trim().isEmpty();
+                    ajPanier.setDisable(!allFilled);
+                };
+                quantite.textProperty().addListener(listener);
+                Integer qte = Integer.parseInt(quantite.getText());
+                ajPanier.setOnAction(new ControleurAjouterLivre(this, commandecli, livreVue, qte, this.connection));
+
+                cptbtn++;
+                ajPanier.setUserData(String.valueOf(cptbtn));
+                ajPanier.setStyle("-fx-text-fill: white; " +
+                    "-fx-font-color:#ece3d3; -fx-border-width: 2; " +
+                    "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold; -fx-font-size: 22px; -fx-background-color: #154c45;");
+                livre.getChildren().addAll(titre, prix, quantite, ajPanier);
+                livre.setPadding(new Insets(10, 0, 10, 0));
+                ajPanier.setPadding(new Insets(7, 0, 7, 0));
+                listLivres.getChildren().add(livre);
             }
         }
 
@@ -1912,10 +1927,10 @@ public void fenetreVerifDispo() {
     VBox mainContainer = new VBox(20);
     mainContainer.setAlignment(Pos.CENTER);
 
-    // Titre
-    Text titre = new Text("Disponibilité");
-    titre.setStyle("-fx-font-size: 30px; -fx-font-weight: bold;");
-    mainContainer.getChildren().add(titre);
+    // Titre principal
+    Text titrePrincipal = new Text("Disponibilité");
+    titrePrincipal.setStyle("-fx-font-size: 30px; -fx-font-weight: bold;");
+    mainContainer.getChildren().add(titrePrincipal);
 
     // Conteneur pour les champs de saisie
     HBox fieldsContainer = new HBox(50);
@@ -1946,18 +1961,21 @@ public void fenetreVerifDispo() {
     recheField.textProperty().addListener(listener);
 
     // Configurer l'action du bouton
-    Vendeur vend = (Vendeur) personneConnectee;
+    Vendeur vend = null;
+    if (personneConnectee instanceof Vendeur) {
+        vend = (Vendeur) personneConnectee;
+        // ...utilisation de vend...
+    }
     Magasin magActu = vend.getMagasin();
     cherBtn.setOnAction(new ControleurVerifDispo(this, new LivreBD(connection), magActu, recheField));
 
     fieldsContainer.getChildren().addAll(rechercheLabel, recheField, cherBtn);
     mainContainer.getChildren().addAll(fieldsContainer);
-    this.panelCentral.setCenter(mainContainer);
 
     VBox listLivres = new VBox();
         listLivres.setPadding(new Insets(50,150,0,600));
         this.setCataloguesC();
-        int pageMax = this.catalogues.size(); // nombre total de pages
+        int pageMax = this.catalogues.size();
         List<Livre> livresPage = this.catalogues.get(this.pageCataActu);
 
         // HBox pour navigation pagination
@@ -1965,54 +1983,61 @@ public void fenetreVerifDispo() {
         pagination.setAlignment(Pos.CENTER);
         Button btnPrev = new Button("<");
         btnPrev.setUserData("AVANT");
+        btnPrev.setOnAction(new ControleurDefiler(this, "VENDEUR"));
         Button btnNext = new Button(">");
         btnNext.setUserData("APRES");
-        Label pageLabel = new Label("Page " + (this.pageCataActu) + " / " + pageMax);
+        btnNext.setOnAction(new ControleurDefiler(this, "VENDEUR"));
+
+        // Correction pagination et affichage page
+        int currentPage = (livresPage == null || livresPage.isEmpty()) ? 0 : this.pageCataActu;
+        int totalPages = (pageMax == 0) ? 0 : pageMax;
+        Label pageLabel = new Label("Page " + currentPage + " / " + totalPages);
         pageLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
         btnPrev.setStyle("-fx-font-size: 22px; -fx-background-color: #154c45; -fx-text-fill: white;");
         btnNext.setStyle("-fx-font-size: 22px; -fx-background-color: #154c45; -fx-text-fill: white;");
-        btnPrev.setDisable(this.pageCataActu == 0);
-        btnNext.setDisable(this.pageCataActu == pageMax);
+        // Désactiver la pagination si pas de livres ou une seule page
+        btnPrev.setDisable(pageMax <= 1 || currentPage <= 1);
+        btnNext.setDisable(pageMax <= 1 || currentPage >= totalPages);
+        if (totalPages == 0) {
+            btnPrev.setDisable(true);
+            btnNext.setDisable(true);
+        }
         pagination.getChildren().addAll(btnPrev, pageLabel, btnNext);
 
         int cptbtn = 0;
-        if (livresPage == null) {
+        if (livresPage == null || livresPage.isEmpty()) {
             Label noLivre = new Label("Aucun livre à afficher pour cette page.");
             noLivre.setStyle("-fx-font-size: 22px; -fx-text-fill: #154c45;");
             listLivres.getChildren().add(noLivre);
         } else {
             for (Livre livreVue : livresPage) {
-            HBox livre = new HBox(30);
-            Label titreLivre = new Label(livreVue.getTitre());
-            titreLivre.setStyle("-fx-font-size: 25px;");
-            Label prix = new Label(String.format("%.2f €", livreVue.getPrix()));
-            prix.setStyle("-fx-font-size: 25px;");
-            TextField quantite = new TextField("Quelle quantité souhaitez vous commander");
-            quantite.setStyle("-fx-font-size: 25px;");
-            Button ajPanier = new Button("Ajouter Panier");
-            cptbtn++;
-            ajPanier.setUserData(String.valueOf(cptbtn));
-            ajPanier.setStyle("-fx-text-fill: white; " +
-                "-fx-font-color:#ece3d3; -fx-border-width: 2; " +
-                "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold; -fx-font-size: 22px; -fx-background-color: #154c45;");
-            livre.getChildren().addAll(titre, prix, quantite, ajPanier);
-            livre.setPadding(new Insets(10, 0, 10, 0));
-            ajPanier.setPadding(new Insets(7, 0, 7, 0));
-            listLivres.getChildren().add(livre);
+                HBox livre = new HBox(30);
+                Label titreLivre = new Label(livreVue.getTitre());
+                titreLivre.setStyle("-fx-font-size: 25px;");
+                Label prix = new Label(String.format("%.2f €", livreVue.getPrix()));
+                prix.setStyle("-fx-font-size: 25px;");
+                TextField quantite = new TextField("Quelle quantité souhaitez vous commander");
+                quantite.setStyle("-fx-font-size: 25px;");
+                Button ajPanier = new Button("Ajouter Panier");
+                cptbtn++;
+                ajPanier.setUserData(String.valueOf(cptbtn));
+                ajPanier.setStyle("-fx-text-fill: white; " +
+                    "-fx-font-color:#ece3d3; -fx-border-width: 2; " +
+                    "-fx-border-radius: 25; -fx-background-radius: 25; -fx-font-weight: bold; -fx-font-size: 22px; -fx-background-color: #154c45;");
+                // Correction ici : utiliser titreLivre au lieu de titre
+                livre.getChildren().addAll(titreLivre, prix, quantite, ajPanier);
+                livre.setPadding(new Insets(10, 0, 10, 0));
+                ajPanier.setPadding(new Insets(7, 0, 7, 0));
+                listLivres.getChildren().add(livre);
             }
         }
 
         // Ajoute la pagination en bas de la liste
+        VBox center = new VBox(20);
+        center.getChildren().addAll(mainContainer, listLivres);
         this.panelCentral.setBottom(pagination);
-
-        this.panelCentral.setCenter(listLivres);
-        
+        this.panelCentral.setCenter(center);
     }
-
-
-
-    //recheField.textProperty().addListener(listener);
-    
 
 public void fenetreAjouterLivre(){
      this.gauche = null;
